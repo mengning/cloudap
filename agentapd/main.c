@@ -13,6 +13,14 @@
 #include<sys/wait.h>		/* waitpid */
 #include<string.h>			/* memset */
 
+#include<arpa/inet.h> /* internet socket */
+#include<assert.h>
+
+#define PORT    5001
+#define IP_ADDR "127.0.0.1"
+#define MAX_CONNECT_QUEUE   1024
+#define MAX_BUF_LEN         1024
+
 #include"driver.h"
 
 struct hostapd_data

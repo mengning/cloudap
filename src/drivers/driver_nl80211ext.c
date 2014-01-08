@@ -21,6 +21,17 @@
 #include <netpacket/packet.h>
 #include <linux/filter.h>
 #include <linux/errqueue.h>
+
+#include<stdio.h>
+#include<arpa/inet.h>
+#include<assert.h>
+#include<string.h>
+
+#define PORT                    5001
+#define IP_ADDR                 "127.0.0.1"
+#define MAX_CONNECT_QUEUE       1024
+#define MAX_BUF_LEN             1024
+
 #include "nl80211_copy.h"
 
 #include "common.h"
