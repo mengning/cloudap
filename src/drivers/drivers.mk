@@ -72,6 +72,7 @@ endif
 ifdef CONFIG_DRIVER_NL80211EXT
 DRV_AP_CFLAGS += -DCONFIG_DRIVER_NL80211EXT
 DRV_AP_OBJS += src/drivers/driver_nl80211ext.c
+DRV_AP_OBJS += src/drivers/wiflow_protocol.c
 NEED_SME=y
 NEED_AP_MLME=y
 NEED_NETLINK=y

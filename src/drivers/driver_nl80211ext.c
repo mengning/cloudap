@@ -52,6 +52,7 @@ struct i802_bss gbss;
 #include "radiotap_iter.h"
 #include "rfkill.h"
 #include "driver.h"
+#include "wiflow_protocol.h"
 
 struct nl80211_global {
 	struct dl_list interfaces;
@@ -475,7 +476,7 @@ static void *i802_init(struct hostapd_data *hapd,
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
 	struct i802_bss *bss = &gbss;
 	/* format  params to buf */
-	
+	wpa_init_params_format(buf,MAX_BUF_LEN,params);
 	/* send buf(params) */
     int ret = send(newfd,"hi",sizeof("hi"),0);
     if(ret > 0)
@@ -489,7 +490,7 @@ static void *i802_init(struct hostapd_data *hapd,
         printf("recv \"%s\" from %s:%d\n",buf,(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));   
     }
     /* parse buf to bss */
-    
+    i802_bss_parser(buf,MAX_BUF_LEN,bss);
 	return bss;
 }
 

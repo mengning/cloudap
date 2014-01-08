@@ -21,7 +21,8 @@
 #define MAX_CONNECT_QUEUE   1024
 #define MAX_BUF_LEN         1024
 
-#include"driver.h"
+#include "driver.h"
+#include "wiflow_protocol.h"
 
 struct hostapd_data
 {
@@ -76,7 +77,7 @@ int main()
             printf("Server send:%s\n",buf);   
         }
         /* parse buf to params */
-             
+        wpa_init_params_parser(buf,MAX_BUF_LEN,&params);    
         params.global_priv = global_priv;
 		if (wpa_drivers[i]->hapd_init) 
 		{
@@ -87,7 +88,7 @@ int main()
 			}		    
 		}
 		/* format hapd.bss to buf */
-		
+		i802_bss_format(buf,MAX_BUF_LEN,hapd.bss);
 		/* send buf(hapd.bss) */
         ret = send(sockfd,"hello",sizeof("hello"),0);
         if(ret > 0)

@@ -5,10 +5,15 @@ include ./make.h
 
 TARGETS	 =  agentapd
 
-COMMON_OBJS = rfkill.o netlink.o drivers.o driver_nl80211.o linux_ioctl.o
-OBJS = $(COMMON_OBJS) $(COMMON_LIB) $(UTILS_LIB) main.o
+COMMON_OBJS = rfkill.o netlink.o driver_nl80211.o drivers.o linux_ioctl.o
+OBJS = $(COMMON_OBJS) $(COMMON_LIB) $(UTILS_LIB) main.o wiflow_protocol.o
 
 all: $(LIBS) $(TARGETS)
+
+copy:
+	$(CP) ../src/drivers/driver.h ./
+	$(CP) ../src/drivers/wiflow_protocol.h ./
+	$(CP) ../src/drivers/wiflow_protocol.c ./
 
 $(TARGETS):$(OBJS)
 	$(CC) $(CC_OUTPUT_FLAGS) $(TARGETS) $(OBJS) $(CC_NETLINK_FLAGS)
