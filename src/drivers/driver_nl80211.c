@@ -186,29 +186,6 @@ struct nl80211_wiphy_data {
 static void nl80211_global_deinit(void *priv);
 static void wpa_driver_nl80211_deinit(void *priv);
 
-struct i802_bss {
-	struct wpa_driver_nl80211_data *drv;
-	struct i802_bss *next;
-	int ifindex;
-	char ifname[IFNAMSIZ + 1];
-	char brname[IFNAMSIZ];
-	unsigned int beacon_set:1;
-	unsigned int added_if_into_bridge:1;
-	unsigned int added_bridge:1;
-	unsigned int in_deinit:1;
-
-	u8 addr[ETH_ALEN];
-
-	int freq;
-
-	void *ctx;
-	struct nl_handle *nl_preq, *nl_mgmt;
-	struct nl_cb *nl_cb;
-
-	struct nl80211_wiphy_data *wiphy_data;
-	struct dl_list wiphy_list;
-};
-
 struct wpa_driver_nl80211_data {
 	struct nl80211_global *global;
 	struct dl_list list;
@@ -8749,7 +8726,7 @@ static void * nl80211_global_init(void)
 {
 	struct nl80211_global *global;
 	struct netlink_config *cfg;
-
+    wpa_printf(MSG_DEBUG,"NL80211:nl80211_global_init start\n");
 	global = os_zalloc(sizeof(*global));
 	if (global == NULL)
 		return NULL;
