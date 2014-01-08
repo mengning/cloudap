@@ -22,7 +22,6 @@
 #include "common/defs.h"
 #include "common.h"
 
-
 #define HOSTAPD_CHAN_DISABLED 0x00000001
 #define HOSTAPD_CHAN_PASSIVE_SCAN 0x00000002
 #define HOSTAPD_CHAN_NO_IBSS 0x00000004
@@ -3730,5 +3729,32 @@ void wpa_scan_results_free(struct wpa_scan_results *res);
 
 /* Convert wpa_event_type to a string for logging */
 const char * event_to_string(enum wpa_event_type event);
+
+#include "utils/list.h"
+
+struct i802_bss {
+	struct wpa_driver_nl80211_data *drv;
+	struct i802_bss *next;
+	int ifindex;
+	char ifname[IFNAMSIZ + 1];
+	char brname[IFNAMSIZ];
+	unsigned int beacon_set:1;
+	unsigned int added_if_into_bridge:1;
+	unsigned int added_bridge:1;
+	unsigned int in_deinit:1;
+
+	u8 addr[ETH_ALEN];
+
+	int freq;
+
+	void *ctx;
+	struct nl_handle *nl_preq, *nl_mgmt;
+	struct nl_cb *nl_cb;
+
+	struct nl80211_wiphy_data *wiphy_data;
+	struct dl_list wiphy_list;
+};
+
+
 
 #endif /* DRIVER_H */

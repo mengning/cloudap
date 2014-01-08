@@ -25,7 +25,7 @@
 
 struct hostapd_data
 {
-    void * drv_priv;
+    struct i802_bss * bss;
 };
 
 extern struct wpa_driver_ops *wpa_drivers[];
@@ -42,7 +42,22 @@ int main()
     struct hostapd_data hapd;
     struct wpa_init_params params;
     /* init socket client */
-    
+    int sockfd = -1;
+    char buf[MAX_BUF_LEN];
+    struct sockaddr_in serveraddr;
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_port = htons(PORT);
+    serveraddr.sin_addr.s_addr = inet_addr(IP_ADDR);
+    //bzero(&(serveraddr.sin_zero), 8);/* in string.h */
+    memset(&serveraddr.sin_zero, 0, 8);
+    sockfd = socket(PF_INET,SOCK_STREAM,0);
+    assert((sockfd != -1));
+    int ret = connect(sockfd,(struct sockaddr *)&serveraddr,sizeof(struct sockaddr));
+    if(ret == -1)
+    {
+        fprintf(stderr,"Connect Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }    
     /* init nl80211 */ 
 	for (i = 0; wpa_drivers[i]; i++) 
 	{
@@ -54,17 +69,31 @@ int main()
 				return -1;
 			}
 		}
-        /* recv params from remote */
-        
+        /* recv buf(params) from remote */
+        ret = recv(sockfd,buf,MAX_BUF_LEN,0);
+        if(ret > 0)
+        {
+            printf("Server send:%s\n",buf);   
+        }
+        /* parse buf to params */
+             
         params.global_priv = global_priv;
 		if (wpa_drivers[i]->hapd_init) 
 		{
-			hapd.drv_priv = wpa_drivers[i]->hapd_init(&hapd,&params);
-			if (hapd.drv_priv == NULL) {
+			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
+			if (hapd.bss == NULL) {
 				printf("hapd_init Failed to initialize\n");
 				return -1;
 			}		    
-		}		    
+		}
+		/* format hapd.bss to buf */
+		
+		/* send buf(hapd.bss) */
+        ret = send(sockfd,"hello",sizeof("hello"),0);
+        if(ret > 0)
+        {
+            printf("send \"hello\" to %s:%d\n",(char*)inet_ntoa(serveraddr.sin_addr),ntohs(serveraddr.sin_port));
+        }				    
 	}
 	printf("NL80211 initialized\n");
 	eloop_run();

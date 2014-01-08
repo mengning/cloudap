@@ -28,15 +28,15 @@ int main()
         return -1;
     }
     /* talk with client here */
+    ret = recv(sockfd,buf,MAX_BUF_LEN,0);
+    if(ret > 0)
+    {
+        printf("Server send:%s\n",buf);   
+    }
     ret = send(sockfd,"hello",sizeof("hello"),0);
     if(ret > 0)
     {
         printf("send \"hello\" to %s:%d\n",(char*)inet_ntoa(serveraddr.sin_addr),ntohs(serveraddr.sin_port));
-    }
-    ret = recv(sockfd,buf,MAX_BUF_LEN,0);
-    if(ret > 0)
-    {
-        printf("Server rely:%s\n",buf);   
     }
     close(sockfd);
     return 0;

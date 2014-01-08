@@ -9,6 +9,7 @@
 #define MAX_BUF_LEN             1024
 int main()
 {
+    printf("nl80211ext: %s\n",__FUNCTION__ );
     int fd = -1;
     int ret = -1;
     char buf[MAX_BUF_LEN];
@@ -36,15 +37,16 @@ int main()
         {
             fprintf(stderr,"Accept Error,%s:%d\n",__FILE__,__LINE__);
         }
-        ret = recv(newfd,buf,MAX_BUF_LEN,0);
-        if(ret > 0)
-        {
-            printf("recv \"%s\" from %s:%d\n",buf,(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));   
-        }
+
         ret = send(newfd,"hi",sizeof("hi"),0);
         if(ret > 0)
         {
             printf("send \"hi\" to %s:%d\n",(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));
+        }
+        ret = recv(newfd,buf,MAX_BUF_LEN,0);
+        if(ret > 0)
+        {
+            printf("recv \"%s\" from %s:%d\n",buf,(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));   
         }
         close(newfd);
     }
