@@ -1,10 +1,8 @@
 /*
- * Driver interaction with Linux nl80211/cfg80211
- * Copyright (c) 2002-2012, Jouni Malinen <j@w1.fi>
- * Copyright (c) 2003-2004, Instant802 Networks, Inc.
- * Copyright (c) 2005-2006, Devicescape Software, Inc.
- * Copyright (c) 2007, Johannes Berg <johannes@sipsolutions.net>
- * Copyright (c) 2009-2010, Atheros Communications
+ * Driver interaction with socket to Linux nl80211/cfg80211
+ * Copyright (c) 2013-2014, SSE@USTCSZ mengning <mengning@ustc.edu.cn>
+ *
+ * driver_nl80211ext.c(socket server) - agentapd(socket client)with Linux nl80211/cfg80211
  *
  * This software may be distributed under the terms of the BSD license.
  * See README for more details.
