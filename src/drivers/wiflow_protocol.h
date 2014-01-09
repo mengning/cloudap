@@ -21,9 +21,21 @@
 #ifndef _WI_FLOW_H_
 #define _WI_FLOW_H_
 
+#define MAX_BUF_LEN             1024
+#define MAX_ARG_NUM             10
+
+/* this is ABI! */
+enum wiflow_commands
+{
+    /* static void *i802_init(struct hostapd_data *hapd,struct wpa_init_params *params) */ 
+    I802_INIT_PARAMS,/* struct wpa_init_params */
+    I802_INIT_RETURN /* struct i802_bss */   
+};
+
+
 /*
  * Parse the PDU to struct wpa_init_params *params
- * input	: char * pdu , Memory allocate outside
+ * input	: pdu/pdu_size , Memory allocate outside
  * output	: struct wpa_init_params *params , Memory allocate outside
  * return	: SUCCESS(0)/FAILURE(-1)
  *
@@ -31,12 +43,12 @@
 int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *params);
 /*
  * Format the struct wpa_init_params *params to the PDU
- * output	: char * pdu , Memory allocate outside
+ * output	: pdu/pdu_size , Memory allocate outside
  * input	: struct wpa_init_params *params , Memory allocate outside
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_init_params_format(char * pdu, int pdu_size,struct wpa_init_params *params);
+int wpa_init_params_format(char * pdu, int *pdu_size,struct wpa_init_params *params);
 
 /*
  * Parse the PDU to struct i802_bss *bss
@@ -53,7 +65,7 @@ int i802_bss_parser(char * pdu, int pdu_size,struct i802_bss *bss);
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int i802_bss_format(char * pdu, int pdu_size,struct i802_bss *bss);
+int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
 
 #endif /* _WI_FLOW_H_ */
 

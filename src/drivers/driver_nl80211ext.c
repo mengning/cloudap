@@ -27,17 +27,6 @@
 #include<assert.h>
 #include<string.h>
 
-#define PORT                    5001
-#define IP_ADDR                 "127.0.0.1"
-#define MAX_CONNECT_QUEUE       1024
-#define MAX_BUF_LEN             1024
-
-int fd = -1;
-int newfd = -1;
-struct sockaddr_in clientaddr;
-char buf[MAX_BUF_LEN];
-struct i802_bss gbss;
-
 #include "nl80211_copy.h"
 
 #include "common.h"
@@ -53,6 +42,17 @@ struct i802_bss gbss;
 #include "rfkill.h"
 #include "driver.h"
 #include "wiflow_protocol.h"
+
+#define PORT                    5001
+#define IP_ADDR                 "127.0.0.1"
+#define MAX_CONNECT_QUEUE       1024
+#define SOCKET_ENABLE           1
+
+int fd = -1;
+int newfd = -1;
+struct sockaddr_in clientaddr;
+char buf[MAX_BUF_LEN];
+struct i802_bss gbss;
 
 struct nl80211_global {
 	struct dl_list interfaces;
@@ -475,22 +475,43 @@ static void *i802_init(struct hostapd_data *hapd,
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
 	struct i802_bss *bss = &gbss;
+	int buf_size = 0;
+	int ret;
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params->ifname);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params->ssid);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params->ssid_len);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params->num_bridge);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params->bridge[0]);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[1]:%s",params->bridge[1]);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[2]:%s",params->bridge[2]);
+#if SOCKET_ENABLE
 	/* format  params to buf */
-	wpa_init_params_format(buf,MAX_BUF_LEN,params);
-	/* send buf(params) */
-    int ret = send(newfd,"hi",sizeof("hi"),0);
-    if(ret > 0)
+	buf_size = MAX_BUF_LEN;
+	ret = wpa_init_params_format(buf,&buf_size,params);
+    if(ret < 0)
     {
-        printf("send \"hi\" to %s:%d\n",(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));
+        fprintf(stderr,"wpa_init_params_format Error,%s:%d\n",__FILE__,__LINE__); 
     }
+	/* send buf(params) */
+    ret = send(newfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__); 
+    }
+    printf("recv buf(bss)\n");
     /* recv buf(bss) */
     ret = recv(newfd,buf,MAX_BUF_LEN,0);
-    if(ret > 0)
+    if(ret < 0)
     {
-        printf("recv \"%s\" from %s:%d\n",buf,(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));   
+        fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__); 
     }
     /* parse buf to bss */
-    i802_bss_parser(buf,MAX_BUF_LEN,bss);
+    ret = i802_bss_parser(buf,ret,bss);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__); 
+    }
+#endif /* SOCKET_ENABLE */
 	return bss;
 }
 
@@ -702,6 +723,7 @@ static void * nl80211_global_init(void)
 	global = os_zalloc(sizeof(*global));
 	if (global == NULL)
 		return NULL;
+#if SOCKET_ENABLE
     int ret = -1;
     struct sockaddr_in serveradd;
     socklen_t clientaddr_len = sizeof(struct sockaddr);
@@ -727,6 +749,7 @@ static void * nl80211_global_init(void)
     {
         fprintf(stderr,"Accept Error,%s:%d\n",__FILE__,__LINE__);
     }
+#endif /* SOCKET_ENABLE */
 	return global;
 }
 

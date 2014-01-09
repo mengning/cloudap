@@ -19,7 +19,6 @@
 #define PORT    5001
 #define IP_ADDR "127.0.0.1"
 #define MAX_CONNECT_QUEUE   1024
-#define MAX_BUF_LEN         1024
 
 #include "driver.h"
 #include "wiflow_protocol.h"
@@ -45,6 +44,7 @@ int main()
     /* init socket client */
     int sockfd = -1;
     char buf[MAX_BUF_LEN];
+    int buf_size = 0;
     struct sockaddr_in serveraddr;
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons(PORT);
@@ -70,31 +70,49 @@ int main()
 				return -1;
 			}
 		}
+		printf("recv buf(params) from remote\n");
         /* recv buf(params) from remote */
         ret = recv(sockfd,buf,MAX_BUF_LEN,0);
-        if(ret > 0)
+        if(ret < 0)
         {
-            printf("Server send:%s\n",buf);   
+            fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);  
         }
+        printf("parse buf to params\n"); 
         /* parse buf to params */
-        wpa_init_params_parser(buf,MAX_BUF_LEN,&params);    
-        params.global_priv = global_priv;
+        ret = wpa_init_params_parser(buf,ret,&params);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_init_params_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+        wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params.ifname);
+        wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params.ssid);
+        wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params.ssid_len);
+
+        params.global_priv = global_priv; 
+        params.test_socket = NULL;
+        params.use_pae_group_addr = 0;
 		if (wpa_drivers[i]->hapd_init) 
 		{
 			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
-			if (hapd.bss == NULL) {
+			if (hapd.bss == NULL) 
+			{
 				printf("hapd_init Failed to initialize\n");
 				return -1;
 			}		    
 		}
 		/* format hapd.bss to buf */
-		i802_bss_format(buf,MAX_BUF_LEN,hapd.bss);
-		/* send buf(hapd.bss) */
-        ret = send(sockfd,"hello",sizeof("hello"),0);
-        if(ret > 0)
+		buf_size = MAX_BUF_LEN;
+		ret = i802_bss_format(buf,&buf_size,hapd.bss);
+        if(ret < 0 || buf_size <= 0)
         {
-            printf("send \"hello\" to %s:%d\n",(char*)inet_ntoa(serveraddr.sin_addr),ntohs(serveraddr.sin_port));
-        }				    
+            fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+        }
+		/* send buf(hapd.bss) */
+        ret = send(sockfd,buf,buf_size,0);
+        if(ret < 0)
+        {
+            fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+        }		    
 	}
 	printf("NL80211 initialized\n");
 	eloop_run();
