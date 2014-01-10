@@ -79,20 +79,27 @@ int main()
         }
         printf("parse buf to params\n"); 
         /* parse buf to params */
-        ret = wpa_init_params_parser(buf,ret,&params);
+        ret = wpa_init_params_parser(buf,MAX_BUF_LEN,&params);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_init_params_parser Error,%s:%d\n",__FILE__,__LINE__); 
         }
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params.ifname);
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params.ssid);
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params.ssid_len);
+    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params.bssid, ETH_ALEN);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params.ifname);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params.ssid);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params.ssid_len);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params.num_bridge);
+//    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]",params.bridge[0],IFNAMSIZ + 1);
+//    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params.own_addr, ETH_ALEN);
 
         params.global_priv = global_priv; 
         params.test_socket = NULL;
         params.use_pae_group_addr = 0;
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params.num_bridge);
+    assert((wpa_drivers[i]->hapd_init != NULL));
 		if (wpa_drivers[i]->hapd_init) 
 		{
+		    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_init(&hapd,&params)");
 			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
 			if (hapd.bss == NULL) 
 			{
@@ -100,6 +107,7 @@ int main()
 				return -1;
 			}		    
 		}
+        wpa_printf(MSG_DEBUG, "nl80211ext: hapd.bss->ifname:%s",hapd.bss->ifname);
 		/* format hapd.bss to buf */
 		buf_size = MAX_BUF_LEN;
 		ret = i802_bss_format(buf,&buf_size,hapd.bss);

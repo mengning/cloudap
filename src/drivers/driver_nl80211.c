@@ -7876,6 +7876,16 @@ static void *i802_init(struct hostapd_data *hapd,
 	char brname[IFNAMSIZ];
 	int ifindex, br_ifindex;
 	int br_added = 0;
+	
+    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params->bssid, ETH_ALEN);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params->ifname);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params->ssid);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params->ssid_len);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params->num_bridge);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",*(params->bridge));
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[1]:%s",params->bridge[1]);
+    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[2]:%s",params->bridge[2]);
+    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params->own_addr, ETH_ALEN);
 
 	bss = wpa_driver_nl80211_init(hapd, params->ifname,
 				      params->global_priv);

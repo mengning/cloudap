@@ -38,6 +38,8 @@
 #include "rfkill.h"
 #include "driver.h"
 
+#define HOSTAPD
+
 #ifndef SO_WIFI_STATUS
 # if defined(__sparc__)
 #  define SO_WIFI_STATUS	0x0025

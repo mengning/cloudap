@@ -477,13 +477,15 @@ static void *i802_init(struct hostapd_data *hapd,
 	struct i802_bss *bss = &gbss;
 	int buf_size = 0;
 	int ret;
+	
+    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params->bssid, ETH_ALEN);
     wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params->ifname);
     wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params->ssid);
     wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params->ssid_len);
     wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params->num_bridge);
-    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params->bridge[0]);
-    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[1]:%s",params->bridge[1]);
-    wpa_printf(MSG_DEBUG, "nl80211ext: params->bridge[2]:%s",params->bridge[2]);
+    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]",params->bridge[0],IFNAMSIZ + 1);
+    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params->own_addr, ETH_ALEN);
+    
 #if SOCKET_ENABLE
 	/* format  params to buf */
 	buf_size = MAX_BUF_LEN;
@@ -492,6 +494,7 @@ static void *i802_init(struct hostapd_data *hapd,
     {
         fprintf(stderr,"wpa_init_params_format Error,%s:%d\n",__FILE__,__LINE__); 
     }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_init_params_format buf_size:%d",buf_size);
 	/* send buf(params) */
     ret = send(newfd,buf,buf_size,0);
     if(ret < 0)

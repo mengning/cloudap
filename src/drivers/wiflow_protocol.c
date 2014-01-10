@@ -22,10 +22,13 @@
 #include<sys/types.h>		/* WNOHANG */
 #include<sys/wait.h>		/* waitpid */
 #include<string.h>			/* memset */
+#include<assert.h>
 
 #include "common.h"
 #include "driver.h"
 #include "wiflow_protocol.h"
+
+#define MAX_SSID_LEN    32
 
 struct wiflow_pdu_element
 {
@@ -41,7 +44,7 @@ struct wiflow_pdu
 /*
 struct wpa_init_params {
 	void *global_priv; //NOT used,use local global_priv
-	const u8 *bssid;   //NOT used,ETH_ALEN length
+	const u8 *bssid;   //ETH_ALEN length
 	const char *ifname;//sizeof(bss->ifname) or char ifname[IFNAMSIZ + 1]; ex.wlan0
 	const u8 *ssid;    //ssid_len
 	size_t ssid_len;    
@@ -61,21 +64,35 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
     int i = 0;
     int len;
     char * p;
-    
     if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || params == NULL)
     {
+        fprintf(stderr,"wpa_init_params_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
         goto err;   
     }
     wpdu = (struct wiflow_pdu*)pdu;
     if(wpdu->type != I802_INIT_PARAMS)
     {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
         goto err;   
     }
     counter += sizeof(struct wiflow_pdu);
+    /* bssid */
+    len = sizeof(element->len) + ETH_ALEN;
+    if(pdu_size < counter + len)
+    {
+        fprintf(stderr,"bssid Error,%s:%d\n",__FILE__,__LINE__);
+        goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    p = malloc(ETH_ALEN);
+    memcpy(p,&element->data,ETH_ALEN);
+    params->bssid = (u8 *)p;
+    counter += len;
     /* ifname */
     len = sizeof(element->len) + IFNAMSIZ + 1;
     if(pdu_size < counter + len)
     {
+        fprintf(stderr,"ifname Error,%s:%d\n",__FILE__,__LINE__);
         goto err; 
     }
     element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -83,29 +100,40 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
     memcpy(p,&element->data,IFNAMSIZ + 1);
     params->ifname = (const char *)p;
     counter += len;
-    /* ssid & ssid_len */
-    len = sizeof(element->len) + params->ssid_len;
+    /* ssid */
+    len = sizeof(element->len) + MAX_SSID_LEN;
     if(pdu_size < counter + len)
     {
+        fprintf(stderr,"ssid Error,%s:%d\n",__FILE__,__LINE__);
         goto err;  
     }
     element = (struct wiflow_pdu_element *)(pdu + counter);
-    p = malloc(element->len);
-    params->ssid_len = element->len;
-    memcpy(p,&element->data,params->ssid_len);
+    p = malloc(MAX_SSID_LEN);
+    memcpy(p,&element->data,MAX_SSID_LEN);
     params->ssid = (const u8 *)p;
     counter += len;
-#if 0
+    /* ssid_len */
+    len = sizeof(element->len) + sizeof(params->ssid_len);
+    if(pdu_size < counter + len)
+    {
+        fprintf(stderr,"ssid_len Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;  
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    memcpy(&params->ssid_len,&element->data,sizeof(params->ssid_len));
+    counter += len;
+
     /* num_bridge */
     len = sizeof(element->len) + sizeof(params->num_bridge);
     if(pdu_size < counter + len)
     {
+        fprintf(stderr,"num_bridge Error,%s:%d\n",__FILE__,__LINE__);
         goto err; 
     }
     element = (struct wiflow_pdu_element *)(pdu + counter);
     memcpy(&params->num_bridge,&element->data,sizeof(params->num_bridge)); 
     counter += len;
-    params->bridge = malloc(params->num_bridge * (IFNAMSIZ + 1));
+    params->bridge = malloc(params->num_bridge * sizeof(char*));
     /* bridge[] */
     for(i=0;i<params->num_bridge;i++)
     {
@@ -113,9 +141,11 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
         len = sizeof(element->len) + IFNAMSIZ + 1; 
         if(pdu_size < counter + len)
         {
+            fprintf(stderr,"bridge[i] Error,%s:%d\n",__FILE__,__LINE__);
             goto err; 
         }
         element = (struct wiflow_pdu_element *)(pdu + counter);
+        params->bridge[i] = malloc(IFNAMSIZ + 1);
         memcpy(params->bridge[i],&element->data,IFNAMSIZ + 1);
         counter += len;                  
     }
@@ -123,12 +153,13 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
     len = sizeof(element->len) + ETH_ALEN;
     if(pdu_size < counter + len)
     {
+        fprintf(stderr,"own_addr Error,%s:%d\n",__FILE__,__LINE__);
         goto err; 
     }
     element = (struct wiflow_pdu_element *)(pdu + counter);
     params->own_addr = malloc(ETH_ALEN);
     memcpy(params->own_addr,&element->data,ETH_ALEN);
-#endif
+
     return 0;
 err:
     return -1;
@@ -142,7 +173,7 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     int i = 0;
     int len;
     int pdu_size = *p_size;
-   
+     
     if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || params == NULL)
     {
         fprintf(stderr,"wpa_init_params_format args Error,%s:%d\n",__FILE__,__LINE__); 
@@ -152,6 +183,23 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     wpdu = (struct wiflow_pdu*)pdu;
     wpdu->type = I802_INIT_PARAMS;
     counter += sizeof(struct wiflow_pdu);
+    /* bssid */
+    len = sizeof(element->len) + ETH_ALEN;
+    if(pdu_size < counter + len)
+    {
+        goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = ETH_ALEN;
+    if(params->bssid == NULL)
+    {
+        memset(&element->data,0,element->len);
+    }
+    else
+    {
+        memcpy(&element->data,params->bssid,element->len);
+    }
+    counter += len;
     /* ifname */
     len = sizeof(element->len) + IFNAMSIZ + 1;
     if(pdu_size < counter + len)
@@ -162,17 +210,27 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     element->len = IFNAMSIZ + 1;
     memcpy(&element->data,params->ifname,element->len);
     counter += len;
-    /* ssid & ssid_len */
-    len = sizeof(element->len) + params->ssid_len;
+    /* ssid */
+    len = sizeof(element->len) + MAX_SSID_LEN;
     if(pdu_size < counter + len)
     {
         goto err;  
     }
     element = (struct wiflow_pdu_element *)(pdu + counter);
-    element->len = params->ssid_len;
-    memcpy(&element->data,params->ssid,params->ssid_len);
+    element->len = MAX_SSID_LEN;
+    memcpy(&element->data,params->ssid,element->len);
     counter += len;
-#if 0
+    /* ssid_len */
+    len = sizeof(element->len) + sizeof(params->ssid_len);
+    if(pdu_size < counter + len)
+    {
+        goto err;  
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = sizeof(params->ssid_len);
+    memcpy(&element->data,&params->ssid_len,element->len);
+    counter += len;
+
     /* num_bridge */
     len = sizeof(element->len) + sizeof(params->num_bridge);
     if(pdu_size < counter + len)
@@ -194,9 +252,15 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
         }
         element = (struct wiflow_pdu_element *)(pdu + counter);
         element->len = IFNAMSIZ + 1;
-        memcpy(&element->data,params->bridge[i],IFNAMSIZ + 1);
-        counter += len;
-                   
+        if(params->bridge[i] == NULL)
+        {
+            memset(&element->data,0,IFNAMSIZ + 1);
+        }
+        else
+        {
+            memcpy(&element->data,params->bridge[i],IFNAMSIZ + 1);
+        }               
+        counter += len;                   
     }
     /* own_addr */
     len = sizeof(element->len) + ETH_ALEN;
@@ -208,7 +272,7 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     element->len = ETH_ALEN;
     memcpy(&element->data,params->own_addr,ETH_ALEN);
     counter += len;
-#endif
+
     *p_size = counter;
     return 0; 
 err:
