@@ -189,7 +189,7 @@ int main()
         params.bridge = os_calloc(params.num_bridge, sizeof(char *));
     	if (params.bridge == NULL)
     		return -1;
-    	params.bridge[0] = bridge;
+    	/*params.bridge[0] = bridge;*/
 
         params.own_addr = own_addr;
         wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params.bssid, ETH_ALEN);
