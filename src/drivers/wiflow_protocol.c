@@ -61,7 +61,6 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
     struct wiflow_pdu *wpdu;
     struct wiflow_pdu_element *element;
     int counter = 0;
-    int i = 0;
     int len;
     char * p;
     if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || params == NULL)
@@ -143,7 +142,6 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     struct wiflow_pdu *wpdu;
     struct wiflow_pdu_element *element;
     int counter = 0;
-    int i = 0;
     int len;
     int pdu_size = *p_size;
      
@@ -274,7 +272,6 @@ int i802_bss_parser(char * pdu, int pdu_size,struct i802_bss *bss)
 
 int i802_bss_format(char * pdu, int *p_size,struct i802_bss *p)
 {
-    int pdu_size = *p_size;
     struct i802_bss_pdu *bss = (struct i802_bss_pdu *)pdu;
     bss->ifindex = p->ifindex;
     memcpy(bss->ifname,p->ifname,IFNAMSIZ + 1);
