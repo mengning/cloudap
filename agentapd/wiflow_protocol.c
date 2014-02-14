@@ -50,8 +50,8 @@ struct wpa_init_params {
 	size_t ssid_len;    
 	const char *test_socket;//NOT used
 	int use_pae_group_addr;//NOT used
-	char **bridge; //ex. br0
-	size_t num_bridge;
+	char **bridge; //Not used here,its up to AP hardware
+	size_t num_bridge;//Not used here,its up to AP hardware
 
 	u8 *own_addr; // ETH_ALENlength,buffer for writing own MAC address 
 };
@@ -122,33 +122,6 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
     element = (struct wiflow_pdu_element *)(pdu + counter);
     memcpy(&params->ssid_len,&element->data,sizeof(params->ssid_len));
     counter += len;
-
-    /* num_bridge */
-    len = sizeof(element->len) + sizeof(params->num_bridge);
-    if(pdu_size < counter + len)
-    {
-        fprintf(stderr,"num_bridge Error,%s:%d\n",__FILE__,__LINE__);
-        goto err; 
-    }
-    element = (struct wiflow_pdu_element *)(pdu + counter);
-    memcpy(&params->num_bridge,&element->data,sizeof(params->num_bridge)); 
-    counter += len;
-    params->bridge = malloc(params->num_bridge * sizeof(char*));
-    /* bridge[] */
-    for(i=0;i<params->num_bridge;i++)
-    {
-        /* bridge[i] */
-        len = sizeof(element->len) + IFNAMSIZ + 1; 
-        if(pdu_size < counter + len)
-        {
-            fprintf(stderr,"bridge[i] Error,%s:%d\n",__FILE__,__LINE__);
-            goto err; 
-        }
-        element = (struct wiflow_pdu_element *)(pdu + counter);
-        params->bridge[i] = malloc(IFNAMSIZ + 1);
-        memcpy(params->bridge[i],&element->data,IFNAMSIZ + 1);
-        counter += len;                  
-    }
     /* own_addr */
     len = sizeof(element->len) + ETH_ALEN;
     if(pdu_size < counter + len)
@@ -230,38 +203,6 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     element->len = sizeof(params->ssid_len);
     memcpy(&element->data,&params->ssid_len,element->len);
     counter += len;
-
-    /* num_bridge */
-    len = sizeof(element->len) + sizeof(params->num_bridge);
-    if(pdu_size < counter + len)
-    {
-        goto err; 
-    }
-    element = (struct wiflow_pdu_element *)(pdu + counter);
-    element->len = sizeof(params->num_bridge);
-    memcpy(&element->data,&params->num_bridge,sizeof(params->num_bridge)); 
-    counter += len;
-    /* bridge[] */
-    for(i=0;i<params->num_bridge;i++)
-    {
-        /* bridge[i] */
-        len = sizeof(element->len) + IFNAMSIZ + 1; 
-        if(pdu_size < counter + len)
-        {
-            goto err; 
-        }
-        element = (struct wiflow_pdu_element *)(pdu + counter);
-        element->len = IFNAMSIZ + 1;
-        if(params->bridge[i] == NULL)
-        {
-            memset(&element->data,0,IFNAMSIZ + 1);
-        }
-        else
-        {
-            memcpy(&element->data,params->bridge[i],IFNAMSIZ + 1);
-        }               
-        counter += len;                   
-    }
     /* own_addr */
     len = sizeof(element->len) + ETH_ALEN;
     if(pdu_size < counter + len)

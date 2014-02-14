@@ -482,8 +482,6 @@ static void *i802_init(struct hostapd_data *hapd,
     wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params->ifname);
     wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params->ssid);
     wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params->ssid_len);
-    wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params->num_bridge);
-    wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]",params->bridge[0],IFNAMSIZ + 1);
     wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params->own_addr, ETH_ALEN);
     
 #if SOCKET_ENABLE
