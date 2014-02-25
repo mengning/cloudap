@@ -30,17 +30,23 @@
 
 #define MAX_SSID_LEN    32
 
-struct wiflow_pdu_element
+int wiflow_pdu_format(char * pdu, int *p_size,int type)
 {
-    int len;
-    char data;
-};
+    struct wiflow_pdu *wpdu;
+    int pdu_size = *p_size;
+     
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wiflow_pdu_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
 
-struct wiflow_pdu 
-{
-    int type;
-    /* elements - struct wiflow_pdu_element */
-};
+    wpdu = (struct wiflow_pdu*)pdu;
+    wpdu->type = WIFLOW_INIT_PARAMS_REQUEST;
+    return 0;
+err:
+    return -1;   
+}
 /*
 struct wpa_init_params {
 	void *global_priv; //NOT used,use local global_priv
@@ -69,7 +75,7 @@ int wpa_init_params_parser(char * pdu, int pdu_size,struct wpa_init_params *para
         goto err;   
     }
     wpdu = (struct wiflow_pdu*)pdu;
-    if(wpdu->type != I802_INIT_PARAMS)
+    if(wpdu->type != WIFLOW_INIT_PARAMS_RESPONSE)
     {
         fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
         goto err;   
@@ -152,7 +158,7 @@ int wpa_init_params_format(char * pdu, int *p_size,struct wpa_init_params *param
     }
 
     wpdu = (struct wiflow_pdu*)pdu;
-    wpdu->type = I802_INIT_PARAMS;
+    wpdu->type = WIFLOW_INIT_PARAMS_RESPONSE;
     counter += sizeof(struct wiflow_pdu);
     /* bssid */
     len = sizeof(element->len) + ETH_ALEN;

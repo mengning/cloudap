@@ -27,11 +27,23 @@
 /* this is ABI! */
 enum wiflow_commands
 {
-    /* static void *i802_init(struct hostapd_data *hapd,struct wpa_init_params *params) */ 
-    I802_INIT_PARAMS,/* struct wpa_init_params */
-    I802_INIT_RETURN /* struct i802_bss */   
+    WIFLOW_INIT_PARAMS_REQUEST, /* agent request AP params */
+    WIFLOW_INIT_PARAMS_RESPONSE /* remote response AP params to agent */
 };
 
+struct wiflow_pdu_element
+{
+    int len;
+    char data;
+};
+
+struct wiflow_pdu 
+{
+    int type;
+    /* elements - struct wiflow_pdu_element */
+};
+
+int wiflow_pdu_format(char * pdu, int *pdu_size,int type);
 
 /*
  * Parse the PDU to struct wpa_init_params *params
