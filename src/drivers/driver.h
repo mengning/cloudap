@@ -1462,7 +1462,9 @@ struct wpa_driver_ops {
 	 * data available to per-interface initializer.
 	 */
 	void * (*global_init)(void);
-
+#ifdef CONFIG_DRIVER_NL80211EXT
+	void  (*agent_init)(void (*init)(void));
+#endif /* CONFIG_DRIVER_NL80211EXT */
 	/**
 	 * global_deinit - Global driver deinitialization
 	 * @priv: private driver global data from global_init()

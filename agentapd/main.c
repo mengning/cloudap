@@ -43,7 +43,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx);
 int main() 
 {
     int i = 0;
-    
+    struct wpa_init_params params;
 	if (eloop_init()) 
 	{
 		wpa_printf(MSG_ERROR, "Failed to initialize event loop");
@@ -86,6 +86,7 @@ int main()
 		}
 	    
 	}
+	/* agent request AP params */
 	buf_size = MAX_BUF_LEN;
 	ret = wiflow_pdu_format(buf,&buf_size,WIFLOW_INIT_PARAMS_REQUEST);
     if(ret < 0 || buf_size <= 0)
@@ -97,6 +98,7 @@ int main()
     {
         fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
     }
+
 	printf("NL80211 global initialized\n");
 	eloop_run();
     return 0;
