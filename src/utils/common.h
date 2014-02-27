@@ -313,6 +313,10 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #ifndef ETH_P_RRB
 #define ETH_P_RRB 0x890D
 #endif /* ETH_P_RRB */
+#ifndef INT_SIZE
+#define INT_SIZE 4
+#endif /* INT_SIZE */
+
 
 
 #ifdef __GNUC__
