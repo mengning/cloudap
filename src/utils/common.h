@@ -316,6 +316,17 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #ifndef INT_SIZE
 #define INT_SIZE 4
 #endif /* INT_SIZE */
+#ifndef COUNTRY_SIZE
+#define COUNTRY_SIZE 4
+#endif /* COUNTRY_SIZE */
+#ifndef NUM_MODES
+#define NUM_MODES 2
+#endif /* NUMS_MODE */
+#ifndef FLAGS
+#define FLAGS 2
+#endif /* NUMS_MODE */
+
+
 
 
 

@@ -89,6 +89,15 @@ int local_default_capa(struct wpa_driver_capa *capa);
 
 int wpa_set_country_format(char * pdu, int *pdu_size,const char *alpha2_arg);
 
+int wpa_set_country_parser(char * pdu, int pdu_size,const char *alpha2_arg);
+
+
+int wpa_get_hw_feature_format(char * pdu, int *pdu_size, u16 *num_modes, u16 *flags);
+
+
+int local_default_hw_mode(struct hostapd_hw_modes *local_hw_mode);
+
+
 
 
 #endif /* _WI_FLOW_H_ */

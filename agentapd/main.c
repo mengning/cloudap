@@ -123,7 +123,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
     char buf[MAX_BUF_LEN];
     struct wpa_init_params params;
 	struct wpa_driver_capa capa;
-	char *alpha2_arg;
+	char *country;
     struct hostapd_data * hapd = (struct hostapd_data *)eloop_ctx;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
@@ -207,6 +207,14 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		{
 			fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
     	}
+
+	case WIFLOW_SET_COUNTRY:
+		ret = wpa_set_country_parser(buf,MAX_BUF_LEN,country);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_init_params_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		hapd->driver->set_country(hapd->drv_priv, country);
 
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);

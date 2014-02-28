@@ -196,7 +196,7 @@ static int wpa_driver_nl80211_set_country(void *priv, const char *alpha2_arg)
     {
         fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
     }
-	ret = send(sockfd,buf,buf_size,0);
+	ret = send(agentfd,buf,buf_size,0);
     if(ret < 0)
     {
         fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
@@ -300,6 +300,31 @@ static struct hostapd_hw_modes *
 wpa_driver_nl80211_get_hw_feature_data(void *priv, u16 *num_modes, u16 *flags)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int ret;
+	int buf_size = MAX_BUF_LEN;
+	struct hostapd_hw_modes *local_hw_mode;
+	
+	memset(buf, 0, MAX_BUF_LEN);
+	ret = wpa_get_hw_feature_format(buf,&buf_size,num_modes,flags);
+    if(ret < 0 || buf_size <= 0)
+    {
+        fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+		goto err;
+    }
+	ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+		goto err;
+    }
+
+	if(local_default_hw_mode(local_hw_mode) != 0)
+	{
+		fprintf(stderr,"capa default init Error,%s:%d\n",__FILE__,__LINE__);
+		return -1;
+	}
+
+err:
 	return NULL;
 }
 
@@ -370,7 +395,7 @@ static int wpa_driver_nl80211_get_capa(void *priv,
     {
         fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
     }
-    ret = send(sockfd,buf,buf_size,0);
+    ret = send(agentfd,buf,buf_size,0);
     if(ret < 0)
     {
         fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  

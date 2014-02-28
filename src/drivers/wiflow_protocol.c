@@ -625,7 +625,7 @@ int wpa_set_country_format(char * pdu, int *p_size,const char *alpha2_arg)
 	wpdu->type = WIFLOW_SET_COUNTRY;
 	counter += sizeof(struct wiflow_pdu);
 	element = (struct wiflow_pdu_element *)(pdu + counter);
-	element->len = sizeof(*alpha2_arg);
+	element->len = COUNTRY_SIZE;
 	len = sizeof(element->len) + element->len;
 	if(pdu_size < counter + len)
 	{
@@ -636,6 +636,123 @@ int wpa_set_country_format(char * pdu, int *p_size,const char *alpha2_arg)
 	
 	*p_size = counter;
 	return 0; 
+}
+
+int wpa_set_country_parser(char * pdu, int pdu_size, char *alpha2_arg)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    char * p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || alpha2_arg == NULL)
+    {
+        fprintf(stderr,"wpa_init_params_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    if(wpdu->type != WIFLOW_SET_COUNTRY)
+    {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;   
+    }
+    counter += sizeof(struct wiflow_pdu);
+	/* alpha2_arg*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	p = malloc(element->len);
+	memcpy(p,&element->data,element->len);
+	alpha2_arg = (char *)p;
+	counter += len;
+
+err:
+    return -1;
+}
+
+
+int wpa_get_hw_feature_format(char * pdu, int *pdu_size, u16 *num_modes, u16 *flags)
+{
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int counter = 0;
+	int len;
+	int pdu_size = *p_size;
+	 
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || num_modes == NULL || flags == NULL)
+	{
+		fprintf(stderr,"wpa_init_params_format args Error,%s:%d\n",__FILE__,__LINE__); 
+		goto err;	
+	}
+	
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WPA_GET_HW_MODE_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+	/*num_modes*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = NUM_MODES;
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&element->data,alpha2_arg,element->len);
+	counter += len;
+	/*flags*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = FLAGS;
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&element->data,alpha2_arg,element->len);
+	counter += len;
+
+	*p_size = counter;
+	return 0;
+
+err:
+	return -1;
+}
+
+
+int local_default_hw_mode(struct hostapd_hw_modes *local_hw_mode)
+{
+	if(local_hw_mode == NULL)
+	{
+		fprintf(stderr,"local_default_hw_mode args Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	struct hostapd_channel_data *channel;
+	int *rate;
+	local_hw_mode = (struct hostapd_hw_modes *)malloc(sizeof(struct hostapd_hw_modes));
+	channel = (struct hostapd_channel_data *)malloc(sizeof(struct hostapd_channel_data));
+	rate = (int *)malloc(4);
+	local_hw_mode.channels = channel;
+
+	/*set default hw modes*/
+	channel.chan = 1;
+	channel.flag = 1;
+	channel.freq = 1;
+	channel.max_tx_power = 1;
+	local_hw_mode.a_mpdu_params = 1;
+	local_hw_mode.flags = 1;
+	local_hw_mode.ht_capab = 1;
+	local_hw_mode.mcs_set
+	local_hw_mode.mode =  HOSTAPD_MODE_IEEE80211B;
+	local_hw_mode.num_channels =  1;
+	local_hw_mode.num_rates = 1;
+	local_hw_mode.vht_capab = 1;
+	local_hw_mode.vht_mcs_set
+	
+	return 0;
+
+err:
+	return -1;
 }
 
 
