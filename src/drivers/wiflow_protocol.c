@@ -42,7 +42,7 @@ int wiflow_pdu_format(char * pdu, int *p_size,int type)
     }
 
     wpdu = (struct wiflow_pdu*)pdu;
-    wpdu->type = WIFLOW_INIT_PARAMS_REQUEST;
+    wpdu->type = type;
     return 0;
 err:
     return -1;   
@@ -292,5 +292,57 @@ int i802_bss_format(char * pdu, int *p_size,struct i802_bss *p)
     return 0;    
 }
 
+int wpa_ieee80211_mgmt_format(char *pdu, int *p_size, const u8 *data, size_t data_len, int encrypt)
+{
+	struct wiflow_pdu *wpdu;
+	struct ieee80211_mgmt *mgmt = data;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || data== NULL)
+    {
+        fprintf(stderr,"wpa_init_params_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+    wpdu->type = WIFLOW_NL80211_SEND_FRAME_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+	/*struct ieee80211_mgmt *mgmt*/
+	len = sizeof(element->len) + sizeof(struct ieee80211_mgmt);
+	if(pdu_size < counter + len)
+	{
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(struct ieee80211_mgmt);
+	memcpy(&element->data,mgmt,element->len);
+	counter += len;
+	/*data_len*/
+	len = sizeof(element->len) + sizeof(data_len);
+	if(pdu_size < counter + len)
+	{
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(data_len);
+	memcpy(&element->data,&data_len,element->len);
+	counter += len;
+	/*encrypt*/
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&encrypt,element->len);
+	counter += len;
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
 
 
