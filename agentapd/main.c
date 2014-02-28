@@ -26,6 +26,7 @@
 struct hostapd_data
 {
     struct i802_bss * bss;
+	const struct wpa_driver_ops *driver;
 };
 
 extern struct wpa_driver_ops *wpa_drivers[];
@@ -67,7 +68,7 @@ int main()
         fprintf(stderr,"Connect Error,%s:%d\n",__FILE__,__LINE__);
         return -1;
     } 
-	if (eloop_register_read_sock(sockfd, handle_agent_read, hapd.bss, NULL)) 
+	if (eloop_register_read_sock(sockfd, handle_agent_read, hapd, NULL)) 
     {
 		printf("Could not register agent read socket\n");
 		return -1;
@@ -121,7 +122,9 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
     int i = 0;
     char buf[MAX_BUF_LEN];
     struct wpa_init_params params;
-    struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
+	struct wpa_driver_capa capa;
+	char *country;
+    struct hostapd_data * hapd = (struct hostapd_data *)eloop_ctx;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
 	int ret;
@@ -170,7 +173,49 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 			}		    
 		}
         break;
-    /* add new case here */
+		
+	case WIFLOW_INIT_CAPA_REQUEST:
+		if(hapd->driver->set_country(hapd.bss,&capa) != 0)
+		{
+			printf("get_capa Failed!\n");
+			return ;
+		}
+		ret = wpa_init_capa_format(buf, &buf_size, &capa);
+		if(ret < 0 || buf_size <= 0)
+		{
+			fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+		}
+		ret = send(sockfd,buf,buf_size,0);
+		if(ret < 0)
+		{
+			fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    	}
+		
+	case WIFLOW_INIT_CAPA_REQUEST:
+		ret = wpa_init_capa_format(buf, &buf_size, alpha2_arg);
+		if(ret < 0 || buf_size <= 0)
+		{
+			fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+		}
+		if(hapd->driver->set_country(hapd.bss,&capa) != 0)
+		{
+			printf("get_capa Failed!\n");
+			return ;
+		}
+		ret = send(sockfd,buf,buf_size,0);
+		if(ret < 0)
+		{
+			fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    	}
+
+	case WIFLOW_SET_COUNTRY:
+		ret = wpa_set_country_parser(buf,MAX_BUF_LEN,country);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_init_params_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		hapd->driver->set_country(hapd->drv_priv, country);
+
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 	}  
