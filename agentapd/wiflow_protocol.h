@@ -28,7 +28,10 @@
 enum wiflow_commands
 {
     WIFLOW_INIT_PARAMS_REQUEST, /* agent request AP params */
-    WIFLOW_INIT_PARAMS_RESPONSE /* remote response AP params to agent */
+    WIFLOW_INIT_PARAMS_RESPONSE, /* remote response AP params to agent */
+    WIFLOW_NL80211_SET_OPERSTATE_REQUEST, /*remote request call set_operstate func*/
+    WIFLOW_NL80211_HAPD_DEINIT_REQUEST, /*remote request call hapd_deinit func*/
+    WIFLOW_NL80211_SEND_FRAME_REQUEST /*remote request call send_fram func*/
 };
 
 struct wiflow_pdu_element
@@ -78,6 +81,16 @@ int i802_bss_parser(char * pdu, int pdu_size,struct i802_bss *bss);
  *
  */
 int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
+
+/*
+ * Parse the PDU to struct ieee80211_mgmt *mgmt
+ * input	: char * pdu , Memory allocate outside
+ * output	: struct ieee80211_mgmt *mgmt , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_ieee80211_mgmt_parser(char * pdu,int  p_size, struct ieee80211_mgmt *mgmt, size_t *data_len, int *encrypt);
+
 
 #endif /* _WI_FLOW_H_ */
 
