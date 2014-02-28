@@ -354,7 +354,21 @@ static int wpa_driver_nl80211_get_capa(void *priv,
 
 static int wpa_driver_nl80211_set_operstate(void *priv, int state)
 {
-    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  type to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wiflow_pdu_format(buf,&buf_size,WIFLOW_NL80211_SET_OPERSTATE_REQUEST);
+	if(ret < 0 || buf_size <= 0)
+    {
+        fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+    }
+	ret = send(agentfd,buf,buf_size,0);
+	if(ret < 0)
+    {
+        fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    }
 	return 0;
 }
 
@@ -579,6 +593,24 @@ static int nl80211_send_frame(void *priv, const u8 *data, size_t data_len,
 			      int encrypt)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  mgmt to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_ieee80211_mgmt_format(buf, &buf_size, data, data_len, encrypt);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_init_params_format Error,%s:%d\n",__FILE__,__LINE__);
+        return NULL;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_init_params_format buf_size:%d",buf_size);
+    /* send buf(params) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return NULL;
+    }
 	return 0;
 }
 
@@ -725,8 +757,22 @@ static void *i802_init(struct hostapd_data *hapd,
 }
 
 static void i802_deinit(void *priv)
-{
+{	
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  type to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wiflow_pdu_format(buf,&buf_size,WIFLOW_NL80211_HAPD_DEINIT_REQUEST);
+	if(ret < 0 || buf_size <= 0)
+    {
+        fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+    }
+	ret = send(agentfd,buf,buf_size,0);
+	if(ret < 0)
+    {
+        fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    }
 }
 
 static void * nl80211_global_init(void)
