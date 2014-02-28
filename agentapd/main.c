@@ -119,8 +119,10 @@ void wpa_scan_results_free(struct wpa_scan_results *res)
 void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 {
     int i = 0;
+	int data_len = 0, encrypt = 0;
     char buf[MAX_BUF_LEN];
     struct wpa_init_params params;
+	struct ieee80211_mgmt mgmt;
     struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
@@ -171,6 +173,31 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
         break;
     /* add new case here */
+	case WIFLOW_NL80211_SET_OPERSTATE_REQUEST:
+		if(wpa_drivers[i]->set_operstate)
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_operstate(void *priv,int state)");
+			wpa_drivers[i]->set_operstate(hapd.bss, 1);
+		}
+		break;
+	case WIFLOW_NL80211_HAPD_DEINIT_REQUEST:
+		if(wpa_drivers[i]->hapd_deinit)
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_deinit(void *priv)");
+			wpa_drivers[i]->hapd_deinit(hapd.bss);
+		}
+		break;
+	case WIFLOW_NL80211_SEND_FRAME_REQUEST:
+		ret = wpa_ieee80211_mgmt_parser(buf,MAX_BUF_LEN,&mgmt,&data_len,&encrypt);
+		if(ret < 0)
+        {
+            fprintf(stderr,"wpa_ieee80211_mgmt_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->send_frame)
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->send_frame()");
+			wpa_drivers[i]->send_frame(hapd.bss, (u8 *)&mgmt, data_len, encrypt);
+		break;
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 	}  
