@@ -292,5 +292,57 @@ int i802_bss_format(char * pdu, int *p_size,struct i802_bss *p)
     return 0;    
 }
 
-
+int wpa_ieee80211_mgmt_parser(char * pdu,int  p_size, struct ieee80211_mgmt *mgmt, size_t *data_len, int *encrypt)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    size_t datalen;
+	int p_encrypt;
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || mgmt== NULL)
+    {
+        fprintf(stderr,"wpa_init_params_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    if(wpdu->type != WIFLOW_NL80211_SEND_FRAME_REQUEST)
+    {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;   
+    }
+    counter += sizeof(struct wiflow_pdu);
+	/*struct ieee80211_mgmt *mgmt*/
+	len = sizeof(element->len) + sizeof(struct ieee80211_mgmt);
+	if(p_size < counter + len)
+	{
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(mgmt,&element->data,sizeof(struct ieee80211_mgmt);
+	counter += len;
+	/*data_len*/
+	len = sizeof(element->len) + sizeof(datalen);
+	if(pdu_size < counter + len)
+    {
+        fprintf(stderr,"ssid_len Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;  
+    }
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&datalen,&element->data,sizeof(datalen));
+	*data_len = datalen;
+	/*encrypt*/
+	len = sizeof(element->len) + sizeof(p_encrypt);
+	if(pdu_size < counter + len)
+    {
+        fprintf(stderr,"ssid_len Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;  
+    }
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&p_encrypt,&element->data,sizeof(p_encrypt));
+	*encrypt = p_encrypt;
+	return 0;
+err:
+	return -1;
+}
 
