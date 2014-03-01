@@ -25,7 +25,8 @@ enum {
 /* #define wpa_printf(args...) do { } while (0) */
 void wpa_printf(int level, const char *fmt, ...)
 PRINTF_FORMAT(2, 3);
-#define wpa_hexdump(l,t,b,le) do { } while (0)
+/*#define wpa_hexdump(l,t,b,le) do { } while (0)*/
+void wpa_hexdump(int level, const char *title, const u8 *buf, size_t len);
 #define wpa_hexdump_buf(l,t,b) do { } while (0)
 #define wpa_hexdump_key(l,t,b,le) do { } while (0)
 #define wpa_hexdump_buf_key(l,t,b) do { } while (0)

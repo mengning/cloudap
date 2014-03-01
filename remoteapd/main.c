@@ -530,13 +530,32 @@ static int hostapd_get_global_ctrl_iface(struct hapd_interfaces *interfaces,
 	return 0;
 }
 
+struct hapd_interfaces interfaces;
+char **gargv;
+int debug = 0;
+
+void  init_agent(void)
+{
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+    int i;
+	/* Initialize interfaces */
+	for (i = 0; i < interfaces.count; i++) {
+		interfaces.iface[i] = hostapd_interface_init(&interfaces,
+							     gargv[optind + i],
+							     debug);
+		if (!interfaces.iface[i])
+			return;
+	}
+
+	hostapd_global_ctrl_iface_init(&interfaces);    
+}
 
 int main(int argc, char *argv[])
 {
-	struct hapd_interfaces interfaces;
+	gargv = argv;
 	int ret = 1;
 	size_t i;
-	int c, debug = 0, daemonize = 0;
+	int c, daemonize = 0;
 	char *pid_file = NULL;
 	const char *log_file = NULL;
 	const char *entropy_file = NULL;
@@ -621,7 +640,17 @@ int main(int argc, char *argv[])
 
 	if (hostapd_global_init(&interfaces, entropy_file))
 		return -1;
-
+		
+#ifdef CONFIG_DRIVER_NL80211EXT
+	for (i = 0; wpa_drivers[i]; i++) {
+		if (strcmp(wpa_drivers[i]->name,"nl80211ext") == 0 &&
+		    wpa_drivers[i]->agent_init) {
+			wpa_drivers[i]->agent_init(init_agent);
+			wpa_printf(MSG_DEBUG, "nl80211ext: %s wpa_drivers[i]->agent_init",__FUNCTION__ );
+			break;
+		}		
+	}
+#else
 	/* Initialize interfaces */
 	for (i = 0; i < interfaces.count; i++) {
 		interfaces.iface[i] = hostapd_interface_init(&interfaces,
@@ -632,6 +661,7 @@ int main(int argc, char *argv[])
 	}
 
 	hostapd_global_ctrl_iface_init(&interfaces);
+#endif /* CONFIG_DRIVER_NL80211EXT */
 
 	if (hostapd_global_run(&interfaces, daemonize, pid_file))
 		goto out;

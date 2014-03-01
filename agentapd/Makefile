@@ -5,8 +5,8 @@ include ./make.h
 
 TARGETS	 =  agentapd
 
-COMMON_OBJS = rfkill.o netlink.o driver_nl80211.o drivers.o linux_ioctl.o
-OBJS = $(COMMON_OBJS) $(COMMON_LIB) $(UTILS_LIB) main.o wiflow_protocol.o
+COMMON_OBJS = rfkill.o netlink.o driver_nl80211.o drivers.o linux_ioctl.o wiflow_protocol.o
+OBJS = $(COMMON_OBJS) $(COMMON_LIB) $(UTILS_LIB)
 
 all: $(LIBS) $(TARGETS)
 
@@ -15,8 +15,9 @@ copy:
 	$(CP) ../src/drivers/wiflow_protocol.h ./
 	$(CP) ../src/drivers/wiflow_protocol.c ./
 
-$(TARGETS):$(OBJS)
-	$(CC) $(CC_OUTPUT_FLAGS) $(TARGETS) $(OBJS) $(CC_NETLINK_FLAGS)
+$(TARGETS):$(OBJS) main.o test.o
+	$(CC) $(CC_OUTPUT_FLAGS) $(TARGETS) main.o $(OBJS) $(CC_NETLINK_FLAGS)
+	$(CC) $(CC_OUTPUT_FLAGS) test test.o $(OBJS) $(CC_NETLINK_FLAGS)
 
 .c.o:
 	$(CC) $(CC_FLAGS)  $(COMMON_INCLUDE_DIRS)  $<
@@ -34,7 +35,7 @@ $(COMMON_LIB):
 clean:
 	make -w -C $(UTILS_DIR) -f Makefile clean
 	make -w -C $(COMMON_DIR) -f Makefile clean
-	$(RM) $(RM_FLAGS) $(OBJS) $(TARGETS)
+	$(RM) $(RM_FLAGS) $(OBJS) $(TARGETS) test
 	$(RM) $(RM_FLAGS) *.lib *.bak *.a *~
 
 

@@ -38,6 +38,8 @@
 #include "rfkill.h"
 #include "driver.h"
 
+#define HOSTAPD
+
 #ifndef SO_WIFI_STATUS
 # if defined(__sparc__)
 #  define SO_WIFI_STATUS	0x0025
@@ -8726,7 +8728,7 @@ static void * nl80211_global_init(void)
 {
 	struct nl80211_global *global;
 	struct netlink_config *cfg;
-    wpa_printf(MSG_DEBUG,"NL80211:nl80211_global_init start\n");
+	
 	global = os_zalloc(sizeof(*global));
 	if (global == NULL)
 		return NULL;
@@ -8755,7 +8757,6 @@ static void * nl80211_global_init(void)
 		perror("socket(PF_INET,SOCK_DGRAM)");
 		goto err;
 	}
-
 	return global;
 
 err:

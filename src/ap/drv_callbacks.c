@@ -700,6 +700,7 @@ static void hostapd_event_eapol_rx(struct hostapd_data *hapd, const u8 *src,
 void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 			  union wpa_event_data *data)
 {
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s,event:%d",__FUNCTION__ ,event);
 	struct hostapd_data *hapd = ctx;
 #ifndef CONFIG_NO_STDOUT_DEBUG
 	int level = MSG_DEBUG;

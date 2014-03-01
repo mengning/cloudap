@@ -27,17 +27,6 @@
 #include<assert.h>
 #include<string.h>
 
-#define PORT                    5001
-#define IP_ADDR                 "127.0.0.1"
-#define MAX_CONNECT_QUEUE       1024
-#define MAX_BUF_LEN             1024
-
-int fd = -1;
-int newfd = -1;
-struct sockaddr_in clientaddr;
-char buf[MAX_BUF_LEN];
-struct i802_bss gbss;
-
 #include "nl80211_copy.h"
 
 #include "common.h"
@@ -53,6 +42,15 @@ struct i802_bss gbss;
 #include "rfkill.h"
 #include "driver.h"
 #include "wiflow_protocol.h"
+
+#define PORT                    5001
+#define IP_ADDR                 "127.0.0.1"
+#define MAX_CONNECT_QUEUE       1024
+
+int accept_fd = -1;
+int agentfd = -1;
+char buf[MAX_BUF_LEN];
+struct i802_bss gbss;
 
 struct nl80211_global {
 	struct dl_list interfaces;
@@ -470,37 +468,6 @@ static int i802_set_wds_sta(void *priv, const u8 *addr, int aid, int val,
 	return 0;
 }
 
-static void *i802_init(struct hostapd_data *hapd,
-		       struct wpa_init_params *params)
-{
-    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
-	struct i802_bss *bss = &gbss;
-	/* format  params to buf */
-	wpa_init_params_format(buf,MAX_BUF_LEN,params);
-	/* send buf(params) */
-    int ret = send(newfd,"hi",sizeof("hi"),0);
-    if(ret > 0)
-    {
-        printf("send \"hi\" to %s:%d\n",(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));
-    }
-    /* recv buf(bss) */
-    ret = recv(newfd,buf,MAX_BUF_LEN,0);
-    if(ret > 0)
-    {
-        printf("recv \"%s\" from %s:%d\n",buf,(char*)inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));   
-    }
-    /* parse buf to bss */
-    i802_bss_parser(buf,MAX_BUF_LEN,bss);
-	return bss;
-}
-
-
-static void i802_deinit(void *priv)
-{
-    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
-    close(newfd);
-}
-
 static int wpa_driver_nl80211_if_add(void *priv, enum wpa_driver_if_type type,
 				     const char *ifname, const u8 *addr,
 				     void *bss_ctx, void **drv_priv,
@@ -684,16 +651,83 @@ wpa_driver_nl80211_get_scan_results(void *priv)
 		return NULL;
 	return res;
 }
-/*
+static void  (*init_agent_callback)(void);
+
 static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
 					     void *handle)
 {
-    agentfd = accept(sock,(struct sockaddr *)eloop_ctx,(socklen_t*)handle);
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+    /* read nl80211 event from agent  */
+	int buf_size = 0;
+	int ret;
+	buf_size = MAX_BUF_LEN;
+    ret = recv(sock,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
+        return;
+    }
+    struct wiflow_pdu *pdu = (struct wiflow_pdu*) buf;
+ 	switch (pdu->type) 
+ 	{
+	case WIFLOW_INIT_PARAMS_REQUEST:
+        init_agent_callback(); /* call init_agent in remoteapd/main.c,why can?*/
+        break;
+    /* add new case here */
+	default:
+		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
+		return;
+	}  
+}
+
+static void handle_remote_accept(int sock, void *eloop_ctx, void *sock_ctx)
+{
+    socklen_t clientaddr_len = sizeof(struct sockaddr);
+    struct sockaddr_in clientaddr;
+	agentfd = accept(sock,(struct sockaddr *)&clientaddr,&clientaddr_len);
     if(agentfd == -1)
     {
         fprintf(stderr,"Accept Error,%s:%d\n",__FILE__,__LINE__);
-    }    
-}*/
+        return ;
+    }
+    if (eloop_register_read_sock(agentfd, wpa_driver_nl80211_event_receive, NULL, NULL)) 
+    {
+		printf("Could not register remote read socket\n");
+		return ;
+	}
+}
+
+
+static void *i802_init(struct hostapd_data *hapd,
+		       struct wpa_init_params *params)
+{
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	struct i802_bss *bss = &gbss;
+	int buf_size = 0;
+	int ret = 0;
+    /* format  params to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_init_params_format(buf,&buf_size,params);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_init_params_format Error,%s:%d\n",__FILE__,__LINE__);
+        return NULL;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_init_params_format buf_size:%d",buf_size);
+    /* send buf(params) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return NULL;
+    }
+	return bss;
+}
+
+static void i802_deinit(void *priv)
+{
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+}
 
 static void * nl80211_global_init(void)
 {
@@ -702,31 +736,7 @@ static void * nl80211_global_init(void)
 	global = os_zalloc(sizeof(*global));
 	if (global == NULL)
 		return NULL;
-    int ret = -1;
-    struct sockaddr_in serveradd;
-    socklen_t clientaddr_len = sizeof(struct sockaddr);
-    serveradd.sin_family = AF_INET;
-    serveradd.sin_port = ntohs(PORT);
-    serveradd.sin_addr.s_addr = inet_addr(IP_ADDR);
-    bzero(&(serveradd.sin_zero),8);
-    fd = socket(PF_INET,SOCK_STREAM,0);
-    assert(fd != -1);
-    ret = bind(fd,(struct sockaddr *)&serveradd,sizeof(struct sockaddr));
-    if(ret == -1)
-    {
-        fprintf(stderr,"Bind Error %s:%d\n",__FILE__,__LINE__);
-        return NULL;
-    }
-    ret = listen(fd,MAX_CONNECT_QUEUE);
-    assert(ret != -1);
-    /* eloop_register_read_sock(fd,
-				 wpa_driver_nl80211_event_receive,
-				 &clientaddr, &clientaddr_len);*/
-	newfd = accept(fd,(struct sockaddr *)&clientaddr,&clientaddr_len);
-    if(newfd == -1)
-    {
-        fprintf(stderr,"Accept Error,%s:%d\n",__FILE__,__LINE__);
-    }
+
 	return global;
 }
 
@@ -735,7 +745,35 @@ static void nl80211_global_deinit(void *priv)
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
 	struct nl80211_global *global = priv;
 	os_free(global);
-	close(fd);
+	close(accept_fd);
+}
+void  nl80211_agent_init(void (*init)(void))
+{
+    init_agent_callback = init;
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s ...",__FUNCTION__ );
+    int ret = -1;
+    struct sockaddr_in serveradd;
+    serveradd.sin_family = AF_INET;
+    serveradd.sin_port = ntohs(PORT);
+    serveradd.sin_addr.s_addr = inet_addr(IP_ADDR);
+    bzero(&(serveradd.sin_zero),8);
+    accept_fd = socket(PF_INET,SOCK_STREAM,0);
+    assert(accept_fd != -1);
+    ret = bind(accept_fd,(struct sockaddr *)&serveradd,sizeof(struct sockaddr));
+    if(ret == -1)
+    {
+        fprintf(stderr,"Bind Error %s:%d\n",__FILE__,__LINE__);
+        return ;
+    }
+    listen(accept_fd,MAX_CONNECT_QUEUE);
+
+    if (eloop_register_read_sock(accept_fd, handle_remote_accept, NULL, NULL)) 
+    {
+		printf("Could not register remote accept socket\n");
+		return ;
+	}
+	wpa_printf(MSG_DEBUG, "nl80211ext: %s end",__FUNCTION__ );
+	return;
 }
 
 const struct wpa_driver_ops wpa_driver_nl80211ext_ops = {
@@ -752,6 +790,7 @@ const struct wpa_driver_ops wpa_driver_nl80211ext_ops = {
 	.authenticate = wpa_driver_nl80211_authenticate,
 	.associate = wpa_driver_nl80211_associate,
 	.global_init = nl80211_global_init,
+	.agent_init = nl80211_agent_init,
 	.global_deinit = nl80211_global_deinit,
 	.init2 = wpa_driver_nl80211_init,
 	.deinit = wpa_driver_nl80211_deinit,
