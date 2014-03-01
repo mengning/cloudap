@@ -31,8 +31,16 @@ enum wiflow_commands
     WIFLOW_INIT_PARAMS_RESPONSE, /* remote response AP params to agent */
     WIFLOW_NL80211_SET_OPERSTATE_REQUEST, /*remote request call set_operstate func*/
     WIFLOW_NL80211_HAPD_DEINIT_REQUEST, /*remote request call hapd_deinit func*/
-    WIFLOW_NL80211_SEND_FRAME_REQUEST /*remote request call send_fram func*/
-};
+    WIFLOW_NL80211_SEND_FRAME_REQUEST, /*remote request call send_fram func*/
+    WIFLOW_NL80211_I802_SET_WDS_STA_REQUEST, /*remote request call i802_set_wds_sta func*/
+    WIFLOW_NL80211_STA_ADD_REQUEST, /*remote request call sta_add func*/
+    WIFLOW_NL80211_IF_ADD_REQUEST1, /*remote request call if_add func*/
+    WIFLOW_NL80211_IF_ADD_REQUEST2,  /*remote request call if_add func*/
+    WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
+    WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
+    WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
+    WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST /*remote request call set_tx_queue_params func*/
+}; 
 
 struct wiflow_pdu_element
 {
@@ -88,7 +96,76 @@ int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_ieee80211_mgmt_format(char *pdu, int *pdu_size, const u8 *data, size_t data_len, int encrypt);
+int wpa_ieee80211_mgmt_format(char *pdu, int *p_size, const u8 *data, size_t data_len, int encrypt);
+
+/*
+ * Format the argc of i802_set_wds_sta function to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: the argc of i802_set_wds_sta function, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_i802_set_wds_sta_format(char *pdu, int *p_size, const u8 *addr, int aid, int val, const char *bridge_ifname);
+
+/*
+ * Format the struct hostapd_sta_add_params to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: struct hostapd_sta_add_param , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_add_format(char *pdu, int *p_size,struct hostapd_sta_add_params *params);
+
+/*
+ * Format the argc of if_add function to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: the argc of if_add function, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_if_add_format(char *pdu, int *p_size, enum wpa_driver_if_type type, const char *ifname, const u8 *addr, 
+							void *bss_ctx, void **drv_priv, char *force_ifname, u8 *if_addr);
+
+/*
+ * Format the struct hostapd_freq_params *freq to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: struct hostapd_freq_params *freq , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_freq_format(char *pdu, int *p_size, struct hostapd_freq_params *freq);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_set_flags_format(char *pdu, int *p_size, const u8 *addr, int total_flags,
+					    int flags_or, int flags_and);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_send_action_format(char *pdu, int *p_size, unsigned int freq, unsigned int wait_time,
+					  const u8 *dst,
+					  const u8 *data, size_t data_len);
+
+/*
+ * Format the set_tx_queue_params() func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_tx_queue_params_format(char * pdu, int * p_size, int queue, int aifs, int cw_min, int cw_max, int burst_time);
+
+
 #endif /* _WI_FLOW_H_ */
 
 

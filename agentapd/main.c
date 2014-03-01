@@ -26,6 +26,7 @@
 struct hostapd_data
 {
     struct i802_bss * bss;
+	u8 own_addr[ETH_ALEN];
 };
 
 extern struct wpa_driver_ops *wpa_drivers[];
@@ -119,11 +120,20 @@ void wpa_scan_results_free(struct wpa_scan_results *res)
 void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 {
     int i = 0;
-	int data_len = 0, encrypt = 0;
+	size_t data_len = 0;
+	int encrypt = 0;
+	int temp1,temp2;
+	u8 * addr;
+	u8 * data;
+	char * bridge_ifname;
     char buf[MAX_BUF_LEN];
     struct wpa_init_params params;
 	struct ieee80211_mgmt mgmt;
     struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
+	struct hostapd_sta_add_params add_params;
+	struct wpa_function_params func_params;
+	struct hostapd_freq_params data;
+	struct wpa_set_tx_queue_params tx_params;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
 	int ret;
@@ -148,6 +158,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
         params.use_pae_group_addr = 0;
         params.num_bridge = 1;
         params.bridge = os_calloc(params.num_bridge, sizeof(char *));
+		hapd.own_addr = params.own_addr;
     	if (params.bridge == NULL)
     	{
     	    fprintf(stderr,"os_calloc Error,%s:%d\n",__FILE__,__LINE__);
@@ -197,6 +208,105 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		{
 			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->send_frame()");
 			wpa_drivers[i]->send_frame(hapd.bss, (u8 *)&mgmt, data_len, encrypt);
+		}
+		break;
+	case WIFLOW_NL80211_I802_SET_WDS_STA_REQUEST:
+		ret = wpa_i802_set_wds_sta_parser(buf,MAX_BUF_LEN,addr,&temp1,&temp2,bridge_ifname);
+		if(ret < 0)
+        {
+            fprintf(stderr,"wpa_i802_set_wds_sta_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->set_wds_sta)
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_wds_sta()");
+			wpa_drivers[i]->set_wds_sta(hapd.bss, addr, temp1, temp2, bridge_ifname);
+		}
+		break;
+	case WIFLOW_NL80211_STA_ADD_REQUEST:
+		ret = wpa_sta_add_parser(buf,MAX_BUF_LEN,&add_params);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_sta_add_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->sta_add) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->sta_add()");
+			wpa_drivers[i]->sta_add(hapd.bss, &add_params);
+		}
+		break;
+	case WIFLOW_NL80211_IF_ADD_REQUEST1:
+		ret = wpa_if_add_parser(buf, MAX_BUF_LEN, &func_params);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_sta_add_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->if_add) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->if_add1()");
+			wpa_drivers[i]->if_add(hapd.bss, func_params->type, func_params->ifname, func_params->addr,
+							NULL, NULL, func_params->force_ifname, func_params->if_addr, NULL);
+		}
+		break;
+	case WIFLOW_NL80211_IF_ADD_REQUEST2:
+		ret = wpa_if_add_parser(buf, MAX_BUF_LEN, &func_params);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_sta_add_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->if_add) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->if_add2()");
+			wpa_drivers[i]->if_add(hapd.bss, func_params->type, func_params->ifname, func_params->addr,
+							hapd.bss, &hapd.bss, func_params->force_ifname, func_params->if_addr, NULL);
+		}
+		break;
+	case WIFLOW_NL80211_SET_FREQ_REQUEST:
+		ret = wpa_set_freq_parser(buf, MAX_BUF_LEN, &data);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_set_freq_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->set_freq) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_freq()");
+			wpa_drivers[i]->set_freq(hapd.bss,&data)
+		}
+		break;
+	case WIFLOW_NL80211_STA_SET_FLAGS_REQUEST:
+		ret = wpa_sta_set_flags_parser(buf, MAX_BUF_LEN, addr, &temp1, &temp2, &encrypt);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_sta_set_flags_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->sta_set_flags) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->sta_set_flags()");
+			wpa_drivers[i]->sta_set_flags(hapd.bss, addr, temp1, temp2, encrypt);
+		}
+		break;
+	case WIFLOW_NL80211_SEND_ACTION_REQUEST:
+		ret = wpa_send_action_parser(buf, MAX_BUF_LEN,(unsigned int)&temp1,(unsigned int)&temp2,addr, data, data_len)
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_send_action_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->send_action) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->send_action()");
+			wpa_drivers[i]->send_action(hapd.bss,temp1,temp2,addr,hapd.own_addr,hapd.own_addr,data,data_len,0);
+		}
+		break;
+	case WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST:
+		ret = wpa_set_tx_queue_params_parser(buf, MAX_BUF_LEN, &tx_params);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_send_action_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->set_tx_queue_params) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_tx_queue_params()");
+			wpa_drivers[i]->set_tx_queue_params(hapd.bss,tx_params.queue, tx_params.aifs,tx_params.cw_min,tx_params.cw_max,tx_params.burst_time);
+		}
 		break;
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
