@@ -292,5 +292,81 @@ int i802_bss_format(char * pdu, int *p_size,struct i802_bss *p)
     return 0;    
 }
 
+int wpa_set_frag(char * pdu, int *p_size,int frag)
+{
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int counter = 0;
+	int len;
+	int pdu_size = *p_size;
+	
+	char string[10];
+	itoa(frag, string, 10);
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+	{
+		fprintf(stderr,"wpa_init_params_format args Error,%s:%d\n",__FILE__,__LINE__); 
+		goto err;	
+	}	
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_SET_FRAG;
+	counter += sizeof(struct wiflow_pdu);
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	
+	element->len = sizeof(string);
+
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&element->data,string,element->len);
+	counter += len;	
+	*p_size = counter;
+	return 0;
+
+err:
+	return -1;	
+}
+
+
+int wpa_set_frag_parser(char * pdu, int pdu_size, int frag)
+ {
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int counter = 0;
+	int len;
+	char *p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+     {
+        fprintf(stderr,"wpa_set_frag_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+		goto err;   
+     }
+     wpdu = (struct wiflow_pdu*)pdu;
+     if(wpdu->type != WIFLOW_SET_FRAG)
+     {
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;   
+    }
+	counter += sizeof(struct wiflow_pdu);
+ 	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+ 	if(pdu_size < counter + len)
+ 	{
+		goto err; 
+ 	}
+	p = malloc(element->len);
+	memcpy(p,&element->data,element->len);
+	frag = atoi(p);
+ 	counter += len;
+
+	
+ err:
+     return -1;
+ }
+
+
+
+
 
 

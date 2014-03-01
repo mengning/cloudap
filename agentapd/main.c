@@ -120,6 +120,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 {
     int i = 0;
     char buf[MAX_BUF_LEN];
+	int frag;
     struct wpa_init_params params;
     struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
     /* read nl80211 commands from remote  */
@@ -171,6 +172,18 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
         break;
     /* add new case here */
+	
+	case WIFLOW_SET_FRAG:
+
+		ret = wpa_set_frag_parser(buf,MAX_BUF_LEN,frag);
+		
+        if(ret < 0)
+        {
+        	fprintf(stderr,"wpa_set_frag_parse Error,%s:%d\n",__FILE__,__LINE__); 
+		}
+		
+ 		hapd->driver->set_frag(hapd->drv_priv, frag);
+		
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 	}  

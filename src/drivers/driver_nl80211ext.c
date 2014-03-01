@@ -394,6 +394,31 @@ static int i802_set_rts(void *priv, int rts)
 static int i802_set_frag(void *priv, int frag)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+
+ 	int ret;
+	int buf_size = MAX_BUF_LEN;
+	memset(buf, 0, MAX_BUF_LEN);
+	
+	ret = wpa_set_frag(buf,&buf_size,frag);
+	
+	if(ret < 0 || buf_size <= 0)
+	{
+		fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+	    goto err;
+	}
+	
+	ret = send(agentfd,buf,buf_size,0);
+	
+	if(ret < 0)
+	{
+		fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+		goto err;
+	}
+	
+err:
+	return NULL;
+
+
 	return 0;
 }
 

@@ -29,6 +29,7 @@ enum wiflow_commands
 {
     WIFLOW_INIT_PARAMS_REQUEST, /* agent request AP params */
     WIFLOW_INIT_PARAMS_RESPONSE /* remote response AP params to agent */
+    WIFLOW_SET_FRAG				/* remote set_farg */
 };
 
 struct wiflow_pdu_element
@@ -78,6 +79,26 @@ int i802_bss_parser(char * pdu, int pdu_size,struct i802_bss *bss);
  *
  */
 int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
+
+/*
+ * Format int frag to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: int frag
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_frag(char * pdu, int *p_size,int frag)
+
+/*
+ * Parse the PDU to int frag
+ * input	: char * pdu , Memory allocate outside
+ * output	: int frag
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_frag_parser(char * pdu, int pdu_size, int frag)
+
+
 
 #endif /* _WI_FLOW_H_ */
 
