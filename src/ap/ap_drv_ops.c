@@ -542,10 +542,10 @@ int hostapd_drv_none(struct hostapd_data *hapd)
 
 
 int hostapd_driver_scan(struct hostapd_data *hapd,
-			struct wpa_driver_scan_params *params)
+			struct wpa_driver_scan_params *params, int data_len)
 {
 	if (hapd->driver && hapd->driver->scan2)
-		return hapd->driver->scan2(hapd->drv_priv, params);
+		return hapd->driver->scan2(hapd->drv_priv, params, data_len);
 	return -1;
 }
 
