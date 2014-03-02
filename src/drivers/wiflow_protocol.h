@@ -39,7 +39,13 @@ enum wiflow_commands
     WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
     WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
     WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
-    WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST /*remote request call set_tx_queue_params func*/
+    WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST, /*remote request call set_tx_queue_params func*/
+    WIFLOW_NL80211_SCAN2_REQUEST, /*remote request call scan2 func*/
+    WIFLOW_NL80211_STA_DEAUTH_REQUEST, /*remote request call sta_deauth func*/
+    WIFLOW_NL80211_STA_DISASSOC_REQUEST, /*remote request call sta_disassoc func*/
+    WIFLOW_NL80211_SET_KEY_REQUEST, /*remote request call set_key func*/
+    WIFLOW_NL80211_SEND_MLME_REQUEST, /*remote request call send_mlme func*/
+    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST /*remote request call get_scan_results2 func*/
 }; 
 
 struct wiflow_pdu_element
@@ -165,6 +171,52 @@ int wpa_send_action_format(char *pdu, int *p_size, unsigned int freq, unsigned i
  */
 int wpa_set_tx_queue_params_format(char * pdu, int * p_size, int queue, int aifs, int cw_min, int cw_max, int burst_time);
 
+/*
+* Format the struct wpa_driver_scan_params *params to the PDU
+* output   : char * pdu , Memory allocate outside
+* input    : struct wpa_driver_scan_params *params, Memory allocate outside
+* return   : SUCCESS(0)/FAILURE(-1)
+*
+*/
+int wpa_scan2_format(char * pdu, int * p_size, struct wpa_driver_scan_params *params, int data_len);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_deauth_format(char * pdu, int * p_size, const u8 *addr, int reason);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_disassoc_format (char * pdu, int * p_size, const u8 *addr, int reason);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_key_format(char * pdu, int * p_size, enum wpa_alg alg, const u8 *addr,
+				      int key_idx, int set_tx, const u8 *seq, size_t seq_len,
+				      const u8 *key, size_t key_len);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_send_mlme_format(char *pdu, int *p_size, const u8 *data, size_t data_len, int noack);
 
 #endif /* _WI_FLOW_H_ */
 

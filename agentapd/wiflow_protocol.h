@@ -39,7 +39,13 @@ enum wiflow_commands
     WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
     WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
     WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
-    WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST /*remote request call set_tx_queue_params func*/
+    WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST, /*remote request call set_tx_queue_params func*/
+    WIFLOW_NL80211_SCAN2_REQUEST, /*remote request call scan2 func*/
+    WIFLOW_NL80211_STA_DEAUTH_REQUEST, /*remote request call sta_deauth func*/
+    WIFLOW_NL80211_STA_DISASSOC_REQUEST, /*remote request call sta_disassoc func*/
+    WIFLOW_NL80211_SET_KEY_REQUEST, /*remote request call set_key func*/
+    WIFLOW_NL80211_SEND_MLME_REQUEST, /*remote request call send_mlme func*/
+    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST /*remote request call get_scan_result2 func*/
 };
 
 struct wiflow_pdu_element
@@ -164,7 +170,50 @@ int wpa_send_action_parser(char * pdu,int * p_size, unsigned int freq, unsigned 
  */
 int wpa_set_tx_queue_params_parser(char * pdu, int p_size, struct wpa_set_tx_queue_params *tx_params);
 
+/*
+ * Parse the PDU to struct wpa_driver_scan_params * params
+ * input	: char * pdu , Memory allocate outside
+ * output	: struct wpa_driver_scan_params * params , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_scan2_parser(char * pdu,int p_size,struct wpa_driver_scan_params * params);
 
+/*
+ * Parse the PDU to sta_deauth() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: sta_deauth() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_deauth_parser(char * pdu,int * p_size,const u8 * addr,int *reason);
+
+/*
+ * Parse the PDU to sta_disassoc() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: sta_deauth() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_disassoc_parser(char * pdu,int * p_size,const u8 * addr,int *reason);
+
+/*
+ * Parse the PDU to set_key() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: set_key() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_key_parser(char * pdu,int p_size, struct wpa_set_key_params * key_params);
+
+/*
+ * Parse the PDU to send_mlme() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: send_mlme() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_send_mlme_parser(char *pdu, int p_size, const u8 *data, size_t *data_len, int *noack);
 
 #endif /* _WI_FLOW_H_ */
 
