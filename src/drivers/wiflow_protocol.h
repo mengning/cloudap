@@ -60,7 +60,7 @@ struct wiflow_pdu
     /* elements - struct wiflow_pdu_element */
 };
 
-int wiflow_pdu_format(char * pdu, int *pdu_size,int type);
+int wiflow_pdu_format(char * pdu, int *pdu_size,enum wiflow_commands type);
 
 /*
  * Parse the PDU to struct wpa_init_params *params

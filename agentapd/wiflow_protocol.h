@@ -21,6 +21,7 @@
 #ifndef _WI_FLOW_H_
 #define _WI_FLOW_H_
 
+
 #define MAX_BUF_LEN             1024
 #define MAX_ARG_NUM             10
 
@@ -103,7 +104,7 @@ int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_ieee80211_mgmt_parser(char * pdu,int  p_size, struct ieee80211_mgmt *mgmt, size_t *data_len, int *encrypt);
+int wpa_ieee80211_mgmt_parser(char * pdu,int p_size, struct ieee80211_mgmt *mgmt, size_t *data_len, int *encrypt);
 
 /*
  * Parse the PDU to i802_set_wds_sta() argc
@@ -112,7 +113,7 @@ int wpa_ieee80211_mgmt_parser(char * pdu,int  p_size, struct ieee80211_mgmt *mgm
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_i802_set_wds_sta_parser(char *pdu, int p_size, const u8 *addr, int aid, int val, const char *bridge_ifname);
+int wpa_i802_set_wds_sta_parser(char *pdu, int p_size, u8 *addr, int * aid, int *val, char *bridge_ifname);
 
 /*
  * Parse the PDU to struct hostapd_sta_add_params * params
@@ -139,7 +140,7 @@ int wpa_if_add_parser(char *pdu, int p_size, struct wpa_function_params *func_pa
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_set_freq_parser(char * pdu, int * p_size, struct hostapd_freq_params * freq);
+int wpa_set_freq_parser(char * pdu, int p_size, struct hostapd_freq_params * freq);
 
 /*
  * Parse the PDU to sta_set_flags() argc
@@ -148,7 +149,7 @@ int wpa_set_freq_parser(char * pdu, int * p_size, struct hostapd_freq_params * f
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_sta_set_flags_parser(char *pdu, int *p_size, u8 *addr, int* total_flags,
+int wpa_sta_set_flags_parser(char *pdu, int p_size, u8 *addr, int* total_flags,
 					    int* flags_or, int* flags_and);
 
 /*
@@ -158,8 +159,8 @@ int wpa_sta_set_flags_parser(char *pdu, int *p_size, u8 *addr, int* total_flags,
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_send_action_parser(char * pdu,int * p_size, unsigned int freq, unsigned int wait_time, 
-							const u8 * dst, const u8 * data,size_t data_len);
+int wpa_send_action_parser(char * pdu,int p_size, unsigned int *freq, unsigned int *wait_time, 
+							const u8 * dst, const u8 * data,size_t *data_len);
 
 /*
  * Parse the PDU to struct wpa_set_tx_queue_params * tx_params
@@ -186,7 +187,7 @@ int wpa_scan2_parser(char * pdu,int p_size,struct wpa_driver_scan_params * param
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_sta_deauth_parser(char * pdu,int * p_size,const u8 * addr,int *reason);
+int wpa_sta_deauth_parser(char * pdu,int p_size,const u8 * addr,int *reason);
 
 /*
  * Parse the PDU to sta_disassoc() argc

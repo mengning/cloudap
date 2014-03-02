@@ -295,7 +295,7 @@ int i802_bss_format(char * pdu, int *p_size,struct i802_bss *p)
 int wpa_ieee80211_mgmt_format(char *pdu, int *p_size, const u8 *data, size_t data_len, int encrypt)
 {
 	struct wiflow_pdu *wpdu;
-	struct ieee80211_mgmt *mgmt = data;
+	struct ieee80211_mgmt *mgmt = (struct ieee80211_mgmt*)data;
     struct wiflow_pdu_element *element;
     int counter = 0;
     int len;
@@ -310,13 +310,13 @@ int wpa_ieee80211_mgmt_format(char *pdu, int *p_size, const u8 *data, size_t dat
     wpdu->type = WIFLOW_NL80211_SEND_FRAME_REQUEST;
 	counter += sizeof(struct wiflow_pdu);
 	/*struct ieee80211_mgmt *mgmt*/
-	len = sizeof(element->len) + sizeof(struct ieee80211_mgmt);
+	len = sizeof(element->len) + sizeof(mgmt);
 	if(pdu_size < counter + len)
 	{
 		goto err;
 	}
 	element = (struct wiflow_pdu_element *)(pdu + counter);
-	element->len = sizeof(struct ieee80211_mgmt);
+	element->len = sizeof(mgmt);
 	memcpy(&element->data,mgmt,element->len);
 	counter += len;
 	/*data_len*/
@@ -472,14 +472,14 @@ int wpa_sta_add_format(char *pdu, int *p_size,struct hostapd_sta_add_params *par
 	memcpy(&element->data,&params->capability,element->len);
 	counter += len;
 	/*supp_rates*/
-	len = sizeof(element->len) + WLAN_SUPP_RATES_MAX;
+	len = sizeof(element->len) + 32;
 	if(pdu_size < counter + len)
 	{
 		fprintf(stderr,"supp_rates Error,%s:%d\n",__FILE__,__LINE__);
 		goto err;
 	}
 	element = (struct wiflow_pdu_element *)(pdu + counter);
-	element->len = WLAN_SUPP_RATES_MAX;
+	element->len = 32;
 	memcpy(&element->data,params->supp_rates,element->len);
 	counter += len;
 	/*supp_rates_len*/
@@ -573,7 +573,7 @@ int wpa_if_add_format(char *pdu, int *p_size, enum wpa_driver_if_type type, cons
 	}
 	element = (struct wiflow_pdu_element *)(pdu + counter);
 	element->len = sizeof(int);
-	memcpy(&element->data,type,element->len);
+	memcpy(&element->data,&type,element->len);
 	counter += len;
 	/*ifname*/
 	len = sizeof(element->len) + IFNAMSIZ + 1;
@@ -633,7 +633,7 @@ int wpa_if_add_format(char *pdu, int *p_size, enum wpa_driver_if_type type, cons
 	element->len = ETH_ALEN;
 	if(if_addr == NULL) 
 	{
-		memcpy(&element->data,0,element->len);
+		memset(&element->data,0,element->len);
 	}
 	else 
 	{
@@ -1158,7 +1158,7 @@ int wpa_set_key_format(char * pdu,int * p_size,enum wpa_alg alg,const u8 * addr,
 	element->len = seq_len;
 	if(seq == NULL) 
 	{
-		memcpy(&element->data,0,element->len);
+		memset(&element->data,0,element->len);
 	}
 	else 
 	{

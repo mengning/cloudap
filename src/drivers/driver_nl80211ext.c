@@ -449,7 +449,7 @@ static int wpa_driver_nl80211_set_operstate(void *priv, int state)
 	int ret = 0;
     /* format  type to buf */
     buf_size = MAX_BUF_LEN;
-    ret = wiflow_pdu_format(buf,&buf_size,WIFLOW_NL80211_SET_OPERSTATE_REQUEST);
+    ret = wiflow_pdu_format(buf,&buf_size, WIFLOW_NL80211_SET_OPERSTATE_REQUEST);
 	if(ret < 0 || buf_size <= 0)
     {
         fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
