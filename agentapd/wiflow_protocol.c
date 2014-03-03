@@ -561,7 +561,11 @@ int wpa_i802_set_wds_sta_parser(char *pdu, int p_size,u8 *addr, int *aid, int *v
 	}
 	else 
 	{
+<<<<<<< HEAD
 		bridge_ifname = (u8 *)p;
+=======
+		bridge_ifname = p;
+>>>>>>> e919dd243881cb72333e8080abd3e725ac70891d
 	}
 	
 	return 0;
@@ -1538,7 +1542,10 @@ int wpa_set_tx_queue_params_parser(char * pdu,int p_size,struct wpa_set_tx_queue
     struct wiflow_pdu_element *element;
     int counter = 0;
     int len;
+<<<<<<< HEAD
 	char *p;
+=======
+>>>>>>> e919dd243881cb72333e8080abd3e725ac70891d
 	int int_size = sizeof(int);
 	
 	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu) || tx_params == NULL)
@@ -1647,7 +1654,10 @@ int wpa_scan2_parser(char * pdu,int p_size,struct wpa_driver_scan_params * param
 	struct wiflow_pdu *wpdu;
     struct wiflow_pdu_element *element;
     int counter = 0;
+<<<<<<< HEAD
     int len;
+=======
+>>>>>>> e919dd243881cb72333e8080abd3e725ac70891d
 	char *p;
 
 	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu) || params == NULL)

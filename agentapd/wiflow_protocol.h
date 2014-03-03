@@ -21,6 +21,10 @@
 #ifndef _WI_FLOW_H_
 #define _WI_FLOW_H_
 
+<<<<<<< HEAD
+=======
+#include "driver.h"
+>>>>>>> e919dd243881cb72333e8080abd3e725ac70891d
 #include "utils/list.h"
 #include "common/ieee802_11_defs.h"
 
