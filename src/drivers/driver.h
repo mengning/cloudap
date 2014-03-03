@@ -966,6 +966,32 @@ struct wpa_init_params {
 	u8 *own_addr; /* buffer for writing own MAC address */
 };
 
+struct wpa_function_params {
+	enum wpa_driver_if_type type;
+	const char * ifname;
+	const u8 * addr;
+	char * force_ifname;
+	u8 * if_addr;
+};
+
+struct wpa_set_tx_queue_params {
+	int queue;
+	int aifs; 
+	int cw_min; 
+	int cw_max; 
+	int burst_time;
+};
+
+struct wpa_set_key_params {
+	enum wpa_alg alg;
+	u8 *addr;
+	int key_idx; 
+	int set_tx;
+	u8 *seq;
+	size_t seq_len;
+	u8 *key;
+	size_t key_len; 	
+};
 
 struct wpa_bss_params {
 	/** Interface name (for multi-SSID/VLAN support) */
