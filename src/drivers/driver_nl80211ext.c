@@ -224,9 +224,27 @@ static void wpa_driver_nl80211_deinit(void *priv)
  * Returns: 0 on success, -1 on failure
  */
 static int wpa_driver_nl80211_scan(void *priv,
-				   struct wpa_driver_scan_params *params)
+				   struct wpa_driver_scan_params *params, int data_len)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  params to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_scan2_format(buf, &buf_size, params, data_len);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_scan2_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_scan2_format buf_size:%d",buf_size);
+    /* send buf(params) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -264,7 +282,25 @@ static int wpa_driver_nl80211_set_key(const char *ifname, void *priv,
 				      const u8 *seq, size_t seq_len,
 				      const u8 *key, size_t key_len)
 {
-
+	wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_set_key_format(buf, &buf_size, alg, addr, key_idx, set_tx, seq, seq_len, key, key_len);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_scan2_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_scan2_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -293,6 +329,24 @@ static int wpa_driver_nl80211_send_mlme(void *priv, const u8 *data,
 					size_t data_len, int noack)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_send_mlme_format(buf, &buf_size, data, data_len, noack);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_sta_add_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_sta_add_format buf_size:%d",buf_size);
+    /* send buf(params) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -306,7 +360,25 @@ static int wpa_driver_nl80211_set_ap(void *priv,
 static int wpa_driver_nl80211_sta_add(void *priv,
 				      struct hostapd_sta_add_params *params)
 {
-    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );  
+	int buf_size = 0;
+	int ret = 0;
+    /* format  params to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_sta_add_format(buf, &buf_size, params);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_sta_add_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_sta_add_format buf_size:%d",buf_size);
+    /* send buf(params) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -334,6 +406,24 @@ static int wpa_driver_nl80211_sta_set_flags(void *priv, const u8 *addr,
 					    int flags_or, int flags_and)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_sta_set_flags_format(buf, &buf_size, addr, total_flags, flags_or, flags_and);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_sta_set_flags_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_sta_set_flags_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -354,7 +444,21 @@ static int wpa_driver_nl80211_get_capa(void *priv,
 
 static int wpa_driver_nl80211_set_operstate(void *priv, int state)
 {
-    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  type to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wiflow_pdu_format(buf,&buf_size, WIFLOW_NL80211_SET_OPERSTATE_REQUEST);
+	if(ret < 0 || buf_size <= 0)
+    {
+        fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+    }
+	ret = send(agentfd,buf,buf_size,0);
+	if(ret < 0)
+    {
+        fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    }
 	return 0;
 }
 
@@ -370,6 +474,24 @@ static int wpa_driver_nl80211_set_supp_port(void *priv, int authorized)
 static int i802_set_freq(void *priv, struct hostapd_freq_params *freq)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  freq to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_set_freq_format(buf, &buf_size, freq);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_set_freq_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_set_freq_format buf_size:%d",buf_size);
+    /* send buf(freq) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -394,34 +516,7 @@ static int i802_set_rts(void *priv, int rts)
 static int i802_set_frag(void *priv, int frag)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
-
- 	int ret;
-	int buf_size = MAX_BUF_LEN;
-	memset(buf, 0, MAX_BUF_LEN);
-	
-	ret = wpa_set_frag(buf,&buf_size,frag);
-	
-	if(ret < 0 || buf_size <= 0)
-	{
-		fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
-	    goto err;
-	}
-	
-	ret = send(agentfd,buf,buf_size,0);
-	
-	if(ret < 0)
-	{
-		fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
-		goto err;
-	}
-
 	return 0;
-
-	
-err:
-	return -1;
-
-
 }
 
 
@@ -444,6 +539,24 @@ static int i802_set_tx_queue_params(void *priv, int queue, int aifs,
 				    int cw_min, int cw_max, int burst_time)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  func argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_set_tx_queue_params_format(buf, &buf_size, queue, aifs, cw_min, cw_max, burst_time);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_set_tx_queue_params_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_set_tx_queue_params_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -477,6 +590,24 @@ static int i802_sta_deauth(void *priv, const u8 *own_addr, const u8 *addr,
 			   int reason)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_sta_deauth_format(buf, &buf_size, addr, reason);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_sta_deauth_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_sta_deauth_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -485,6 +616,24 @@ static int i802_sta_disassoc(void *priv, const u8 *own_addr, const u8 *addr,
 			     int reason)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_sta_disassoc_format(buf, &buf_size, addr, reason);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_sta_disassoc_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_sta_disassoc_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -492,6 +641,24 @@ static int i802_set_wds_sta(void *priv, const u8 *addr, int aid, int val,
                             const char *bridge_ifname)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_i802_set_wds_sta_format(buf, &buf_size, addr, aid, val, bridge_ifname);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_i802_set_wds_sta_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_i802_set_wds_sta_format buf_size:%d",buf_size);
+    /* send buf(mgmt) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -502,6 +669,24 @@ static int wpa_driver_nl80211_if_add(void *priv, enum wpa_driver_if_type type,
 				     const char *bridge)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_if_add_format(buf, &buf_size, type, ifname, addr, bss_ctx, drv_priv, force_ifname, if_addr);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_if_add_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_if_add_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -510,34 +695,8 @@ static int wpa_driver_nl80211_if_remove(void *priv,
 					enum wpa_driver_if_type type,
 					const char *ifname)
 {
-   	wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
-
- 	int ret;
-	int buf_size = MAX_BUF_LEN;
-	memset(buf, 0, MAX_BUF_LEN);
-	
-	ret = wpa_if_remove(buf,&buf_size,type,ifname);
-	
-	if(ret < 0 || buf_size <= 0)
-	{
-		fprintf(stderr,"wpa_if_remove Error,%s:%d\n",__FILE__,__LINE__);  
-	    goto err;
-	}
-	
-	ret = send(agentfd,buf,buf_size,0);
-	
-	if(ret < 0)
-	{
-		fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
-		goto err;
-	}
-
+    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
 	return 0;
-
-	
-err:
-	return -1;
-
 }
 
 static int wpa_driver_nl80211_send_action(void *priv, unsigned int freq,
@@ -548,6 +707,24 @@ static int wpa_driver_nl80211_send_action(void *priv, unsigned int freq,
 					  int no_cck)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  argc to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_send_action_format(buf, &buf_size, freq, wait_time, dst, data, data_len);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_if_add_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_if_add_format buf_size:%d",buf_size);
+    /* send buf(argc) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -632,6 +809,24 @@ static int nl80211_send_frame(void *priv, const u8 *data, size_t data_len,
 			      int encrypt)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  mgmt to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wpa_ieee80211_mgmt_format(buf, &buf_size, data, data_len, encrypt);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wpa_ieee80211_mgmt_format Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_ieee80211_mgmt_format buf_size:%d",buf_size);
+    /* send buf(mgmt) */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return -1;
+    }
 	return 0;
 }
 
@@ -698,6 +893,24 @@ static struct wpa_scan_results *
 wpa_driver_nl80211_get_scan_results(void *priv)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  type to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wiflow_pdu_format(buf, &buf_size, WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST);
+    if(ret < 0)
+    {
+        fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);
+        return NULL;
+    }
+    wpa_printf(MSG_DEBUG, "nl80211ext: wiflow_pdu_format buf_size:%d",buf_size);
+    /* send buf */
+    ret = send(agentfd,buf,buf_size,0);
+    if(ret < 0)
+    {
+        fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        return NULL;
+    }
 	struct wpa_scan_results *res;
 	res = os_zalloc(sizeof(*res));
 	if (res == NULL)
@@ -778,8 +991,22 @@ static void *i802_init(struct hostapd_data *hapd,
 }
 
 static void i802_deinit(void *priv)
-{
+{	
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+	int buf_size = 0;
+	int ret = 0;
+    /* format  type to buf */
+    buf_size = MAX_BUF_LEN;
+    ret = wiflow_pdu_format(buf,&buf_size,WIFLOW_NL80211_HAPD_DEINIT_REQUEST);
+	if(ret < 0 || buf_size <= 0)
+    {
+        fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+    }
+	ret = send(agentfd,buf,buf_size,0);
+	if(ret < 0)
+    {
+        fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    }
 }
 
 static void * nl80211_global_init(void)

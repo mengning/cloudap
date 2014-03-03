@@ -8193,7 +8193,7 @@ static int wpa_driver_nl80211_if_add(void *priv, enum wpa_driver_if_type type,
 	return 0;
 }
 
-//MARK
+
 static int wpa_driver_nl80211_if_remove(void *priv,
 					enum wpa_driver_if_type type,
 					const char *ifname)
