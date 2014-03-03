@@ -32,7 +32,8 @@ enum wiflow_commands
     WIFLOW_INIT_CAPA_RESPONSE,             /*get capa from*/
     WIFLOW_INIT_CAPA_REQUEST,
     WIFLOW_SET_COUNTRY,
-    WPA_GET_HW_MODE_REQUEST
+    WPA_GET_HW_MODE_REQUEST,
+    REMOTE_HW_MODE
 };
 
 struct wiflow_pdu_element
@@ -84,19 +85,19 @@ int i802_bss_parser(char * pdu, int pdu_size,struct i802_bss *bss);
 int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
 
 int wpa_init_capa_format(char * pdu, int *pdu_size,struct i802_bss *bss);
-
 int wpa_init_capa_parser(char * pdu, int pdu_size,struct wpa_driver_capa *capa);
 
-int local_default_capa(struct wpa_driver_capa *capa);
-
 int wpa_set_country_format(char * pdu, int *pdu_size,const char *alpha2_arg);
-
 int wpa_set_country_parser(char * pdu, int pdu_size,const char *alpha2_arg);
 
-
 int wpa_get_hw_feature_format(char * pdu, int *pdu_size, u16 *num_modes, u16 *flags);
+int wpa_get_hw_feature_parser(char * pdu, int pdu_size, u16 *num_modes, u16 *flags);
+int remote_hw_modes_format(char * pdu, int *pdu_size, struct hostapd_hw_modes *remote_hw_modes);
+int remote_hw_modes_parser(char * pdu, int *pdu_size, struct hostapd_hw_modes *remote_hw_modes);
 
 
+
+int local_default_capa(struct wpa_driver_capa *capa);
 int local_default_hw_mode(struct hostapd_hw_modes *local_hw_mode);
 
 

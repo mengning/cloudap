@@ -318,11 +318,15 @@ wpa_driver_nl80211_get_hw_feature_data(void *priv, u16 *num_modes, u16 *flags)
 		goto err;
     }
 
+	*num_modes = 1;
+	*flags = 1;
 	if(local_default_hw_mode(local_hw_mode) != 0)
 	{
 		fprintf(stderr,"capa default init Error,%s:%d\n",__FILE__,__LINE__);
 		return -1;
 	}
+
+	return local_hw_mode;
 
 err:
 	return NULL;
@@ -717,6 +721,7 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
     /* read nl80211 event from agent  */
 	struct wpa_driver_capa capa;
+	struct hostapd_iface *iface = (struct hostapd_iface *)eloop_ctx;
 	int buf_size = 0;
 	int ret;
 	buf_size = MAX_BUF_LEN;
@@ -734,11 +739,17 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
         break;
     /* add new case here */
 	case WIFLOW_INIT_CAPA_RESPONSE:
-	struct hostapd_iface *iface = (struct hostapd_iface *)eloop_ctx;
-	ret = wpa_init_capa_parser(buf,&buf_size,&capa);
-	iface->drv_flags = capa.flags;
-	iface->probe_resp_offloads = capa.probe_resp_offloads;
-	break;
+		ret = wpa_init_capa_parser(buf,&buf_size,&capa);
+		iface->drv_flags = capa.flags;
+		iface->probe_resp_offloads = capa.probe_resp_offloads;
+		break;
+	case REMOTE_HW_MODE:
+		ret = remote_hw_modes_parser(buf, buf_size, iface->hw_features);
+		if(ret < 0)
+    	{
+        	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
+        	return -1;
+    	}
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 		return;

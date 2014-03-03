@@ -718,4 +718,202 @@ err:
 	return -1;
 }
 
+int wpa_get_hw_feature_parser(char * pdu, int pdu_size, u16 *num_modes, u16 *flags)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    char * p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || alpha2_arg == NULL)
+    {
+        fprintf(stderr,"wpa_init_params_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    if(wpdu->type != WPA_GET_HW_MODE_REQUEST)
+    {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;   
+    }
+    counter += sizeof(struct wiflow_pdu);
+	/* num_modes*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	p = malloc(element->len);
+	memcpy(p,&element->data,element->len);
+	num_modes = (u16 *)p;
+	counter += len;
+	/* flags*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	p = malloc(element->len);
+	memcpy(p,&element->data,element->len);
+	num_modes = (u16 *)p;
+	counter += len;
+
+err:
+    return -1;
+}
+
+
+int remote_hw_modes_format(char * pdu, int *p_size, struct hostapd_hw_modes *remote_hw_modes)
+{
+		struct wiflow_pdu *wpdu;
+		struct wiflow_pdu_element *element;
+		int counter = 0;
+		int len;
+		int pdu_size = *p_size;
+		 
+		if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || num_modes == NULL || flags == NULL)
+		{
+			fprintf(stderr,"wpa_init_params_format args Error,%s:%d\n",__FILE__,__LINE__); 
+			goto err;	
+		}
+		
+		wpdu = (struct wiflow_pdu*)pdu;
+		wpdu->type = REMOTE_HW_MODE;
+		counter += sizeof(struct wiflow_pdu);
+		/*modes*/
+		element = (struct wiflow_pdu_element *)(pdu + counter);
+		element->len = INT_SIZE;
+		len = sizeof(element->len) + element->len;
+		if(pdu_size < counter + len)
+		{
+			goto err; 
+		}
+		memcpy(&element->data,&remote_hw_modes->mode,element->len);
+		counter += len;
+		/*num_channels*/
+		element = (struct wiflow_pdu_element *)(pdu + counter);
+		element->len = INT_SIZE;
+		len = sizeof(element->len) + element->len;
+		if(pdu_size < counter + len)
+		{
+			goto err; 
+		}
+		memcpy(&element->data,&remote_hw_modes->num_channels,element->len);
+		counter += len;
+		/*channels*/
+		element = (struct wiflow_pdu_element *)(pdu + counter);
+		element->len = CHANNEL_DATA;
+		len = sizeof(element->len) + element->len;
+		if(pdu_size < counter + len)
+		{
+			goto err; 
+		}
+		memcpy(&element->data,remote_hw_modes->channels,element->len);
+		counter += len;
+		/*num_rates*/
+		element = (struct wiflow_pdu_element *)(pdu + counter);
+		element->len = INT_SIZE;
+		len = sizeof(element->len) + element->len;
+		if(pdu_size < counter + len)
+		{
+			goto err; 
+		}
+		memcpy(&element->data,&remote_hw_modes->num_rates,element->len);
+		counter += len;
+		/*rates*/
+		element = (struct wiflow_pdu_element *)(pdu + counter);
+		element->len = RATES;
+		len = sizeof(element->len) + element->len;
+		if(pdu_size < counter + len)
+		{
+			goto err; 
+		}
+		memcpy(&element->data,remote_hw_modes->rates,element->len);
+		counter += len;
+		/*others*/
+		element = (struct wiflow_pdu_element *)(pdu + counter);
+		element->len = 31;
+		len = sizeof(element->len) + element->len;
+		if(pdu_size < counter + len)
+		{
+			goto err; 
+		}
+		memcpy(&element->data,remote_hw_modes->ht_capab,element->len);
+		counter += len;
+
+		*p_size = counter;
+		return 0;
+	
+	err:
+		return -1;
+
+}
+
+
+int remote_hw_modes_parser(char * pdu, int pdu_size, struct hostapd_hw_modes *remote_hw_modes)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    char * p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || remote_hw_modes == NULL)
+    {
+        fprintf(stderr,"wpa_init_params_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    if(wpdu->type != REMOTE_HW_MODE)
+    {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;   
+    }
+    counter += sizeof(struct wiflow_pdu);
+	/* mode*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&remote_hw_modes->mode,&element->data,element->len);
+	counter += len;
+	/* num_channels*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&remote_hw_modes->num_channels,&element->data,element->len);
+	counter += len;
+	/* channels*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	p = malloc(element->len);
+	memcpy(p,&element->data,element->len);
+	remote_hw_modes->channels = p;
+	counter += len;
+	/* others*/
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&remote_hw_modes->ht_capab,&element->data,element->len);
+	counter += len;
+
+err:
+    return -1;
+}
+
+
+
 

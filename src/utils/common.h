@@ -314,7 +314,7 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #define ETH_P_RRB 0x890D
 #endif /* ETH_P_RRB */
 #ifndef INT_SIZE
-#define INT_SIZE 4
+#define INT_SIZE sizeof(int)
 #endif /* INT_SIZE */
 #ifndef COUNTRY_SIZE
 #define COUNTRY_SIZE 4
@@ -325,6 +325,15 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #ifndef FLAGS
 #define FLAGS 2
 #endif /* NUMS_MODE */
+#ifndef CHANNEL_DATA
+#define CHANNEL_DATA (2*sizeof(int)+sizeof(short)+sizeof(u8))
+#endif /* CHANNEL_DATA */
+#ifndef RATES
+#define RATES (4*sizeof(int))
+#endif /* RATES */
+
+
+
 
 
 
