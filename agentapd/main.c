@@ -138,6 +138,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	struct wpa_set_tx_queue_params tx_params;
 	struct wpa_driver_scan_params scan_params;
 	struct wpa_set_key_params key_params;
+	int rts;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
 	int ret;
@@ -289,6 +290,18 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 			wpa_drivers[i]->sta_set_flags(hapd.bss, addr, temp1, temp2, encrypt);
 		}
 		break;
+	case WIFLOW_NL80211_SET_RTS_REQUEST:
+	 	ret = wpa_set_rts_parser(buf, MAX_BUF_LEN, &rts);
+	 	if(ret < 0)
+	 	{
+	 		fprintf(stderr,"wpa_set_rts_parser Error,%s:%d\n",__FILE__,__LINE__); 
+	 	}
+	 	if(wpa_drivers[i]->set_rts) 
+	 	{
+	 		wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_rts()");
+	 		wpa_drivers[i]->set_rts(hapd.bss,rts);
+	 	}
+	 	break;
 	case WIFLOW_NL80211_SEND_ACTION_REQUEST:
 		ret = wpa_send_action_parser(buf, MAX_BUF_LEN,&temp1,
 			&temp2,addr, data, &data_len);

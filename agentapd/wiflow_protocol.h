@@ -42,6 +42,7 @@ enum wiflow_commands
     WIFLOW_NL80211_IF_ADD_REQUEST2,  /*remote request call if_add func*/
     WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
     WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
+    WIFLOW_NL80211_SET_RTS_REQUEST,/*remote request call set_rts func*/
     WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
     WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST, /*remote request call set_tx_queue_params func*/
     WIFLOW_NL80211_SCAN2_REQUEST, /*remote request call scan2 func*/
@@ -209,6 +210,25 @@ int wpa_sta_set_flags_format(char *pdu, int *p_size, const u8 *addr, int total_f
  */
 int wpa_sta_set_flags_parser(char *pdu, int p_size, u8 *addr, int* total_flags,
 					    int* flags_or, int* flags_and);
+
+/*
+ * Format the struct i802_bss *bss to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: int rts , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_rts_format(char * pdu, int *p_size, int rts);
+
+/*
+  * Parse the PDU to sta_set_rts() argc
+  * input	: char * pdu , Memory allocate outside
+  * output	: sta_set_rts() agrc , Memory allocate outside
+  * return	: SUCCESS(0)/FAILURE(-1)
+  *
+  */
+int wpa_set_rts_parser(char * pdu, int p_size, int * rts);
+
 
 /*
  * Format the func argc to the PDU

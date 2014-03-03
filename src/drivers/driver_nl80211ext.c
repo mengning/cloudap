@@ -509,7 +509,25 @@ static int i802_get_seqnum(const char *iface, void *priv, const u8 *addr,
 static int i802_set_rts(void *priv, int rts)
 {
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
-	return 0;
+    int buf_size = 0;
+    int ret = 0;
+	 /* format rts to buf */
+	 buf_size = MAX_BUF_LEN;
+	 ret = wpa_set_rts_format(buf, &buf_size, rts);
+	 if(ret < 0)
+	 {
+		 fprintf(stderr,"wpa_set_rts_format Error,%s:%d\n",__FILE__,__LINE__);
+		 return -1;
+	 }
+	 wpa_printf(MSG_DEBUG, "nl80211ext: wpa_set_rts_format buf_size:%d",buf_size);
+	 /* send buf(freq) */
+	 ret = send(agentfd,buf,buf_size,0);
+	 if(ret < 0)
+	 {
+		 fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+		 return -1;
+	 }
+     return 0;
 }
 
 
