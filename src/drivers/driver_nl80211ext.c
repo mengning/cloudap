@@ -414,12 +414,14 @@ static int i802_set_frag(void *priv, int frag)
 		fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
 		goto err;
 	}
-	
-err:
-	return NULL;
-
 
 	return 0;
+
+	
+err:
+	return -1;
+
+
 }
 
 
@@ -508,8 +510,34 @@ static int wpa_driver_nl80211_if_remove(void *priv,
 					enum wpa_driver_if_type type,
 					const char *ifname)
 {
-    wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+   	wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
+
+ 	int ret;
+	int buf_size = MAX_BUF_LEN;
+	memset(buf, 0, MAX_BUF_LEN);
+	
+	ret = wpa_if_remove(buf,&buf_size,type,ifname);
+	
+	if(ret < 0 || buf_size <= 0)
+	{
+		fprintf(stderr,"wpa_if_remove Error,%s:%d\n",__FILE__,__LINE__);  
+	    goto err;
+	}
+	
+	ret = send(agentfd,buf,buf_size,0);
+	
+	if(ret < 0)
+	{
+		fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+		goto err;
+	}
+
 	return 0;
+
+	
+err:
+	return -1;
+
 }
 
 static int wpa_driver_nl80211_send_action(void *priv, unsigned int freq,

@@ -300,8 +300,8 @@ int wpa_set_frag(char * pdu, int *p_size,int frag)
 	int len;
 	int pdu_size = *p_size;
 	
-	char string[10];
-	itoa(frag, string, 10);
+	//char string[10];
+	//itoa(frag, string, 10);
 	
 	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
 	{
@@ -313,14 +313,14 @@ int wpa_set_frag(char * pdu, int *p_size,int frag)
 	counter += sizeof(struct wiflow_pdu);
 	element = (struct wiflow_pdu_element *)(pdu + counter);
 	
-	element->len = sizeof(string);
+	element->len = 4;
 
 	len = sizeof(element->len) + element->len;
 	if(pdu_size < counter + len)
 	{
 		goto err; 
 	}
-	memcpy(&element->data,string,element->len);
+	memcpy(&element->data,&frag,element->len);
 	counter += len;	
 	*p_size = counter;
 	return 0;
@@ -330,11 +330,13 @@ err:
 }
 
 
-int wpa_set_frag_parser(char * pdu, int pdu_size, int frag)
+int wpa_set_frag_parser(char * pdu, int pdu_size)
  {
 	struct wiflow_pdu *wpdu;
 	struct wiflow_pdu_element *element;
+	//int pdu_size = *p_size;
 	int counter = 0;
+	int frag = -1;
 	int len;
 	char *p;
     if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
@@ -359,12 +361,113 @@ int wpa_set_frag_parser(char * pdu, int pdu_size, int frag)
 	memcpy(p,&element->data,element->len);
 	frag = atoi(p);
  	counter += len;
-
+	return frag;
 	
  err:
      return -1;
  }
 
+int wpa_if_remove(char * pdu, int *p_size,enum wpa_driver_if_type type,
+					 const char *ifname)
+{
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int pdu_size = *p_size;
+	int counter = 0;
+	int len;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+	{
+		fprintf(stderr,"wpa_if_remove args Error,%s:%d\n",__FILE__,__LINE__); 
+			goto err;	
+	}	
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_IF_REMOVE;
+	counter += sizeof(struct wiflow_pdu);
+
+	/* type */
+    len = sizeof(element->len) + 4;
+    if(pdu_size < counter + len)
+    {
+        goto err;  
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = 4;
+    memcpy(&element->data,&type,element->len);
+    counter += len;
+
+	/* ifname */
+    //len = sizeof(element->len) + IFNAMSIZ + 1;
+    //if(pdu_size < counter + len)
+    //{
+    //     goto err; 
+    // }
+    // element = (struct wiflow_pdu_element *)(pdu + counter);
+    // element->len = IFNAMSIZ + 1;
+    //  memcpy(&element->data,&ifname,element->len);
+    //  counter += len;
+	return 0;
+	
+err:
+	return -1;		
+ 
+}
+
+
+
+ 
+ int wpa_if_remove_parser(char * pdu, int pdu_size)
+ {
+ 	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	//int pdu_size = *p_size;
+	int counter = 0;
+	int len;
+	enum wpa_driver_if_type type;
+	char *p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+     {
+        fprintf(stderr,"wpa_if_remove_parserr args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+		goto err;   
+     }
+     wpdu = (struct wiflow_pdu*)pdu;
+     if(wpdu->type != WIFLOW_IF_REMOVE)
+     {
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;   
+    }
+	 wpdu = (struct wiflow_pdu*)pdu;
+	 wpdu->type = WIFLOW_INIT_PARAMS_RESPONSE;
+	 counter += sizeof(struct wiflow_pdu);
+	 /* type */
+	 len = sizeof(element->len) + 4;
+	 if(pdu_size < counter + len)
+	 {
+		 goto err; 
+	 }
+	 element = (struct wiflow_pdu_element *)(pdu + counter);
+	 element->len = 4;
+	 p = malloc(element->len);
+	 memcpy(p,&element->data,element->len);
+	 type = atoi(p);
+ 	 counter += len;
+	 /* ifname */
+	//len = sizeof(element->len) + IFNAMSIZ + 1;
+	//if(pdu_size < counter + len)
+	// {
+	//	 goto err; 
+	// }
+	// element = (struct wiflow_pdu_element *)(pdu + counter);
+	// element->len = IFNAMSIZ + 1;
+	// memcpy(&element->data,params->ifname,element->len);
+	// counter += len;
+
+	 return type;
+
+	
+ err:
+     return -1;
+ }
 
 
 

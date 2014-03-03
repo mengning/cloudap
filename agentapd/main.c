@@ -121,6 +121,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
     int i = 0;
     char buf[MAX_BUF_LEN];
 	int frag;
+	enum wpa_driver_if_type type;
     struct wpa_init_params params;
     struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
     /* read nl80211 commands from remote  */
@@ -175,14 +176,25 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	
 	case WIFLOW_SET_FRAG:
 
-		ret = wpa_set_frag_parser(buf,MAX_BUF_LEN,frag);
+		frag = wpa_set_frag_parser(buf,MAX_BUF_LEN);
 		
-        if(ret < 0)
+        if(frag < 0)
         {
         	fprintf(stderr,"wpa_set_frag_parse Error,%s:%d\n",__FILE__,__LINE__); 
 		}
 		
- 		hapd->driver->set_frag(hapd->drv_priv, frag);
+ 		 wpa_drivers[i]->set_frag(hapd.bss, frag);
+
+	case WIFLOW_IF_REMOVE:
+
+		type =wpa_if_remove_parser(buf,MAX_BUF_LEN);
+
+		if(type < 0)
+		{
+			fprintf(stderr,"wpa_if_remove__parse Error,%s:%d\n",__FILE__,__LINE__); 
+		}
+		 wpa_drivers[i]->if_remove(hapd.bss, type,params.ifname);
+		
 		
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);

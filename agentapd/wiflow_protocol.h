@@ -28,8 +28,9 @@
 enum wiflow_commands
 {
     WIFLOW_INIT_PARAMS_REQUEST, /* agent request AP params */
-    WIFLOW_INIT_PARAMS_RESPONSE /* remote response AP params to agent */
-    WIFLOW_SET_FRAG				/* remote set_farg */
+    WIFLOW_INIT_PARAMS_RESPONSE, /* remote response AP params to agent */
+    WIFLOW_SET_FRAG,			/* remote set_farg */
+    WIFLOW_IF_REMOVE			/* remove */
 };
 
 struct wiflow_pdu_element
@@ -78,7 +79,7 @@ int i802_bss_parser(char * pdu, int pdu_size,struct i802_bss *bss);
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
+int i802_bss_format(char * pdu, int *p_size,struct i802_bss *bss);
 
 /*
  * Format int frag to the PDU
@@ -87,16 +88,22 @@ int i802_bss_format(char * pdu, int *pdu_size,struct i802_bss *bss);
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_set_frag(char * pdu, int *p_size,int frag)
+int wpa_set_frag(char * pdu, int *p_size,int frag);
 
 /*
  * Parse the PDU to int frag
  * input	: char * pdu , Memory allocate outside
  * output	: int frag
- * return	: SUCCESS(0)/FAILURE(-1)
+ * return	: frag
  *
  */
-int wpa_set_frag_parser(char * pdu, int pdu_size, int frag)
+int wpa_set_frag_parser(char * pdu, int pdu_size);
+
+
+int wpa_if_remove(char * pdu, int *p_size,enum wpa_driver_if_type type,
+					const char *ifname);
+
+int wpa_if_remove_parser(char * pdu, int pdu_size);
 
 
 
