@@ -1266,6 +1266,70 @@ err:
 	return -1;
 }
 
+int wpa_set_rts_format(char * pdu, int *p_size, int rts)
+{
+    struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	if(pdu == NULL || *p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_set_rts_format args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,*p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    wpdu->type = WIFLOW_NL80211_SET_RTS_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+	/*rts*/
+	len = sizeof(element->len) + sizeof(int);
+    if(*p_size < counter + len)
+    {
+        goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = sizeof(int);
+    memcpy(&element->data,&rts,sizeof(int));
+    counter += len;
+    *p_size = counter;
+    return 0;
+err:
+    return -1;
+}
+
+int wpa_set_rts_parser(char * pdu, int p_size, int * rts)
+{
+    struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu) || rts == NULL)
+    {
+        fprintf(stderr,"wpa_set_rts_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    if(wpdu->type != WIFLOW_NL80211_SET_RTS_REQUEST)
+    {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;   
+    }
+	counter += sizeof(struct wiflow_pdu);
+	/*rts*/
+	len = sizeof(element->len) + sizeof(int);
+    if(p_size < counter + len)
+    {
+        fprintf(stderr,"rts Error,%s:%d\n",__FILE__,__LINE__);
+        goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    memcpy(rts,&element->data,sizeof(int));
+	
+    return 0;
+err:
+    return -1;
+}
+
+
 int wpa_send_action_format(char * pdu,int * p_size, unsigned int freq, unsigned int wait_time, const u8 * dst, const u8 * data,size_t data_len)
 {
 	struct wiflow_pdu *wpdu;
