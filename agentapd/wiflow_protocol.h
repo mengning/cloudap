@@ -21,10 +21,7 @@
 #ifndef _WI_FLOW_H_
 #define _WI_FLOW_H_
 
-<<<<<<< HEAD
-=======
 #include "driver.h"
->>>>>>> e919dd243881cb72333e8080abd3e725ac70891d
 #include "utils/list.h"
 #include "common/ieee802_11_defs.h"
 
@@ -52,7 +49,15 @@ enum wiflow_commands
     WIFLOW_NL80211_STA_DISASSOC_REQUEST, /*remote request call sta_disassoc func*/
     WIFLOW_NL80211_SET_KEY_REQUEST, /*remote request call set_key func*/
     WIFLOW_NL80211_SEND_MLME_REQUEST, /*remote request call send_mlme func*/
-    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST /*remote request call get_scan_results2 func*/
+    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST, /*remote request call get_scan_results2 func*/
+    WIFLOW_NL80211_GET_SEQNUM_REQUEST, /*remote request call get_seqnum func*/
+    WIFLOW_NL80211_SET_STA_VLAN_REQUEST, /*remote request call set_sta_vlan func*/
+    WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST, /*remote request call hapd_send_eapol func*/
+    WIFLOW_NL80211_READ_STA_DATA_REQUEST, /*remote request call read_sta_data func */
+    WIFLOW_NL80211_POLL_CLIENT_REQUEST, /*remote request call poll_client func*/
+    WIFLOW_NL80211_GET_INACT_SEC_REQUEST, /*remote request call get_inact_sec func*/
+    WIFLOW_NL80211_STA_REMOVE_REQUEST, /*remote request call sta_remove func*/
+    WIFLOW_NL80211_SET_AP_REQUEST  /*remote request call set_ap func*/
 }; 
 
 struct wiflow_pdu_element
@@ -344,6 +349,152 @@ int wpa_send_mlme_format(char *pdu, int *p_size, const u8 *data, size_t data_len
  *
  */
 int wpa_send_mlme_parser(char *pdu, int p_size, const u8 *data, size_t *data_len, int *noack);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_get_seqnum_format(char *pdu, int *p_size, const u8 *addr, int idx, u8 *seq);
+
+/*
+ * Parse the PDU to get_seqnum() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: get_seqnum() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_get_seqnum_parser(char *pdu, int p_size, u8 *addr, int *idx, u8 *seq);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_sta_vlan_format(char *pdu, int *p_size, const u8 *addr, int vlan_id);
+
+/*
+ * Parse the PDU to set_sta_vlan() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: set_sta_vlan() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_sta_vlan_parser(char *pdu, int p_size, const u8 *addr, int *vlan_id);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_hapd_send_eapol_format(char *pdu, int *p_size, const u8 *addr, const u8 *data,
+							size_t data_len, int encrypt, u32 flags);
+
+/*
+ * Parse the PDU to hapd_send_eapol() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: hapd_send_eapol() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_hapd_send_eapol_parser(char *pdu, int p_size, const u8 *addr, const u8 *data,
+							size_t *data_len, int *encrypt, u32 *flags);
+
+/*
+ * Format thestruct hostap_sta_driver_data *data to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	:struct hostap_sta_driver_data *data, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_read_sta_data_format(char *pdu, int *p_size, struct hostap_sta_driver_data *data, const u8 *addr);
+
+/*
+ * Parse the PDU to  struct hostap_sta_driver_data *data
+ * input	: char * pdu , Memory allocate outside
+ * output	:  struct hostap_sta_driver_data *data, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_read_sta_data_parser(char *pdu, int p_size, struct hostap_sta_driver_data *data, const u8 *addr);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_poll_client_format(char *pdu, int *p_size, const u8 *addr, int qos);
+
+/*
+ * Parse the PDU to poll_client() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: poll_client() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_poll_client_parser(char * pdu,int p_size, const u8 * addr, int *qos);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_get_inact_sec_format(char * pdu,int *p_size, const u8 * addr);
+
+/*
+ * Parse the PDU to get_inact_sec() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: get_inact_sec() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_get_inact_sec_parser(char * pdu, int p_size, const u8 * addr);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_remove_format(char * pdu,int *p_size, const u8 * addr);
+
+/*
+ * Parse the PDU to sta_remove() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: sta_remove() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_sta_remove_parser(char * pdu, int p_size, const u8 * addr);
+
+/*
+ * Format the struct wpa_driver_ap_params *params to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	:struct wpa_driver_ap_params *params, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_ap_format(char *pdu, int *p_size, struct wpa_driver_ap_params *params);
+
+/*
+ * Parse the PDU to struct wpa_driver_ap_params *params
+ * input	: char * pdu , Memory allocate outside
+ * output	:struct wpa_driver_ap_params *params, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_ap_parser(char * pdu, int pdu_size, struct wpa_driver_ap_params *params);
 
 #endif /* _WI_FLOW_H_ */
 

@@ -29,6 +29,7 @@
 #include "common/ieee802_11_defs.h"
 #include "driver.h"
 #include "wiflow_protocol.h"
+#include "utils/wpabuf.h"
 
 #define MAX_SSID_LEN    32
 
@@ -1624,15 +1625,15 @@ int wpa_scan2_format(char * pdu, int * p_size, struct wpa_driver_scan_params *pa
 	wpdu->type = WIFLOW_NL80211_SCAN2_REQUEST;
 	counter += sizeof(struct wiflow_pdu);
 	/*params*/
-	len = sizeof(element->len) + data_len;
+	len = sizeof(element->len) + (data_len + 1) * sizeof(int);
 	if(pdu_size < counter + len)
 	{
 		fprintf(stderr,"params Error,%s:%d\n",__FILE__,__LINE__);
 		goto err;
 	}
 	element = (struct wiflow_pdu_element *)(pdu + counter);
-	element->len = data_len;
-	memcpy(&element->data, params->freqs,element->len);
+	element->len = (data_len + 1) * sizeof(int);
+	memcpy(&element->data, params->freqs, element->len);
 	counter += len;
 
 	*p_size = counter;
@@ -2058,7 +2059,7 @@ int wpa_set_key_parser(char * pdu,int p_size,struct wpa_set_key_params * key_par
 	}
 	element = (struct wiflow_pdu_element *)(pdu + counter);
 	p = malloc(ETH_ALEN);
-	memcpy(p,&element->data,element->len);
+	memcpy(p,&element->data,ETH_ALEN);
 	if(*p == 0)
 	{
 		key_params->addr = NULL;
@@ -2281,4 +2282,1554 @@ err:
 	return -1;
 }
 
+int wpa_get_seqnum_format(char *pdu, int *p_size, const u8 *addr, int idx, u8 *seq)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	int seq_len;
+    int pdu_size = *p_size;
 
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_get_seqnum_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_GET_SEQNUM_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+    /*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+	/*idx*/
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"idx Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&idx,element->len);
+	counter += len;
+	/*seq_len*/
+	seq_len = strlen((char*)seq);
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"seq_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&seq_len,element->len);
+	counter += len;
+	/*seq*/
+	len = sizeof(element->len) + seq_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"seq Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = seq_len;
+	if(seq == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,&seq,element->len);
+	}
+	counter += len;
+	
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_get_seqnum_parser(char * pdu,int p_size, u8 * addr, int *idx, u8 * seq)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	int seq_len;
+	char *p;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_get_seqnum_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_GET_SEQNUM_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		addr = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		addr = (u8 *)p;
+	}
+	counter += len;
+	/*idx*/
+	len = sizeof(element->len) + sizeof(idx);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"idx Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(idx,&element->data,sizeof(idx));
+	counter += len;
+	/*seq_len*/
+	len = sizeof(element->len) + sizeof(seq_len);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"seq_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&seq_len,&element->data,sizeof(seq_len));
+	counter += len;
+	/*seq*/
+	len = sizeof(element->len) + seq_len;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"seq Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(seq_len);
+	memcpy(p,&element->data, seq_len);
+	if(*p == 0)
+	{
+		seq = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		seq = (u8 *)p;
+	}
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_set_sta_vlan_format(char * pdu,int * p_size,const u8 * addr,int vlan_id)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_set_sta_vlan_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_SET_STA_VLAN_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+    /*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+	/*vlan_id*/
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"vlan_id Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&vlan_id,element->len);
+	counter += len;
+
+	*p_size = counter;
+	return 0;
+err: 
+	return -1;
+}
+
+int wpa_set_sta_vlan_parser(char * pdu,int p_size,const u8 * addr,int *vlan_id)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	char *p;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_set_sta_vlan_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_SET_STA_VLAN_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		addr = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		addr = (u8 *)p;
+	}
+	counter += len;
+	/*vlan_id*/
+	len = sizeof(element->len) + sizeof(vlan_id);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"vlan_id Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(vlan_id,&element->data,sizeof(vlan_id));
+
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_hapd_send_eapol_format(char * pdu,int * p_size,const u8 * addr,const u8 * data,size_t data_len,int encrypt,u32 flags)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_set_sta_vlan_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+    /*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+	/*data_len*/
+	len = sizeof(element->len) + sizeof(data_len);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"data_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(data_len);
+	memcpy(&element->data,&data_len,element->len);
+	counter += len;
+	/*data*/
+	len = sizeof(element->len) + data_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"data Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = data_len;
+	if(data == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,data,element->len);
+	}
+	counter += len;
+	/*encrypt*/
+	len = sizeof(element->len) + sizeof(encrypt);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"encrypt Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&encrypt,element->len);
+	counter += len;
+	/*flags*/
+	len = sizeof(element->len) + sizeof(flags);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"flags Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(flags);
+	memcpy(&element->data,&flags,element->len);
+	counter += len;
+	
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_hapd_send_eapol_parser(char * pdu,int p_size,const u8 * addr,const u8 * data,size_t *data_len,int *encrypt,u32 *flags)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	char *p;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_set_sta_vlan_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		addr = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		addr = (u8 *)p;
+	}
+	counter += len;
+	/*data_len*/
+	len = sizeof(element->len) + sizeof(data_len);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"data_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(data_len,&element->data,sizeof(data_len));
+	counter += len;
+	/*data*/
+	len = sizeof(element->len) + *data_len;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"data Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(*data_len);
+	memcpy(p,&element->data, *data_len);
+	if(*p == 0)
+	{
+		data = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		data = (u8 *)p;
+	}
+	counter += len;
+	/*encrypt*/
+	len = sizeof(element->len) + sizeof(encrypt);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"encrypt Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(encrypt,&element->data,sizeof(encrypt));
+	counter += len;
+	/*flags*/
+	len = sizeof(element->len) + sizeof(flags);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"flags Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(flags,&element->data,sizeof(flags));
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_read_sta_data_format(char *pdu, int *p_size, struct hostap_sta_driver_data *data, const u8 *addr)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || data == NULL)
+    {
+        fprintf(stderr,"wpa_read_sta_data_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_READ_STA_DATA_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+	/*data*/
+	len = sizeof(element->len) + sizeof(struct hostap_sta_driver_data);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"data Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(struct hostap_sta_driver_data);
+	if(data == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,data,element->len);
+	}
+	counter += len;
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_read_sta_data_parser(char * pdu,int p_size,struct hostap_sta_driver_data * data,const u8 * addr)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	struct hostap_sta_driver_data *p;
+	char *q;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu) || data == NULL)
+    {
+        fprintf(stderr,"wpa_read_sta_data_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_READ_STA_DATA_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*data*/
+	len = sizeof(element->len) + sizeof(struct hostap_sta_driver_data);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"data Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = (struct hostap_sta_driver_data *)malloc(sizeof(struct hostap_sta_driver_data));
+	memcpy(p,&element->data, sizeof(struct hostap_sta_driver_data));
+	if(p == NULL)
+	{
+		data = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		data = p;
+	}
+	counter += len;
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	q = malloc(ETH_ALEN);
+	memcpy(q,&element->data, ETH_ALEN);
+	if(*q == 0)
+	{
+		addr = NULL;
+		free(q);
+		q = NULL;
+	}
+	else
+	{
+		addr = (u8 *)q;
+	}
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_poll_client_format(char * pdu, int * p_size, const u8 * addr, int qos)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_poll_client_parser args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_POLL_CLIENT_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+    /*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+	/*qos*/
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"qos Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&qos,element->len);
+	counter += len;
+
+	*p_size = counter;
+	return 0;
+err: 
+	return -1;
+}
+
+int wpa_poll_client_parser(char * pdu,int p_size,const u8 * addr,int * qos)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	char *p;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_poll_client_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_POLL_CLIENT_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		addr = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		addr = (u8 *)p;
+	}
+	counter += len;
+	/*qos*/
+	len = sizeof(element->len) + sizeof(qos);
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"qos Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(qos,&element->data,sizeof(qos));
+
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_get_inact_sec_format(char * pdu,int *p_size, const u8 * addr)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_poll_client_parser args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_GET_INACT_SEC_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+    /*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_get_inact_sec_parser(char * pdu,int p_size,const u8 * addr)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	char *p;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_poll_client_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_GET_INACT_SEC_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		addr = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		addr = (u8 *)p;
+	}
+	return 0;
+err:
+	return -1;
+}
+
+
+int wpa_sta_remove_format(char * pdu,int *p_size, const u8 * addr)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_sta_remove_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_STA_REMOVE_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+    /*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(addr == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,addr,element->len);
+	}
+	counter += len;
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_sta_remove_parser(char * pdu,int p_size,const u8 * addr)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	char *p;
+
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_sta_remove_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_STA_REMOVE_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*addr*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(p_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		addr = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		addr = (u8 *)p;
+	}
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_set_ap_format(char * pdu,int * p_size,struct wpa_driver_ap_params * params)
+{  
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+    int pdu_size = *p_size;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || params == NULL)
+    {
+        fprintf(stderr,"wpa_set_ap_format args Error,%s:%d\n",__FILE__,__LINE__); 
+        goto err;   
+    }
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_SET_AP_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+	/*head_len*/
+	len = sizeof(element->len) + sizeof(params->head_len);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"head_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->head_len);
+	memcpy(&element->data,&params->head_len,element->len);
+	counter += len;
+	/*head*/
+	len = sizeof(element->len) + params->head_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"head Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = params->head_len;
+	if(params->head == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,params->head,element->len);
+	}
+	counter += len;
+	/*tail_len*/
+	len = sizeof(element->len) + sizeof(params->tail_len);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"tail_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->tail_len);
+	memcpy(&element->data,&params->tail_len,element->len);
+	counter += len;
+	/*tail*/
+	len = sizeof(element->len) + params->tail_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"tail Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = params->tail_len;
+	if(params->head == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,params->tail,element->len);
+	}
+	counter += len;
+	/*dtim_period*/
+	len = sizeof(element->len) + sizeof(params->dtim_period);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"dtim_period Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->dtim_period);
+	memcpy(&element->data,&params->dtim_period,element->len);
+	counter += len;
+	/*beacon_int*/
+	len = sizeof(element->len) + sizeof(params->beacon_int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"beacon_int Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->beacon_int);
+	memcpy(&element->data,&params->beacon_int,element->len);
+	counter += len;
+	/*basic_rates*/
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"basic_rates Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	if(params->basic_rates == NULL)
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,params->basic_rates,element->len);
+	}
+	counter += len;
+	/*proberesp_len*/
+	len = sizeof(element->len) + sizeof(params->proberesp_len);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"proberesp_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->proberesp_len);
+	memcpy(&element->data,&params->proberesp_len,element->len);
+	counter += len;
+	/*proberesp*/
+	len = sizeof(element->len) + params->proberesp_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"proberesp Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = params->proberesp_len;
+	if(params->proberesp == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,params->proberesp,element->len);
+	}
+	counter += len;
+	/*hide_ssid*/
+	len = sizeof(element->len) + sizeof(int);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"hide_ssid Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(int);
+	memcpy(&element->data,&params->hide_ssid,element->len);
+	counter += len;
+	/*pairwise_ciphers*/
+	len = sizeof(element->len) + sizeof(params->pairwise_ciphers);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"pairwise_ciphers Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->pairwise_ciphers);
+	memcpy(&element->data,&params->pairwise_ciphers,element->len);
+	counter += len;
+	/*group_cipher*/
+	len = sizeof(element->len) + sizeof(params->group_cipher);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"group_cipher Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->group_cipher);
+	memcpy(&element->data,&params->group_cipher,element->len);
+	counter += len;
+	/*key_mgmt_suites*/
+	len = sizeof(element->len) + sizeof(params->key_mgmt_suites);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"key_mgmt_suites Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->key_mgmt_suites);
+	memcpy(&element->data,&params->key_mgmt_suites,element->len);
+	counter += len;
+	/*auth_algs*/
+	len = sizeof(element->len) + sizeof(params->auth_algs);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"auth_algs Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->auth_algs);
+	memcpy(&element->data,&params->auth_algs,element->len);
+	counter += len;
+	/*wpa_version*/
+	len = sizeof(element->len) + sizeof(params->wpa_version);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"wpa_version Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->wpa_version);
+	memcpy(&element->data,&params->wpa_version,element->len);
+	counter += len;
+	/*privacy*/
+	len = sizeof(element->len) + sizeof(params->privacy);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"privacy Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->privacy);
+	memcpy(&element->data,&params->privacy,element->len);
+	counter += len;
+	/*isolate*/
+	len = sizeof(element->len) + sizeof(params->isolate);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"isolate Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->isolate);
+	memcpy(&element->data,&params->isolate,element->len);
+	counter += len;
+	/*cts_protect*/
+	len = sizeof(element->len) + sizeof(params->cts_protect);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"cts_protect Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->cts_protect);
+	memcpy(&element->data,&params->cts_protect,element->len);
+	counter += len;
+	/*preamble*/
+	len = sizeof(element->len) + sizeof(params->preamble);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"preamble Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->preamble);
+	memcpy(&element->data,&params->preamble,element->len);
+	counter += len;
+	/*short_slot_time*/
+	len = sizeof(element->len) + sizeof(params->short_slot_time);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"short_slot_time Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->short_slot_time);
+	memcpy(&element->data,&params->short_slot_time,element->len);
+	counter += len;
+	/*ht_opmode*/
+	len = sizeof(element->len) + sizeof(params->ht_opmode);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"ht_opmode Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->ht_opmode);
+	memcpy(&element->data,&params->ht_opmode,element->len);
+	counter += len;
+	/*interworking*/
+	len = sizeof(element->len) + sizeof(params->interworking);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"interworking Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->interworking);
+	memcpy(&element->data,&params->interworking,element->len);
+	counter += len;
+	/*hessid*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"addr Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = ETH_ALEN;
+	if(params->hessid == NULL) 
+	{
+		memset(&element->data,0,element->len);
+	}
+	else 
+	{
+		memcpy(&element->data,params->hessid,element->len);
+	}
+	counter += len;
+	/*access_network_type*/
+	len = sizeof(element->len) + sizeof(params->access_network_type);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"access_network_type Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->access_network_type);
+	memcpy(&element->data,&params->access_network_type,element->len);
+	counter += len;
+	/*ap_max_inactivity*/
+	len = sizeof(element->len) + sizeof(params->ap_max_inactivity);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"ap_max_inactivity Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->ap_max_inactivity);
+	memcpy(&element->data,&params->ap_max_inactivity,element->len);
+	counter += len;
+	/*disable_dgaf*/
+	len = sizeof(element->len) + sizeof(params->disable_dgaf);
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"disable_dgaf Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	element->len = sizeof(params->disable_dgaf);
+	memcpy(&element->data,&params->disable_dgaf,element->len);
+	counter += len;
+
+	*p_size = counter;
+	return 0;
+err:
+	return -1;
+}
+
+int wpa_set_ap_parser(char * pdu,int pdu_size, struct wpa_driver_ap_params * params)
+{
+	struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	int t_size = sizeof(size_t);
+	int int_size = sizeof(int);
+	char *p;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) || params == NULL)
+    {
+        fprintf(stderr,"wpa_set_ap_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+	if(wpdu->type != WIFLOW_NL80211_SET_AP_REQUEST)
+	{
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;	
+	}
+	counter += sizeof(struct wiflow_pdu);
+	/*head_len*/
+	len = sizeof(element->len) + t_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"head_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->head_len,&element->data,t_size);
+	counter += len;
+	/*head*/
+	len = sizeof(element->len) + params->head_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"head Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(params->head_len);
+	memcpy(p,&element->data, params->head_len);
+	if(*p == 0)
+	{
+		params->head = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		params->head= (u8 *)p;
+	}
+	counter += len;
+	/*tail_len*/
+	len = sizeof(element->len) + t_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"tail_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->tail_len,&element->data,sizeof(t_size));
+	counter += len;
+	/*tail*/
+	len = sizeof(element->len) + params->tail_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"tail Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(params->tail_len);
+	memcpy(p,&element->data, params->tail_len);
+	if(*p == 0)
+	{
+		params->tail = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		params->tail= (u8 *)p;
+	}
+	counter += len;
+	/*dtim_period*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"dtim_period Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->dtim_period,&element->data,int_size);
+	counter += len;
+	/*beacon_int*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"beacon_int Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->beacon_int,&element->data,int_size);
+	counter += len;
+	/*basic_rates*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"basic_rates Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(params->basic_rates,&element->data,int_size);
+	counter += len;
+	/*proberesp_len*/
+	len = sizeof(element->len) + t_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"proberesp_len Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->proberesp_len,&element->data,t_size);
+	counter += len;
+	/*proberesp*/
+	len = sizeof(element->len) + params->proberesp_len;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"proberesp Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(params->proberesp_len);
+	memcpy(p,&element->data, params->proberesp_len);
+	if(*p == 0)
+	{
+		params->proberesp= NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		params->proberesp= (u8 *)p;
+	}
+	counter += len;
+	/*hide_ssid*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"hide_ssid Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->hide_ssid,&element->data,int_size);
+	counter += len;
+	/*pairwise_ciphers*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"pairwise_ciphers Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->pairwise_ciphers,&element->data,int_size);
+	counter += len;
+	/*group_cipher*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"group_cipher Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->group_cipher,&element->data,int_size);
+	counter += len;
+	/*key_mgmt_suites*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"key_mgmt_suites Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->key_mgmt_suites,&element->data,int_size);
+	counter += len;
+	/*auth_algs*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"auth_algs Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->auth_algs,&element->data,int_size);
+	counter += len;
+	/*wpa_version*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"wpa_version Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->wpa_version,&element->data,int_size);
+	counter += len;
+	/*privacy*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"privacy Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->privacy,&element->data,int_size);
+	counter += len;
+	/*isolate*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"isolate Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->isolate,&element->data,int_size);
+	counter += len;
+	/*cts_protect*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"cts_protect Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->cts_protect,&element->data,int_size);
+	counter += len;
+	/*preamble*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"preamble Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->preamble,&element->data,int_size);
+	counter += len;
+	/*short_slot_time*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"short_slot_time Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->short_slot_time,&element->data,int_size);
+	counter += len;
+	/*ht_opmode*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"ht_opmode Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->ht_opmode,&element->data,int_size);
+	counter += len;
+	/*interworking*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"interworking Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->interworking,&element->data,int_size);
+	counter += len;
+	/*hessid*/
+	len = sizeof(element->len) + ETH_ALEN;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"hessid Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	p = malloc(ETH_ALEN);
+	memcpy(p,&element->data, ETH_ALEN);
+	if(*p == 0)
+	{
+		params->hessid = NULL;
+		free(p);
+		p = NULL;
+	}
+	else
+	{
+		params->hessid = (u8 *)p;
+	}
+	counter += len;
+	/*access_network_type*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"access_network_type Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->access_network_type,&element->data,int_size);
+	counter += len;
+	/*ap_max_inactivity*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"ap_max_inactivity Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->ap_max_inactivity,&element->data,int_size);
+	counter += len;
+	/*disable_dgaf*/
+	len = sizeof(element->len) + int_size;
+	if(pdu_size < counter + len)
+	{
+		fprintf(stderr,"disable_dgaf Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;
+	}
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	memcpy(&params->disable_dgaf,&element->data,int_size);
+	counter += len;
+	
+	return 0;
+err:
+	return -1;
+}

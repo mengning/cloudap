@@ -138,6 +138,8 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	struct wpa_set_tx_queue_params tx_params;
 	struct wpa_driver_scan_params scan_params;
 	struct wpa_set_key_params key_params;
+	struct hostap_sta_driver_data sta_data;
+	struct wpa_driver_ap_params ap_params;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
 	int ret;
@@ -383,6 +385,102 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		{
 			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->get_scan_results2()");
 			scan_res = wpa_drivers[i]->get_scan_results2(hapd.bss); /* struct *scan_res */
+		}
+		break;
+	case WIFLOW_NL80211_GET_SEQNUM_REQUEST:
+		ret = wpa_get_seqnum_parser(buf, MAX_BUF_LEN, addr, &temp1, data);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_get_seqnum_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->get_seqnum) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->get_seqnum()");
+			wpa_drivers[i]->get_seqnum(hapd.ifname, hapd.bss, addr, temp1, data);
+		}
+		break;
+	case WIFLOW_NL80211_SET_STA_VLAN_REQUEST:
+		ret = wpa_set_sta_vlan_parser(buf, MAX_BUF_LEN, addr, &temp1);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_set_sta_vlan_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->set_sta_vlan) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_sta_vlan()");
+			wpa_drivers[i]->set_sta_vlan(hapd.bss, addr, hapd.ifname, temp1);
+		}
+		break;
+	case WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST:
+		ret = wpa_hapd_send_eapol_parser(buf,MAX_BUF_LEN, addr, data, &data_len, &encrypt, (u32)&temp1);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_hapd_send_eapol_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->hapd_send_eapol) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_send_eapol()");
+			wpa_drivers[i]->hapd_send_eapol(hapd.bss, addr, data, data_len, encrypt, hapd.own_addr, temp1);
+		}
+		break;
+	case WIFLOW_NL80211_READ_STA_DATA_REQUEST:
+		ret = wpa_read_sta_data_parser(buf,MAX_BUF_LEN, &sta_data, addr);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_read_sta_data_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->read_sta_data) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->read_sta_data()");
+			wpa_drivers[i]->read_sta_data(hapd.bss, &sta_data, addr);
+		}
+		break;
+	case WIFLOW_NL80211_POLL_CLIENT_REQUEST:
+		ret = wpa_poll_client_parser(buf, MAX_BUF_LEN, addr, &temp1);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_poll_client_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->poll_client) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->poll_client()");
+			wpa_drivers[i]->poll_client(hapd.bss, hapd.own_addr, addr, temp1);
+		}
+		break;
+	case WIFLOW_NL80211_GET_INACT_SEC_REQUEST:
+		ret = wpa_get_inact_sec_parser(buf, MAX_BUF_LEN, addr);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_get_inact_sec_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->get_inact_sec) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->get_inact_sec()");
+			wpa_drivers[i]->get_inact_sec(hapd.bss, addr);
+		}
+		break;
+	case WIFLOW_NL80211_STA_REMOVE_REQUEST:
+		ret = wpa_sta_remove_parser(buf, MAX_BUF_LEN, addr);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_sta_remove_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->sta_remove) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->sta_remove()");
+			wpa_drivers[i]->sta_remove(hapd.bss, addr);
+		}
+		break;
+	case WIFLOW_NL80211_SET_AP_REQUEST:
+		ret = wpa_set_ap_parser(buf, MAX_BUF_LEN, &ap_params);
+        if(ret < 0)
+        {
+            fprintf(stderr,"wpa_sta_remove_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		if(wpa_drivers[i]->set_ap) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_ap()");
+			wpa_drivers[i]->set_ap(hapd.bss, &ap_params);
 		}
 		break;
 	default:
