@@ -25,7 +25,7 @@
 
 struct hostapd_data
 {
-    struct i802_bss * bss;
+    struct i802_bss *bss;
 	const struct wpa_driver_ops *driver;
 };
 
@@ -126,7 +126,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	char *country;
 	u16 *num_modes, *flags;
 	struct hostapd_hw_modes *remote_hw_modes;
-    struct hostapd_data * hapd = (struct hostapd_data *)eloop_ctx;
+    struct hostapd_data *hapd = (struct hostapd_data *)eloop_ctx;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
 	int ret;
@@ -167,7 +167,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		if (wpa_drivers[i]->hapd_init) 
 		{
 		    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_init(&hapd,&params)");
-			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
+			hapd->bss = wpa_drivers[i]->hapd_init(hapd,&params);
 			if (hapd->bss == NULL) 
 			{
 				printf("hapd_init Failed to initialize\n");
@@ -177,7 +177,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
         break;
 		
 	case WIFLOW_INIT_CAPA_REQUEST:
-		if(hapd->driver->get_capa(hapd.bss,&capa) != 0)
+		if(hapd->driver->get_capa(hapd->bss,&capa) != 0)
 		{
 			printf("get_capa Failed!\n");
 			return ;
@@ -202,7 +202,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		if(hapd->driver->set_country(hapd->bss, country) != 0)
 		{
 			printf("set_country Failed!\n");
-			return -1;
+	//		return -1;
 		}
 
 	case WPA_GET_HW_MODE_REQUEST:
@@ -214,7 +214,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		if((remote_hw_modes = hapd->driver->get_hw_feature_data(hapd->bss, num_modes, flags)) == NULL)
 		{
 			printf("get_hw_feature_data Failed!\n");
-			return -1;
+	//		return -1;
 		}
 		ret = remote_hw_modes_format(buf, &buf_size, remote_hw_modes);
 		if(ret < 0)

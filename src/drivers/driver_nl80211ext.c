@@ -29,6 +29,7 @@
 
 #include "nl80211_copy.h"
 
+#include "ap/hostapd.h"
 #include "common.h"
 #include "eloop.h"
 #include "utils/list.h"
@@ -323,7 +324,7 @@ wpa_driver_nl80211_get_hw_feature_data(void *priv, u16 *num_modes, u16 *flags)
 	if(local_default_hw_mode(local_hw_mode) != 0)
 	{
 		fprintf(stderr,"capa default init Error,%s:%d\n",__FILE__,__LINE__);
-		return -1;
+		return NULL;
 	}
 
 	return local_hw_mode;
@@ -390,6 +391,7 @@ static int wpa_driver_nl80211_associate(
 static int wpa_driver_nl80211_get_capa(void *priv,
 				       struct wpa_driver_capa *capa)
 {
+	int ret;
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
 	int buf_size = MAX_BUF_LEN;
 
@@ -739,7 +741,7 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
         break;
     /* add new case here */
 	case WIFLOW_INIT_CAPA_RESPONSE:
-		ret = wpa_init_capa_parser(buf,&buf_size,&capa);
+		ret = wpa_init_capa_parser(buf,buf_size,&capa);
 		iface->drv_flags = capa.flags;
 		iface->probe_resp_offloads = capa.probe_resp_offloads;
 		break;
@@ -748,7 +750,6 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
 		if(ret < 0)
     	{
         	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
-        	return -1;
     	}
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
