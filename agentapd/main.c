@@ -124,6 +124,8 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	size_t data_len = 0;
 	int encrypt = 0;
 	int temp1,temp2;
+	int frag = -1;
+	enum wpa_driver_if_type type;
 	u8 * addr;
 	u8 * data;
 	char * bridge_ifname;
@@ -138,6 +140,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	struct wpa_set_tx_queue_params tx_params;
 	struct wpa_driver_scan_params scan_params;
 	struct wpa_set_key_params key_params;
+	int rts;
     /* read nl80211 commands from remote  */
 	int buf_size = 0;
 	int ret;
@@ -289,6 +292,18 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 			wpa_drivers[i]->sta_set_flags(hapd.bss, addr, temp1, temp2, encrypt);
 		}
 		break;
+	case WIFLOW_NL80211_SET_RTS_REQUEST:
+	 	ret = wpa_set_rts_parser(buf, MAX_BUF_LEN, &rts);
+	 	if(ret < 0)
+	 	{
+	 		fprintf(stderr,"wpa_set_rts_parser Error,%s:%d\n",__FILE__,__LINE__); 
+	 	}
+	 	if(wpa_drivers[i]->set_rts) 
+	 	{
+	 		wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_rts()");
+	 		wpa_drivers[i]->set_rts(hapd.bss,rts);
+	 	}
+	 	break;
 	case WIFLOW_NL80211_SEND_ACTION_REQUEST:
 		ret = wpa_send_action_parser(buf, MAX_BUF_LEN,&temp1,
 			&temp2,addr, data, &data_len);
@@ -385,6 +400,22 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 			scan_res = wpa_drivers[i]->get_scan_results2(hapd.bss); /* struct *scan_res */
 		}
 		break;
+	case WIFLOW_NL80211_SET_FRAG:
+		frag = wpa_set_frag_parser(buf,MAX_BUF_LEN);	
+        if(frag < 0)
+        {
+        	fprintf(stderr,"wpa_set_frag_parse Error,%s:%d\n",__FILE__,__LINE__); 
+		}	
+ 		 wpa_drivers[i]->set_frag(hapd.bss, frag);
+		 break;
+	case WIFLOW_NL80211_IF_REMOVE:
+		type =wpa_if_remove_parser(buf,MAX_BUF_LEN,&func_params);
+		if(type < 0)
+		{
+			fprintf(stderr,"wpa_if_remove__parse Error,%s:%d\n",__FILE__,__LINE__); 
+		}
+		 wpa_drivers[i]->if_remove(hapd.bss,type,func_params.ifname);
+		 break;
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 	}  

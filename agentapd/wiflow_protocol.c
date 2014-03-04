@@ -1265,6 +1265,70 @@ err:
 	return -1;
 }
 
+int wpa_set_rts_format(char * pdu, int *p_size, int rts)
+{
+    struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	if(pdu == NULL || *p_size < sizeof(struct wiflow_pdu))
+    {
+        fprintf(stderr,"wpa_set_rts_format args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,*p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    wpdu->type = WIFLOW_NL80211_SET_RTS_REQUEST;
+	counter += sizeof(struct wiflow_pdu);
+	/*rts*/
+	len = sizeof(element->len) + sizeof(int);
+    if(*p_size < counter + len)
+    {
+        goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = sizeof(int);
+    memcpy(&element->data,&rts,sizeof(int));
+    counter += len;
+    *p_size = counter;
+    return 0;
+err:
+    return -1;
+}
+
+int wpa_set_rts_parser(char * pdu, int p_size, int * rts)
+{
+    struct wiflow_pdu *wpdu;
+    struct wiflow_pdu_element *element;
+    int counter = 0;
+    int len;
+	if(pdu == NULL || p_size < sizeof(struct wiflow_pdu) || rts == NULL)
+    {
+        fprintf(stderr,"wpa_set_rts_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,p_size);
+        goto err;   
+    }
+    wpdu = (struct wiflow_pdu*)pdu;
+    if(wpdu->type != WIFLOW_NL80211_SET_RTS_REQUEST)
+    {
+        fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+        goto err;   
+    }
+	counter += sizeof(struct wiflow_pdu);
+	/*rts*/
+	len = sizeof(element->len) + sizeof(int);
+    if(p_size < counter + len)
+    {
+        fprintf(stderr,"rts Error,%s:%d\n",__FILE__,__LINE__);
+        goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    memcpy(rts,&element->data,sizeof(int));
+	
+    return 0;
+err:
+    return -1;
+}
+
+
 int wpa_send_action_format(char * pdu,int * p_size, unsigned int freq, unsigned int wait_time, const u8 * dst, const u8 * data,size_t data_len)
 {
 	struct wiflow_pdu *wpdu;
@@ -2281,4 +2345,180 @@ err:
 	return -1;
 }
 
+int wpa_set_frag_format(char * pdu, int *p_size,int frag)
+{
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int counter = 0;
+	int len;
+	int pdu_size = *p_size;
+	
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+	{
+		fprintf(stderr,"wpa_init_params_format args Error,%s:%d\n",__FILE__,__LINE__); 
+		goto err;	
+	}	
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_SET_FRAG;
+	counter += sizeof(struct wiflow_pdu);
+	element = (struct wiflow_pdu_element *)(pdu + counter);
+	
+	element->len = 4;
+
+	len = sizeof(element->len) + element->len;
+	if(pdu_size < counter + len)
+	{
+		goto err; 
+	}
+	memcpy(&element->data,&frag,element->len);
+	counter += len;	
+	*p_size = counter;
+	return 0;
+
+err:
+	return -1;	
+}
+
+
+int wpa_set_frag_parser(char * pdu, int pdu_size)
+ {
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int counter = 0;
+	int frag = -1;
+	int len;
+	char *p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+     {
+        fprintf(stderr,"wpa_set_frag_parser args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+		goto err;   
+     }
+     wpdu = (struct wiflow_pdu*)pdu;
+     if(wpdu->type != WIFLOW_NL80211_SET_FRAG)
+     {
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;   
+    }
+	counter += sizeof(struct wiflow_pdu);
+ 	element = (struct wiflow_pdu_element *)(pdu + counter);
+	len = sizeof(element->len) + element->len;
+ 	if(pdu_size < counter + len)
+ 	{
+		goto err; 
+ 	}
+	p = malloc(element->len);
+	memcpy(p,&element->data,element->len);
+	frag = atoi(p);
+ 	counter += len;
+	return frag;
+	
+ err:
+     return -1;
+ }
+
+int wpa_if_remove_format(char * pdu, int *p_size,enum wpa_driver_if_type type,
+					 const char *ifname)
+{
+	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int pdu_size = *p_size;
+	int counter = 0;
+	int len;
+
+	if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+	{
+		fprintf(stderr,"wpa_if_remove args Error,%s:%d\n",__FILE__,__LINE__); 
+			goto err;	
+	}	
+	wpdu = (struct wiflow_pdu*)pdu;
+	wpdu->type = WIFLOW_NL80211_IF_REMOVE;
+	counter += sizeof(struct wiflow_pdu);
+	/* type */
+    len = sizeof(element->len) + 4;
+    if(pdu_size < counter + len)
+    {
+        goto err;  
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = 4;
+    memcpy(&element->data,&type,element->len);
+    counter += len;
+	/* ifname */
+    len = sizeof(element->len) + IFNAMSIZ + 1;
+    if(pdu_size < counter + len)
+    {
+         goto err; 
+    }
+    element = (struct wiflow_pdu_element *)(pdu + counter);
+    element->len = IFNAMSIZ + 1;
+    memcpy(&element->data,&ifname,element->len);
+    counter += len;
+	return 0;
+	
+err:
+	return -1;		
+ 
+}
+
+
+
+ 
+ int wpa_if_remove_parser(char * pdu, int pdu_size,struct wpa_function_params *func_params)
+ {
+ 	struct wiflow_pdu *wpdu;
+	struct wiflow_pdu_element *element;
+	int counter = 0;
+	int len;
+	enum wpa_driver_if_type type;
+	char *p;
+    if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu))
+     {
+        fprintf(stderr,"wpa_if_remove_parserr args Error,%s:%d,pdu_size:%d\n",__FILE__,__LINE__,pdu_size);
+		goto err;   
+     }
+     wpdu = (struct wiflow_pdu*)pdu;
+     if(wpdu->type != WIFLOW_NL80211_IF_REMOVE)
+     {
+		fprintf(stderr,"wpdu->type Error,%s:%d\n",__FILE__,__LINE__);
+		goto err;   
+     }
+	 wpdu = (struct wiflow_pdu*)pdu;
+	 wpdu->type = WIFLOW_INIT_PARAMS_RESPONSE;
+	 counter += sizeof(struct wiflow_pdu);
+	 /* type */
+	 len = sizeof(element->len) + 4;
+	 if(pdu_size < counter + len)
+	 {
+		 goto err; 
+	 }
+	 element = (struct wiflow_pdu_element *)(pdu + counter);
+	 element->len = 4;
+	 p = malloc(element->len);
+	 memcpy(p,&element->data,element->len);
+	 type = atoi(p);
+ 	 counter += len;
+	 /* ifname */
+	len = sizeof(element->len) + IFNAMSIZ + 1;
+	if(pdu_size < counter + len)
+	 {
+		 goto err; 
+	 }
+	 element = (struct wiflow_pdu_element *)(pdu + counter);
+	 p = malloc(IFNAMSIZ + 1);
+     	 memcpy(p,&element->data,IFNAMSIZ + 1);
+	 if(*p == 0)
+	 {
+		func_params->ifname = NULL;
+		free(p);
+		p = NULL;
+	 }
+	 else 
+	 {
+		func_params->ifname = (const char *)p;
+	 }
+     counter += len;
+	 return type;
+ err:
+     return -1;
+ }
 

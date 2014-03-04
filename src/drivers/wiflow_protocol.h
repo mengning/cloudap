@@ -42,6 +42,7 @@ enum wiflow_commands
     WIFLOW_NL80211_IF_ADD_REQUEST2,  /*remote request call if_add func*/
     WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
     WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
+    WIFLOW_NL80211_SET_RTS_REQUEST,/*remote request call set_rts func*/
     WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
     WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST, /*remote request call set_tx_queue_params func*/
     WIFLOW_NL80211_SCAN2_REQUEST, /*remote request call scan2 func*/
@@ -49,7 +50,9 @@ enum wiflow_commands
     WIFLOW_NL80211_STA_DISASSOC_REQUEST, /*remote request call sta_disassoc func*/
     WIFLOW_NL80211_SET_KEY_REQUEST, /*remote request call set_key func*/
     WIFLOW_NL80211_SEND_MLME_REQUEST, /*remote request call send_mlme func*/
-    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST /*remote request call get_scan_results2 func*/
+    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST, /*remote request call get_scan_results2 func*/
+    WIFLOW_NL80211_SET_FRAG,			/* remote  call set_farg */
+    WIFLOW_NL80211_IF_REMOVE			/* remove call if_remove */
 }; 
 
 struct wiflow_pdu_element
@@ -211,6 +214,24 @@ int wpa_sta_set_flags_parser(char *pdu, int p_size, u8 *addr, int* total_flags,
 					    int* flags_or, int* flags_and);
 
 /*
+ * Format the struct i802_bss *bss to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: int rts , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_rts_format(char * pdu, int *p_size, int rts);
+
+/*
+  * Parse the PDU to sta_set_rts() argc
+  * input	: char * pdu , Memory allocate outside
+  * output	: sta_set_rts() agrc , Memory allocate outside
+  * return	: SUCCESS(0)/FAILURE(-1)
+  *
+  */
+int wpa_set_rts_parser(char * pdu, int p_size, int * rts);
+
+/*
  * Format the func argc to the PDU
  * output	: char * pdu , Memory allocate outside
  * input	: func argc, Memory allocate outside
@@ -341,6 +362,42 @@ int wpa_send_mlme_format(char *pdu, int *p_size, const u8 *data, size_t data_len
  *
  */
 int wpa_send_mlme_parser(char *pdu, int p_size, const u8 *data, size_t *data_len, int *noack);
+
+/*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_set_frag_format(char * pdu, int *p_size,int frag);
+
+/*
+ * Parse the PDU to wpa_if_remove_parser argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: send_mlme() agrc , Memory allocate outside
+ * return	: frag/FAILURE(-1)
+ *
+ */	
+int wpa_set_frag_parser(char * pdu, int pdu_size);
+
+ /*
+ * Format the func argc to the PDU
+ * output	: char * pdu , Memory allocate outside
+ * input	: func argc, Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
+int wpa_if_remove_format(char * pdu, int *p_size,enum wpa_driver_if_type type,
+					const char *ifname);
+/*
+ * Parse the PDU to wpa_if_remove_parser argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: send_mlme() agrc , Memory allocate outside
+ * return	: type/FAILURE(-1)
+ *
+ */				
+int wpa_if_remove_parser(char * pdu, int pdu_size,struct wpa_function_params *func_params);
 
 #endif /* _WI_FLOW_H_ */
 
