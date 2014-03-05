@@ -122,12 +122,15 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 {
     int i = 0;
 	size_t data_len = 0;
-	int encrypt = 0;
-	int temp1,temp2;
-	u8 * addr;
-	u8 * data;
-	char * bridge_ifname;
+	int temp1,temp2,
+		encrypt = 0,
+		frag = -1;
+	u32 uflags;
+	enum wpa_driver_if_type type;
+	u8 *addr, *data;
+	char *bridge_ifname, *country;
     char buf[MAX_BUF_LEN];
+	u16 num_modes, flags;
     struct wpa_init_params params;
 	struct wpa_scan_results *scan_res;
 	struct ieee80211_mgmt mgmt;
@@ -138,14 +141,14 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	struct wpa_set_tx_queue_params tx_params;
 	struct wpa_driver_scan_params scan_params;
 	struct wpa_set_key_params key_params;
-<<<<<<< HEAD
 	struct hostap_sta_driver_data sta_data;
 	struct wpa_driver_ap_params ap_params;
-=======
+	struct wpa_driver_capa capa;
+	struct hostapd_hw_modes *remote_hw_modes;
+//	struct hostapd_data *hapd = (struct hostapd_data *)eloop_ctx;
 	int rts;
->>>>>>> mengning/master
     /* read nl80211 commands from remote  */
-	int buf_size = 0;
+	int buf_size = MAX_BUF_LEN;
 	int ret;
     ret = recv(sock,buf,MAX_BUF_LEN,0);
     if(ret < 0)
@@ -428,7 +431,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST:
-		ret = wpa_hapd_send_eapol_parser(buf,MAX_BUF_LEN, addr, data, &data_len, &encrypt, (u32)&temp1);
+		ret = wpa_hapd_send_eapol_parser(buf,MAX_BUF_LEN, addr, data, &data_len, &encrypt, &uflags);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_hapd_send_eapol_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -436,7 +439,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		if(wpa_drivers[i]->hapd_send_eapol) 
 		{
 			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_send_eapol()");
-			wpa_drivers[i]->hapd_send_eapol(hapd.bss, addr, data, data_len, encrypt, hapd.own_addr, temp1);
+			wpa_drivers[i]->hapd_send_eapol(hapd.bss, addr, data, data_len, encrypt, hapd.own_addr, uflags);
 		}
 		break;
 	case WIFLOW_NL80211_READ_STA_DATA_REQUEST:
@@ -498,6 +501,77 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_ap()");
 			wpa_drivers[i]->set_ap(hapd.bss, &ap_params);
 		}
+		break;
+	case WIFLOW_NL80211_SET_FRAG:
+		frag = wpa_set_frag_parser(buf,MAX_BUF_LEN);	
+        if(frag < 0)
+        {
+        	fprintf(stderr,"wpa_set_frag_parse Error,%s:%d\n",__FILE__,__LINE__); 
+		}	
+ 		 wpa_drivers[i]->set_frag(hapd.bss, frag);
+		 break;
+	case WIFLOW_NL80211_IF_REMOVE:
+		type =wpa_if_remove_parser(buf,MAX_BUF_LEN,&func_params);
+		if(type < 0)
+		{
+			fprintf(stderr,"wpa_if_remove__parse Error,%s:%d\n",__FILE__,__LINE__); 
+		}
+		 wpa_drivers[i]->if_remove(hapd.bss,type,func_params.ifname);
+		 break;
+	case  WIFLOW_NL80211_i802_FLUSH_REQUEST:
+		if(wpa_drivers[i]->flush) 
+		{
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->flush()");
+			wpa_drivers[i]->flush(hapd.bss);
+		}
+		break;	
+	case WIFLOW_INIT_CAPA_REQUEST:
+		if(wpa_drivers[i]->get_capa(hapd.bss,&capa) != 0)
+		{
+			fprintf(stderr,"get_capa Error,%s:%d\n",__FILE__,__LINE__); 
+		}
+		ret = wpa_init_capa_format(buf, &buf_size, &capa);
+		if(ret < 0 || buf_size <= 0)
+		{
+			fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+		}
+		ret = send(sock,buf,buf_size,0);
+		if(ret < 0)
+		{
+			fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    		}
+		break;
+	case WIFLOW_SET_COUNTRY:
+		ret = wpa_set_country_parser(buf,buf_size,country);
+        	if(ret < 0)
+        	{
+            		fprintf(stderr,"wpa_init_params_parser Error,%s:%d\n",__FILE__,__LINE__); 
+        	}
+		if(wpa_drivers[i]->set_country(hapd.bss, country) != 0)
+		{
+			fprintf(stderr,"set_country Error,%s:%d\n",__FILE__,__LINE__);  
+		}
+		break;
+	case WPA_GET_HW_MODE_REQUEST:
+		ret = wpa_get_hw_feature_parser(buf, buf_size, &num_modes, &flags);
+		if(ret < 0)
+		{
+			fprintf(stderr,"wiflow_pdu_format Error,%s:%d\n",__FILE__,__LINE__);  
+		}
+		if((remote_hw_modes = wpa_drivers[i]->get_hw_feature_data(hapd.bss, &num_modes, &flags)) == NULL)
+		{
+			printf("get_hw_feature_data Failed!\n");
+		}
+		/*ret = remote_hw_modes_format(buf, &buf_size, remote_hw_modes);
+		if(ret < 0)
+        {
+            fprintf(stderr,"remote_hw_modes_format Error,%s:%d\n",__FILE__,__LINE__); 
+        }
+		ret = send(sock,buf,buf_size,0);
+		if(ret < 0)
+		{
+			fprintf(stderr,"send Error,%s:%d\n",__FILE__,__LINE__);  
+    	}*/
 		break;
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
