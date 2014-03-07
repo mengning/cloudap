@@ -333,6 +333,7 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #endif /* RATES */
 
 
+
 #ifdef __GNUC__
 #define PRINTF_FORMAT(a,b) __attribute__ ((format (printf, (a), (b))))
 #define STRUCT_PACKED __attribute__ ((packed))

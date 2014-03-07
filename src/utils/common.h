@@ -313,7 +313,7 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #ifndef ETH_P_RRB
 #define ETH_P_RRB 0x890D
 #endif /* ETH_P_RRB */
-#ifndef INT_SIZE
+#ifdef INT_SIZE
 #define INT_SIZE sizeof(int)
 #endif /* INT_SIZE */
 #ifndef COUNTRY_SIZE
@@ -331,11 +331,6 @@ static inline unsigned int wpa_swap_32(unsigned int v)
 #ifndef RATES
 #define RATES (4*sizeof(int))
 #endif /* RATES */
-
-
-
-
-
 
 
 

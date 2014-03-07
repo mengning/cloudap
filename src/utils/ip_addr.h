@@ -6,8 +6,6 @@
  * See README for more details.
  */
 
-#include "common.h"
-
 #ifndef IP_ADDR_H
 #define IP_ADDR_H
 

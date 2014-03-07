@@ -6,8 +6,6 @@
  * See README for more details.
  */
 
-#include "utils/common.h"
-
 #ifndef WPA_COMMON_H
 #define WPA_COMMON_H
 

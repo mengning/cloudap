@@ -494,16 +494,17 @@ static void ieee80211n_scan_channels_2g4(struct hostapd_iface *iface,
 static int ieee80211n_check_40mhz(struct hostapd_iface *iface)
 {
 	struct wpa_driver_scan_params params;
-
+	struct hostapd_hw_modes *mode;
 	if (!iface->conf->secondary_channel)
 		return 0; /* HT40 not used */
 
+	mode = iface->current_mode;
 	wpa_printf(MSG_DEBUG, "Scan for neighboring BSSes prior to enabling "
 		   "40 MHz channel");
 	os_memset(&params, 0, sizeof(params));
 	if (iface->current_mode->mode == HOSTAPD_MODE_IEEE80211G)
 		ieee80211n_scan_channels_2g4(iface, &params);
-	if (hostapd_driver_scan(iface->bss[0], &params) < 0) {
+	if (hostapd_driver_scan(iface->bss[0], &params, mode->num_channels) < 0) {
 		wpa_printf(MSG_ERROR, "Failed to request a scan of "
 			   "neighboring BSSes");
 		os_free(params.freqs);
