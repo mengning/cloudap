@@ -110,6 +110,54 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 			  union wpa_event_data *data)
 {
     printf("wpa_supplicant_event\n");
+	int ret = 0;
+	char buf[MAX_BUF_LEN];
+	int buf_size;
+	buf_size = MAX_BUF_LEN;
+	switch(event)
+	{
+	case EVENT_RX_MGMT:
+		ret = wpa_supplicant_rx_mgmt_format(buf, &buf_size, ctx, data);
+		if(ret < 0)
+		{
+			 fprintf(stderr,"wpa_supplicant_rx_mgmt_format Error,%s:%d\n",__FILE__,__LINE__);
+			 break;
+		}
+		ret = send(global_sockfd,buf,buf_size,0);
+		if(ret < 0)
+    		{
+        		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        		break;
+   		}
+		break;
+	case EVENT_DISASSOC:
+		ret = wpa_supplicant_disassoc_format(buf, &buf_size, ctx, data);
+		if(ret < 0)
+		{
+			 fprintf(stderr,"wpa_supplicant_disassoc_format Error,%s:%d\n",__FILE__,__LINE__);
+			 break;
+		}
+		ret = send(global_sockfd,buf,buf_size,0);
+		if(ret < 0)
+    		{
+        		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        		break;
+   		}
+		break;
+	case EVENT_EAPOL_TX_STATUS:
+		ret = wpa_supplicant_eapol_tx_format(buf, &buf_size, ctx, data);
+		if(ret < 0)
+		{
+			 fprintf(stderr,"wpa_supplicant_eapol_tx_format Error,%s:%d\n",__FILE__,__LINE__);
+			 break;
+		}
+		ret = send(global_sockfd,buf,buf_size,0);
+		if(ret < 0)
+    		{
+        		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        		break;
+   		}
+		break;
     return;
 }
 
@@ -225,7 +273,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_I802_SET_WDS_STA_REQUEST:
-		ret = wpa_i802_set_wds_sta_parser(buf,MAX_BUF_LEN,addr,&temp1,&temp2,bridge_ifname);
+		ret = wpa_i802_set_wds_sta_parser(buf,MAX_BUF_LEN,&addr,&temp1,&temp2,&bridge_ifname);
 		if(ret < 0)
         {
             fprintf(stderr,"wpa_i802_set_wds_sta_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -287,7 +335,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_STA_SET_FLAGS_REQUEST:
-		ret = wpa_sta_set_flags_parser(buf, MAX_BUF_LEN, addr, &temp1, &temp2, &encrypt);
+		ret = wpa_sta_set_flags_parser(buf, MAX_BUF_LEN, &addr, &temp1, &temp2, &encrypt);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_sta_set_flags_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -312,7 +360,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	 	break;
 	case WIFLOW_NL80211_SEND_ACTION_REQUEST:
 		ret = wpa_send_action_parser(buf, MAX_BUF_LEN,&temp1,
-			&temp2,addr, data, &data_len);
+			&temp2,addr, &data, &data_len);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_send_action_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -349,7 +397,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_STA_DEAUTH_REQUEST:
-		ret = wpa_sta_deauth_parser(buf, MAX_BUF_LEN, addr, &temp1);
+		ret = wpa_sta_deauth_parser(buf, MAX_BUF_LEN, &addr, &temp1);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_sta_deauth_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -361,7 +409,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_STA_DISASSOC_REQUEST:
-		ret = wpa_sta_disassoc_parser(buf, MAX_BUF_LEN, addr, &temp1);
+		ret = wpa_sta_disassoc_parser(buf, MAX_BUF_LEN, &addr, &temp1);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_sta_disassoc_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -387,7 +435,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_SEND_MLME_REQUEST:
-		ret = wpa_send_mlme_parser(buf, MAX_BUF_LEN, data, &data_len, &temp1);
+		ret = wpa_send_mlme_parser(buf, MAX_BUF_LEN, &data, &data_len, &temp1);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_send_mlme_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -407,7 +455,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_GET_SEQNUM_REQUEST:
-		ret = wpa_get_seqnum_parser(buf, MAX_BUF_LEN, addr, &temp1, data);
+		ret = wpa_get_seqnum_parser(buf, MAX_BUF_LEN, &addr, &temp1, data);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_get_seqnum_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -419,7 +467,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_SET_STA_VLAN_REQUEST:
-		ret = wpa_set_sta_vlan_parser(buf, MAX_BUF_LEN, addr, &temp1);
+		ret = wpa_set_sta_vlan_parser(buf, MAX_BUF_LEN, &addr, &temp1);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_set_sta_vlan_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -431,7 +479,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST:
-		ret = wpa_hapd_send_eapol_parser(buf,MAX_BUF_LEN, addr, data, &data_len, &encrypt, &uflags);
+		ret = wpa_hapd_send_eapol_parser(buf,MAX_BUF_LEN, &addr, &data, &data_len, &encrypt, &uflags);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_hapd_send_eapol_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -443,7 +491,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_READ_STA_DATA_REQUEST:
-		ret = wpa_read_sta_data_parser(buf,MAX_BUF_LEN, &sta_data, addr);
+		ret = wpa_read_sta_data_parser(buf,MAX_BUF_LEN, &sta_data, &addr);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_read_sta_data_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -455,7 +503,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_POLL_CLIENT_REQUEST:
-		ret = wpa_poll_client_parser(buf, MAX_BUF_LEN, addr, &temp1);
+		ret = wpa_poll_client_parser(buf, MAX_BUF_LEN, &addr, &temp1);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_poll_client_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -467,7 +515,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_GET_INACT_SEC_REQUEST:
-		ret = wpa_get_inact_sec_parser(buf, MAX_BUF_LEN, addr);
+		ret = wpa_get_inact_sec_parser(buf, MAX_BUF_LEN, &addr);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_get_inact_sec_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -479,7 +527,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		}
 		break;
 	case WIFLOW_NL80211_STA_REMOVE_REQUEST:
-		ret = wpa_sta_remove_parser(buf, MAX_BUF_LEN, addr);
+		ret = wpa_sta_remove_parser(buf, MAX_BUF_LEN, &addr);
         if(ret < 0)
         {
             fprintf(stderr,"wpa_sta_remove_parser Error,%s:%d\n",__FILE__,__LINE__); 
@@ -542,7 +590,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
     		}
 		break;
 	case WIFLOW_SET_COUNTRY:
-		ret = wpa_set_country_parser(buf,buf_size,country);
+		ret = wpa_set_country_parser(buf,buf_size,&country);
         	if(ret < 0)
         	{
             		fprintf(stderr,"wpa_init_params_parser Error,%s:%d\n",__FILE__,__LINE__); 

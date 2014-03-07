@@ -342,7 +342,7 @@ wpa_driver_nl80211_get_hw_feature_data(void *priv, u16 *num_modes, u16 *flags)
 		int ret;
 		int buf_size = MAX_BUF_LEN;
 		struct hostapd_hw_modes *local_hw_mode = NULL;
-		
+		/*local_hw_mode = (struct hostapd_hw_modes *)malloc(buf_size);*/
 		memset(buf, 0, MAX_BUF_LEN);
 		ret = wpa_get_hw_feature_format(buf,&buf_size,num_modes,flags);
 		if(ret < 0 || buf_size <= 0)
@@ -357,16 +357,16 @@ wpa_driver_nl80211_get_hw_feature_data(void *priv, u16 *num_modes, u16 *flags)
 			goto err;
 		}
 	
-		*num_modes = 1;
+		/*num_modes = 1;
 		*flags = 1;
 		if(local_default_hw_mode(local_hw_mode) != 0)
 		{
 			fprintf(stderr,"capa default init Error,%s:%d\n",__FILE__,__LINE__);
 			return NULL;
 		}
-	
-		return local_hw_mode;
-	
+		
+		return local_hw_mode;*/
+		return NULL;
 	err:
 		return NULL;
 
@@ -1196,6 +1196,8 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
     /* read nl80211 event from agent  */
 	struct wpa_driver_capa capa;
 	extern struct hapd_interfaces interfaces; 
+	union wpa_event_data data;
+	void *ctx = NULL;
 //	struct hostapd_iface *iface = (struct hostapd_iface *)eloop_ctx;
 	int buf_size = 0;
 	int ret;
@@ -1224,6 +1226,33 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
     	{
         	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
     	}
+		break;
+	case WPA_SUPPLICANT_EVENT_RX_MGMT:
+		ret = wpa_supplicant_rx_mgmt_parser(buf, buf_size, &ctx, &data);
+		if(ret < 0)
+		{
+			fprintf(stderr,"wpa_supplicant_rx_mgmt_parser Error,%s:%d\n",__FILE__,__LINE__);
+			break;
+		}
+		wpa_supplicant_event(ctx, EVENT_RX_MGMT, &data);
+		break;
+	case WPA_SUPPLICANT_EVENT_DISASSOC_INFO:
+		ret = wpa_supplicant_disassoc_parser(buf, buf_size, &ctx, &data);
+		if(ret < 0)
+		{
+			fprintf(stderr,"wpa_supplicant_disassoc_parser Error,%s:%d\n",__FILE__,__LINE__);
+			break;
+		}
+		wpa_supplicant_event(ctx, EVENT_DISASSOC, &data);
+		break;
+	case  WPA_SUPPLICANT_EVENT_EAPOL_TX:
+		ret = wpa_supplicant_eapol_tx_parser(buf, buf_size, &ctx, &data);
+		if(ret < 0)
+		{
+			fprintf(stderr,"wpa_supplicant_eapol_tx_parser Error,%s:%d\n",__FILE__,__LINE__);
+			break;
+		}
+		wpa_supplicant_event(ctx, EVENT_EAPOL_TX_STATUS, &data);
 		break;
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
