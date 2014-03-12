@@ -66,7 +66,8 @@ enum wiflow_commands
     WIFLOW_INIT_CAPA_REQUEST,
     WIFLOW_SET_COUNTRY,
     WPA_GET_HW_MODE_REQUEST,
-    REMOTE_HW_MODE
+    REMOTE_HW_MODE,
+    WPA_SUP_EVENT
 }; 
 
 struct wiflow_pdu_element
@@ -575,6 +576,15 @@ int local_default_capa(struct wpa_driver_capa *capa);
 int local_default_hw_mode(struct hostapd_hw_modes *local_hw_mode);
 
 int i802_flush_format(char *pdu, int *p_size);
+/*
+int wpa_supplicant_rx_mgmt_format(char *pdu, int *p_size, union wpa_event_data *data);
+int wpa_supplicant_rx_mgmt_parser(char *pdu, int p_size, union wpa_event_data *data);
+*/
+
+int wpa_supplicant_data_format(char *pdu, int p_size, union wpa_event_data *data, enum wpa_event_type *event);
+int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data, enum wpa_event_type *event);
+
+
 
 
 #endif /* _WI_FLOW_H_ */

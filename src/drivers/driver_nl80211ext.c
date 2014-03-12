@@ -1195,6 +1195,8 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
     wpa_printf(MSG_DEBUG, "nl80211ext: %s",__FUNCTION__ );
     /* read nl80211 event from agent  */
 	struct wpa_driver_capa capa;
+	union wpa_event_data data;
+	enum wpa_event_type event;
 	extern struct hapd_interfaces interfaces; 
 //	struct hostapd_iface *iface = (struct hostapd_iface *)eloop_ctx;
 	int buf_size = 0;
@@ -1215,6 +1217,10 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
     /* add new case here */
 	case WIFLOW_INIT_CAPA_RESPONSE:
 		ret = wpa_init_capa_parser(buf,buf_size,&capa);
+		if(ret < 0)
+    	{
+        	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
+    	}
 		interfaces.iface[0]->drv_flags = capa.flags;
 		interfaces.iface[0]->probe_resp_offloads = capa.probe_resp_offloads;
 		break;
@@ -1225,6 +1231,13 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
         	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
     	}
 		break;
+	case WPA_SUP_EVENT:
+		ret = wpa_supplicant_data_parser(buf, buf_size, &data, &event);
+		if(ret < 0)
+    	{
+        	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
+    	}
+		wpa_supplicant_event(hapd, event, &data);
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 		return;

@@ -22,6 +22,7 @@
 
 #include "driver.h"
 #include "wiflow_protocol.h"
+int global_sockfd;
 
 struct hostapd_data
 {
@@ -62,6 +63,7 @@ int main()
     //bzero(&(serveraddr.sin_zero), 8);/* in string.h */
     memset(&serveraddr.sin_zero, 0, 8);
     sockfd = socket(PF_INET,SOCK_STREAM,0);
+	global_sockfd = sockfd;
     assert((sockfd != -1));
     int ret = connect(sockfd,(struct sockaddr *)&serveraddr,sizeof(struct sockaddr));
     if(ret == -1)
@@ -106,10 +108,25 @@ int main()
     return 0;
 }
 
-void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
-			  union wpa_event_data *data)
+void wpa_supplicant_event(void *ctx, enum wpa_event_type event,union wpa_event_data *data)
 {
-    printf("wpa_supplicant_event\n");
+	printf("wpa_supplicant_event\n");
+	int ret = 0;
+	char buf[MAX_BUF_LEN];
+	int buf_size;
+	buf_size = MAX_BUF_LEN;
+	ret = wpa_supplicant_data_format(buf, &buf_size, &data);
+	if(ret < 0)
+	{
+		fprintf(stderr,"wpa_supplicant_rx_mgmt_format Error,%s:%d\n",__FILE__,__LINE__);
+		 break;
+	}
+	ret = send(global_sockfd,buf,buf_size,0);
+	if(ret < 0)
+	{
+		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
+        break;
+   	}
     return;
 }
 
