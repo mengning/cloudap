@@ -40,6 +40,7 @@ struct hapd_global {
 	size_t drv_count;
 };
 
+struct hostapd_data ghapd;
 static struct hapd_global global;
 
 

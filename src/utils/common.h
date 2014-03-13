@@ -505,4 +505,9 @@ void * __hide_aliasing_typecast(void *foo);
 #define WPA_MEM_DEFINED(ptr, len) do { } while (0)
 #endif /* CONFIG_VALGRIND */
 
+
 #endif /* COMMON_H */
+
+
+
+

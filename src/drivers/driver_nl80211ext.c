@@ -49,6 +49,7 @@
 #define IP_ADDR                 "127.0.0.1"
 #define MAX_CONNECT_QUEUE       1024
 
+extern struct hostapd_data ghapd;
 int accept_fd = -1;
 int agentfd = -1;
 char buf[MAX_BUF_LEN];
@@ -1237,7 +1238,7 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
     	{
         	fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
     	}
-		wpa_supplicant_event(hapd, event, &data);
+		wpa_supplicant_event((void*)(&ghapd), event, &data);
 	default:
 		fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 		return;

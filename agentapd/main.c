@@ -33,7 +33,6 @@ struct hostapd_data
 
 extern struct wpa_driver_ops *wpa_drivers[];
 void * global_priv;
-struct hostapd_data hapd;
 
 void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx);
 /*
@@ -115,17 +114,17 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,union wpa_event_d
 	char buf[MAX_BUF_LEN];
 	int buf_size;
 	buf_size = MAX_BUF_LEN;
-	ret = wpa_supplicant_data_format(buf, &buf_size, &data);
+	ret = wpa_supplicant_data_format(buf, &buf_size, &data, &event);
 	if(ret < 0)
 	{
 		fprintf(stderr,"wpa_supplicant_rx_mgmt_format Error,%s:%d\n",__FILE__,__LINE__);
-		 break;
+		return;
 	}
 	ret = send(global_sockfd,buf,buf_size,0);
 	if(ret < 0)
 	{
 		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
-        break;
+        return;
    	}
     return;
 }

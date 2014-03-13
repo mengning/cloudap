@@ -151,7 +151,7 @@ int wpa_i802_set_wds_sta_format(char *pdu, int *p_size, const u8 *addr, int aid,
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_i802_set_wds_sta_parser(char *pdu, int p_size, u8 **addr, int * aid, int *val, char *bridge_ifname);
+int wpa_i802_set_wds_sta_parser(char *pdu, int p_size, u8 **addr, int * aid, int *val, char **bridge_ifname);
 
 /*
  * Format the struct hostapd_sta_add_params to the PDU
@@ -581,7 +581,7 @@ int wpa_supplicant_rx_mgmt_format(char *pdu, int *p_size, union wpa_event_data *
 int wpa_supplicant_rx_mgmt_parser(char *pdu, int p_size, union wpa_event_data *data);
 */
 
-int wpa_supplicant_data_format(char *pdu, int p_size, union wpa_event_data *data, enum wpa_event_type *event);
+int wpa_supplicant_data_format(char *pdu, int *p_size, union wpa_event_data *data, enum wpa_event_type *event);
 int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data, enum wpa_event_type *event);
 
 
