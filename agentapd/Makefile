@@ -11,7 +11,6 @@ OBJS = $(COMMON_OBJS) $(COMMON_LIB) $(UTILS_LIB)
 all: $(LIBS) $(TARGETS)
 
 copy:
-	$(CP) ../src/drivers/driver.h ./
 	$(CP) ../src/drivers/wiflow_protocol.h ./
 	$(CP) ../src/drivers/wiflow_protocol.c ./
 

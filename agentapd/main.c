@@ -104,7 +104,7 @@ int main()
     }
 
 	printf("NL80211 global initialized\n");
-     eloop_run();
+    eloop_run();
     return 0;
 }
 
@@ -125,7 +125,7 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 	if(ret < 0)
 	{
 		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
-        	return;
+        return;
    	}
 }
 
@@ -136,7 +136,7 @@ void wpa_scan_results_free(struct wpa_scan_results *res)
 
 void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 {
-    	int i = 0;
+    int i = 0;
 	size_t data_len = 0;
 	int temp1 = 0,temp2 = 0;
 	int encrypt = 0;
@@ -145,12 +145,12 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 	enum wpa_driver_if_type type;
 	u8 *addr, *data;
 	char *bridge_ifname, *country;
-    	char buf[MAX_BUF_LEN];
+    char buf[MAX_BUF_LEN];
 	u16 num_modes, flags;
-    	struct wpa_init_params params;
+    struct wpa_init_params params;
 	struct wpa_scan_results *scan_res;
 	struct ieee80211_mgmt mgmt;
-    	struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
+    struct i802_bss * bss = (struct i802_bss *)eloop_ctx;
 	struct hostapd_sta_add_params add_params;
 	struct wpa_function_params func_params;
 	struct hostapd_freq_params freq_data;
@@ -172,6 +172,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
     {
         fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__); 
     }
+    wpa_printf(MSG_DEBUG, "Agent Main: recved message from remote");
     struct wiflow_pdu *pdu = (struct wiflow_pdu*) buf;
 	printf("pdu->type = %d\n",pdu->type);
  	switch (pdu->type) 
@@ -189,8 +190,8 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
         params.use_pae_group_addr = 0;
         params.num_bridge = 1;
         params.bridge = os_calloc(params.num_bridge, sizeof(char *));
-	hapd.own_addr = params.own_addr;
-	hapd.ifname = params.ifname;
+        hapd.own_addr = params.own_addr;
+        hapd.ifname = params.ifname;
     	if (params.bridge == NULL)
     	{
     	    fprintf(stderr,"os_calloc Error,%s:%d\n",__FILE__,__LINE__);
@@ -203,20 +204,20 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
         wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params.num_bridge);
         wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params.bridge[0],IFNAMSIZ + 1);
         wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params.own_addr, ETH_ALEN);
-	*/
-	for (i = 0; wpa_drivers[i]; i++) 
-	{
-		if (wpa_drivers[i]->hapd_init) 
-		{
-		    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_init()");
-			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
-			if (hapd.bss == NULL) 
-			{
-				printf("hapd_init Failed to initialize\n");
-				return ;
-			}		    
-		}
-	}
+	    */
+    	for (i = 0; wpa_drivers[i]; i++) 
+    	{
+    		if (wpa_drivers[i]->hapd_init) 
+    		{
+    		    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_init()");
+    			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
+    			if (hapd.bss == NULL) 
+    			{
+    				printf("hapd_init Failed to initialize\n");
+    				return ;
+    			}		    
+    		}
+    	}
 		break;
     /* add new case here */
 	case WIFLOW_NL80211_SET_OPERSTATE_REQUEST:
@@ -354,7 +355,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
 		{
 			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->set_tx_queue_params()");
 			wpa_drivers[i]->set_tx_queue_params(hapd.bss,tx_params.queue, tx_params.aifs,
-				tx_params.cw_min,tx_params.cw_max,tx_params.burst_time);
+            tx_params.cw_min,tx_params.cw_max,tx_params.burst_time);
 		}
 		break;
 	case WIFLOW_NL80211_SCAN2_REQUEST:
@@ -532,7 +533,7 @@ void handle_agent_read(int sock, void *eloop_ctx, void *sock_ctx)
  		 wpa_drivers[i]->set_frag(hapd.bss, frag);
 		 break;
 	case WIFLOW_NL80211_IF_REMOVE:
-		type =wpa_if_remove_parser(buf,MAX_BUF_LEN,&func_params);
+		type = wpa_if_remove_parser(buf,MAX_BUF_LEN,&func_params);
 		if(type < 0)
 		{
 			fprintf(stderr,"wpa_if_remove__parse Error,%s:%d\n",__FILE__,__LINE__); 

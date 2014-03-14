@@ -1533,7 +1533,7 @@ struct wpa_driver_ops {
 	 * results event for wpa_supplicant which will eventually request the
 	 * results with wpa_driver_get_scan_results2().
 	 */
-	int (*scan2)(void *priv, struct wpa_driver_scan_params *params, int data_len);
+	int (*scan2)(void *priv, struct wpa_driver_scan_params *params );
 
 	/**
 	 * authenticate - Request driver to authenticate
