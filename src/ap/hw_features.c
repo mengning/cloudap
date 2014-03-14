@@ -54,6 +54,7 @@ int hostapd_get_hw_features(struct hostapd_iface *iface)
 	if (hostapd_drv_none(hapd))
 		return -1;
 	modes = hostapd_get_hw_feature_data(hapd, &num_modes, &flags);
+
 	if (modes == NULL) {
 		hostapd_logger(hapd, NULL, HOSTAPD_MODULE_IEEE80211,
 			       HOSTAPD_LEVEL_DEBUG,
@@ -63,7 +64,6 @@ int hostapd_get_hw_features(struct hostapd_iface *iface)
 	}
 
 	iface->hw_flags = flags;
-
 	hostapd_free_hw_features(iface->hw_features, iface->num_hw_features);
 	iface->hw_features = modes;
 	iface->num_hw_features = num_modes;
@@ -96,7 +96,6 @@ int hostapd_get_hw_features(struct hostapd_iface *iface)
 				   feature->channels[j].max_tx_power);
 		}
 	}
-
 	return ret;
 }
 
@@ -736,7 +735,7 @@ int hostapd_select_hw_mode(struct hostapd_iface *iface)
 			       iface->conf->channel,
 			       iface->current_mode->mode,
 			       hostapd_hw_mode_txt(iface->current_mode->mode));
-		iface->current_mode = NULL;
+		/*iface->current_mode = NULL;*/
 	}
 
 	if (iface->current_mode == NULL) {
