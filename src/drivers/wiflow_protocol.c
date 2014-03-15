@@ -5105,7 +5105,11 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 	 	}
 	 	p = malloc(element->len);
 		memcpy(p, &element->data, element->len);
+<<<<<<< HEAD
+		data->michael_mic_failure.src = (const u8 *)p;
+=======
 		data->michael_mic_failure.src = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	 case EVENT_TX_STATUS:
@@ -5118,7 +5122,11 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 	 	}
 	 	p = malloc(element->len);
 		memcpy(p, &element->data, element->len);
+<<<<<<< HEAD
+		data->tx_status.dst = (const u8 *)p;
+=======
 		data->tx_status.dst = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*data*/
 	 	element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5129,7 +5137,11 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 	 	}
 	 	p = malloc(element->len);
 		memcpy(p, &element->data, element->len);
+<<<<<<< HEAD
+		data->tx_status.data = (const u8 *)p;
+=======
 		data->tx_status.data = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_EAPOL_TX_STATUS:
@@ -5142,7 +5154,11 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 	 	}
 	 	p = malloc(element->len);
 		memcpy(p, &element->data, element->len);
+<<<<<<< HEAD
+		data->eapol_tx_status.dst = (const u8 *)p;
+=======
 		data->eapol_tx_status.dst = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*dst*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5153,7 +5169,11 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 	 	}
 	 	p = malloc(element->len);
 		memcpy(p, &element->data, element->len);
+<<<<<<< HEAD
+		data->eapol_tx_status.data = (const u8 *)p;
+=======
 		data->eapol_tx_status.data = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_RX_FROM_UNKNOWN:
@@ -5166,7 +5186,11 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		}
 		p = malloc(element->len);
 		memcpy(p, &element->data, element->len);
+<<<<<<< HEAD
+		data->rx_from_unknown.bssid = (const u8 *)p;
+=======
 		data->rx_from_unknown.bssid = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*addr*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5175,8 +5199,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->rx_from_unknown.addr = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->rx_from_unknown.addr = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_RX_MGMT:
@@ -5186,8 +5216,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->rx_mgmt.frame = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->rx_mgmt.frame = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_ASSOC:
@@ -5198,8 +5234,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->assoc_info.req_ies = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->assoc_info.req_ies = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*resp_ies*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5208,8 +5250,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->assoc_info.resp_ies = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->assoc_info.resp_ies = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*beacon_ies*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5218,8 +5266,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->assoc_info.beacon_ies = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->assoc_info.beacon_ies = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*addr*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5228,8 +5282,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->assoc_info.addr = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->assoc_info.addr = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_DEAUTH:
@@ -5240,8 +5300,9 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
-		memcpy(&element->data, &element->data, element->len);
-		data->assoc_info.addr = p;
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->assoc_info.addr = (const u8 *)p;
 		counter += len;
 		/*ie*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5250,8 +5311,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->deauth_info.ie = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->deauth_info.ie = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_RX_ACTION:
@@ -5262,8 +5329,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->rx_action.da = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->rx_action.da = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*sa*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5272,8 +5345,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->rx_action.sa = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->rx_action.sa = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*bssid*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5282,8 +5361,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->rx_action.bssid = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->rx_action.bssid = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		/*data*/
 		element = (struct wiflow_pdu_element *)(pdu + counter);
@@ -5292,8 +5377,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->rx_action.data = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->rx_action.data = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	case EVENT_AUTH:
@@ -5303,8 +5394,14 @@ int wpa_supplicant_data_parser(char *pdu, int p_size, union wpa_event_data *data
 		{
 			goto err;
 		}
+<<<<<<< HEAD
+		p = malloc(element->len);
+		memcpy(p, &element->data, element->len);
+		data->auth.ies = (const u8 *)p;
+=======
 		memcpy(&element->data, &element->data, element->len);
 		data->auth.ies = p;
+>>>>>>> cbbfecf794bfb97d6904aa79730ca7b86fe7217c
 		counter += len;
 		break;
 	default:
