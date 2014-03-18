@@ -1,0 +1,43 @@
+wpa_supplicant_event(ctx, EVENT_ASSOC, &event);
+wpa_supplicant_event(ctx, EVENT_DISASSOC, &event);
+wpa_supplicant_event(ctx, EVENT_EAPOL_RX, &event);
+wpa_supplicant_event(drv->ctx, EVENT_RX_MGMT, &event);
+wpa_supplicant_event(drv->ctx, EVENT_INTERFACE_STATUS, &event);
+wpa_supplicant_event(drv->ctx,
+wpa_supplicant_event(drv->ctx, EVENT_INTERFACE_ENABLED,
+wpa_supplicant_event(drv->ctx, EVENT_AUTH, &event);
+wpa_supplicant_event(drv->ctx, EVENT_ASSOC_REJECT, &event);
+wpa_supplicant_event(drv->ctx, EVENT_ASSOC, &event);
+wpa_supplicant_event(drv->ctx, EVENT_ASSOC_REJECT, &event);
+wpa_supplicant_event(drv->ctx, EVENT_ASSOC, &event);
+wpa_supplicant_event(drv->ctx, EVENT_DEAUTH, &data);
+wpa_supplicant_event(drv->ctx, EVENT_CH_SWITCH, &data);
+wpa_supplicant_event(drv->ctx, ev, &event);
+wpa_supplicant_event(drv->ctx, EVENT_RX_ACTION, &event);
+wpa_supplicant_event(drv->ctx, EVENT_RX_MGMT, &event);
+wpa_supplicant_event(drv->ctx, EVENT_TX_STATUS, &event);
+wpa_supplicant_event(drv->ctx, type, &event);
+wpa_supplicant_event(drv->ctx, type, &event);
+wpa_supplicant_event(bss->ctx, EVENT_MICHAEL_MIC_FAILURE, &data);
+wpa_supplicant_event(drv->ctx, EVENT_ASSOC, NULL);
+wpa_supplicant_event(drv->ctx, cancel_event ?
+wpa_supplicant_event(drv->ctx, EVENT_SCAN_RESULTS, &event);
+wpa_supplicant_event(drv->ctx, EVENT_STATION_LOW_ACK, &ed);
+wpa_supplicant_event(drv->ctx, EVENT_SIGNAL_CHANGE, &ed);
+wpa_supplicant_event(drv->ctx, EVENT_IBSS_RSN_START, &data);
+wpa_supplicant_event(drv->ctx, EVENT_IBSS_PEER_LOST, &data);
+wpa_supplicant_event(drv->ctx, EVENT_DRIVER_GTK_REKEY, &data);
+wpa_supplicant_event(drv->ctx, EVENT_PMKID_CANDIDATE, &data);
+wpa_supplicant_event(drv->ctx, EVENT_DRIVER_CLIENT_POLL_OK, &data);
+wpa_supplicant_event(drv->ctx, EVENT_TDLS, &data);
+wpa_supplicant_event(drv->ctx, EVENT_RX_FROM_UNKNOWN, &event);
+wpa_supplicant_event(drv->ctx, EVENT_SCHED_SCAN_STOPPED, NULL);
+wpa_supplicant_event(drv->ctx, EVENT_CHANNEL_LIST_CHANGED,
+wpa_supplicant_event(drv->ctx, EVENT_CHANNEL_LIST_CHANGED,
+wpa_supplicant_event(drv->ctx, EVENT_EAPOL_TX_STATUS, &event);
+wpa_supplicant_event(timeout_ctx, EVENT_INTERFACE_DISABLED, NULL);
+wpa_supplicant_event(timeout_ctx, EVENT_SCAN_RESULTS, NULL);
+wpa_supplicant_event(drv->ctx, EVENT_AUTH_TIMED_OUT,
+wpa_supplicant_event(ctx, EVENT_TX_STATUS, &event);
+wpa_supplicant_event(drv->ctx, EVENT_RX_FROM_UNKNOWN, &event);
+wpa_supplicant_event(drv->ctx, EVENT_RX_MGMT, &event);

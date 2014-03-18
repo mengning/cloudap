@@ -1,0 +1,735 @@
+random: Trying to read entropy from /dev/random
+Configuration file: /etc/hostapd.conf
+nl80211ext: nl80211_global_init
+nl80211ext: i802_init
+nl80211ext: params->bssid - hexdump(len=6): [NULL]
+nl80211ext: params->ifname:wlan0
+nl80211ext: params->ssid:mengning
+nl80211ext: params->ssid_len:8
+nl80211ext: params->num_bridge:1
+nl80211ext: params->bridge[0]:(null)
+nl80211ext: params->bridge[1]:(null)
+nl80211ext: params->bridge[2]:(null)
+nl80211ext: params->own_addr - hexdump(len=6): 00 00 00 00 00 00
+nl80211ext: wpa_driver_nl80211_init
+nl80211: interface wlan0 in phy phy0
+rfkill: initial event: idx=0 type=1 op=0 soft=0 hard=0
+nl80211: Using driver-based off-channel TX
+nl80211: Add own interface ifindex 3
+nl80211: Set mode ifindex 3 iftype 3 (AP)
+nl80211: Setup AP - device_ap_sme=0 use_monitor=0
+nl80211ext: wpa_driver_nl80211_probe_req_report
+nl80211: Subscribe to mgmt frames with AP handle 0x985d790
+nl80211: Register frame type=0xb0 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211: Register frame type=0x0 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211: Register frame type=0x20 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211: Register frame type=0xa0 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211: Register frame type=0xc0 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211: Register frame type=0xd0 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211: Register frame type=0x40 nl_handle=0x985d790
+nl80211: Register frame match - hexdump(len=0): [NULL]
+nl80211ext: bss->ifname:wlan0
+nl80211ext: bss->brname:
+nl80211ext: bss->addr - hexdump(len=6): c8 3a 35 cc 76 cd
+nl80211ext: wpa_driver_nl80211_get_capa
+BSS count 1, BSSID mask 00:00:00:00:00:00 (0 bits)
+nl80211ext: wpa_driver_nl80211_get_hw_feature_data
+nl80211: Regulatory information - country=00
+nl80211: 2402-2472 @ 40 MHz
+nl80211: 2457-2482 @ 40 MHz
+nl80211: 2474-2494 @ 20 MHz
+nl80211: 5170-5250 @ 40 MHz
+nl80211: 5735-5835 @ 40 MHz
+nl80211: 57240-63720 @ 2160 MHz
+nl80211: Added 802.11b mode based on 802.11g information
+Completing interface initialization
+Mode: IEEE 802.11g  Channel: 11  Frequency: 2462 MHz
+nl80211ext: i802_set_freq
+nl80211: Set freq 2462 (ht_enabled=0 sec_channel_offset=0)
+RATE[0] rate=10 flags=0x1
+RATE[1] rate=20 flags=0x1
+RATE[2] rate=55 flags=0x1
+RATE[3] rate=110 flags=0x1
+RATE[4] rate=60 flags=0x0
+RATE[5] rate=90 flags=0x0
+RATE[6] rate=120 flags=0x0
+RATE[7] rate=180 flags=0x0
+RATE[8] rate=240 flags=0x0
+RATE[9] rate=360 flags=0x0
+RATE[10] rate=480 flags=0x0
+RATE[11] rate=540 flags=0x0
+nl80211ext: i802_set_rts
+nl80211ext: i802_set_frag
+wlan0: Flushing old station entries
+nl80211ext: i802_flush
+wlan0: Deauthenticate all stations
+nl80211ext: i802_sta_deauth
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame command failed: ret=-16 (Device or resource busy) (freq=2462 wait=0)
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=0 set_tx=0 seq_len=0 key_len=0
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=1 set_tx=0 seq_len=0 key_len=0
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=2 set_tx=0 seq_len=0 key_len=0
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=3 set_tx=0 seq_len=0 key_len=0
+Using interface wlan0 with hwaddr c8:3a:35:cc:76:cd and ssid "mengning"
+Deriving WPA PSK based on passphrase
+SSID - hexdump_ascii(len=8):
+     6d 65 6e 67 6e 69 6e 67                           mengning        
+PSK (ASCII passphrase) - hexdump_ascii(len=8): [REMOVED]
+PSK (from passphrase) - hexdump(len=32): [REMOVED]
+random: Got 20/20 bytes from /dev/random
+GMK - hexdump(len=32): [REMOVED]
+Key Counter - hexdump(len=32): [REMOVED]
+WPA: Delay group state machine start until Beacon frames have been configured
+nl80211ext: wpa_driver_nl80211_set_ap
+nl80211: Set beacon (beacon_set=0)
+WPA: Start group state machine to set initial keys
+WPA: group state machine entering state GTK_INIT (VLAN-ID 0)
+GTK - hexdump(len=32): [REMOVED]
+WPA: group state machine entering state SETKEYSDONE (VLAN-ID 0)
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=2 addr=0x80a4dda key_idx=1 set_tx=1 seq_len=0 key_len=32
+   broadcast key
+nl80211ext: wpa_driver_nl80211_set_operstate
+wpa_driver_nl80211_set_operstate: operstate 0->1 (UP)
+netlink: Operstate: linkmode=-1, operstate=6
+nl80211ext: i802_set_tx_queue_params
+nl80211ext: i802_set_tx_queue_params
+nl80211ext: i802_set_tx_queue_params
+nl80211ext: i802_set_tx_queue_params
+wlan0: Setup of interface done.
+ctrl_iface not configured!
+RTM_NEWLINK: operstate=1 ifi_flags=0x1003 ([UP])
+RTM_NEWLINK, IFLA_IFNAME: Interface 'wlan0' added
+nl80211: if_removed already cleared - ignore event
+RTM_NEWLINK: operstate=1 ifi_flags=0x11043 ([UP][RUNNING][LOWER_UP])
+RTM_NEWLINK, IFLA_IFNAME: Interface 'wlan0' added
+nl80211: if_removed already cleared - ignore event
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0e8000
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+mgmt::auth
+authentication: STA=88:cb:87:e5:e0:73 auth_alg=0 auth_transaction=1 status_code=0 wep=0
+  New STA
+ap_sta_add: register ap_handle_timer timeout for 88:cb:87:e5:e0:73 (300 seconds - ap_max_inactivity)
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: authentication OK (open system)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-AUTHENTICATE.indication(88:cb:87:e5:e0:73, OPEN_SYSTEM)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-DELETEKEYS.request(88:cb:87:e5:e0:73)
+authentication reply: STA=88:cb:87:e5:e0:73 auth_alg=0 auth_transaction=2 resp=0 (IE len=0)
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0e8000
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+mgmt::assoc_req
+association request: STA=88:cb:87:e5:e0:73 capab_info=0x431 listen_interval=15
+  new AID 1
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: association OK (aid 1)
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0e9b00
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+mgmt::auth cb
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: authenticated
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+mgmt::assoc_resp cb
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: associated (aid 1)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-ASSOCIATE.indication(88:cb:87:e5:e0:73)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-DELETEKEYS.request(88:cb:87:e5:e0:73)
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+nl80211ext: wpa_driver_nl80211_sta_remove
+nl80211ext: wpa_driver_nl80211_sta_add
+nl80211ext: wpa_driver_nl80211_sta_set_flags
+wlan0: STA 88:cb:87:e5:e0:73 WPA: event 1 notification
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+IEEE 802.1X: Ignore STA - 802.1X not enabled or forced for WPS
+wlan0: STA 88:cb:87:e5:e0:73 WPA: start authentication
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state INITIALIZE
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+nl80211ext: wpa_driver_nl80211_sta_set_flags
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.1X: unauthorizing port
+WPA: 88:cb:87:e5:e0:73 WPA_PTK_GROUP entering state IDLE
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state AUTHENTICATION
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state AUTHENTICATION2
+WPA: Re-initialize GMK/Counter on first station
+GMK - hexdump(len=32): [REMOVED]
+Key Counter - hexdump(len=32): [REMOVED]
+GTK - hexdump(len=32): [REMOVED]
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=2 addr=0x80a4dda key_idx=1 set_tx=1 seq_len=0 key_len=32
+   broadcast key
+WPA: Assign ANonce - hexdump(len=32): ec 9b cb 07 fd 3e 87 61 9f 51 7b e4 2b 66 5b 6e cf aa b7 ff 52 dc 7c c6 12 b7 e6 87 0d be 33 c5
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state INITPSK
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKSTART
+wlan0: STA 88:cb:87:e5:e0:73 WPA: sending 1/4 msg of 4-Way Handshake
+WPA: Send EAPOL(version=2 secure=0 mic=0 ack=1 install=0 pairwise=8 kde_len=0 keyidx=0 encr=0)
+nl80211ext: wpa_driver_nl80211_hapd_send_eapol
+WPA: Use EAPOL-Key timeout of 100 ms (retry counter 1)
+hostapd_new_assoc_sta: reschedule ap_handle_timer timeout for 88:cb:87:e5:e0:73 (300 seconds - ap_max_inactivity)
+nl80211: Event message available
+wlan0: Event RX_FROM_UNKNOWN (19) received
+nl80211: Event message available
+nl80211: New station 88:cb:87:e5:e0:73
+wlan0: Event EAPOL_TX_STATUS (48) received
+IEEE 802.1X: 88:cb:87:e5:e0:73 TX status - version=2 type=3 length=95 - ack=1
+WPA: EAPOL-Key TX status for STA 88:cb:87:e5:e0:73 ack=1
+WPA: Increase initial EAPOL-Key 1/4 timeout by 1000 ms because of acknowledged frame
+wlan0: Event EAPOL_RX (27) received
+IEEE 802.1X: 121 bytes from 88:cb:87:e5:e0:73
+   IEEE 802.1X: version=2 type=3 length=117
+WPA: Received EAPOL-Key from 88:cb:87:e5:e0:73 key_info=0x10a type=2 key_data_length=22
+WPA: Received Key Nonce - hexdump(len=32): 2e 11 8f 75 08 ae ba 8e a8 e3 8e 33 71 9a 19 a2 32 ea 2e a6 75 34 53 4b 9a 5d a5 d9 5d 99 13 31
+WPA: Received Replay Counter - hexdump(len=8): 00 00 00 00 00 00 00 01
+wlan0: STA 88:cb:87:e5:e0:73 WPA: received EAPOL-Key frame (2/4 Pairwise)
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKCALCNEGOTIATING
+WPA: PTK derivation - A1=c8:3a:35:cc:76:cd A2=88:cb:87:e5:e0:73
+WPA: Nonce1 - hexdump(len=32): ec 9b cb 07 fd 3e 87 61 9f 51 7b e4 2b 66 5b 6e cf aa b7 ff 52 dc 7c c6 12 b7 e6 87 0d be 33 c5
+WPA: Nonce2 - hexdump(len=32): 2e 11 8f 75 08 ae ba 8e a8 e3 8e 33 71 9a 19 a2 32 ea 2e a6 75 34 53 4b 9a 5d a5 d9 5d 99 13 31
+WPA: PMK - hexdump(len=32): [REMOVED]
+WPA: PTK - hexdump(len=48): [REMOVED]
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKCALCNEGOTIATING2
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKINITNEGOTIATING
+nl80211ext: i802_get_seqnum
+wlan0: STA 88:cb:87:e5:e0:73 WPA: sending 3/4 msg of 4-Way Handshake
+WPA: Send EAPOL(version=2 secure=1 mic=1 ack=1 install=1 pairwise=8 kde_len=86 keyidx=1 encr=1)
+Plaintext EAPOL-Key Key Data - hexdump(len=96): [REMOVED]
+nl80211ext: wpa_driver_nl80211_hapd_send_eapol
+WPA: Use EAPOL-Key timeout of 100 ms (retry counter 1)
+wlan0: Event EAPOL_TX_STATUS (48) received
+IEEE 802.1X: 88:cb:87:e5:e0:73 TX status - version=2 type=3 length=191 - ack=1
+WPA: EAPOL-Key TX status for STA 88:cb:87:e5:e0:73 ack=1
+wlan0: Event EAPOL_RX (27) received
+IEEE 802.1X: 99 bytes from 88:cb:87:e5:e0:73
+   IEEE 802.1X: version=2 type=3 length=95
+WPA: Received EAPOL-Key from 88:cb:87:e5:e0:73 key_info=0x30a type=2 key_data_length=0
+WPA: Received Key Nonce - hexdump(len=32): 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+WPA: Received Replay Counter - hexdump(len=8): 00 00 00 00 00 00 00 02
+wlan0: STA 88:cb:87:e5:e0:73 WPA: received EAPOL-Key frame (4/4 Pairwise)
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKINITDONE
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=3 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=16
+   addr=88:cb:87:e5:e0:73
+wlan0: AP-STA-CONNECTED 88:cb:87:e5:e0:73
+nl80211ext: wpa_driver_nl80211_sta_set_flags
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.1X: authorizing port
+wlan0: STA 88:cb:87:e5:e0:73 RADIUS: starting accounting session 52D5F88E-00000000
+nl80211ext: i802_sta_clear_stats
+wlan0: STA 88:cb:87:e5:e0:73 WPA: pairwise key handshake completed (RSN)
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xf6df0500
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0fec00
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xf6c6e700
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0fe600
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0fe600
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xf6dfe200
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xf53ae000
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xf6e38500
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+mgmt::auth
+authentication: STA=88:cb:87:e5:e0:73 auth_alg=0 auth_transaction=1 status_code=0 wep=0
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: authentication OK (open system)
+wlan0: STA 88:cb:87:e5:e0:73 WPA: event 0 notification
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-AUTHENTICATE.indication(88:cb:87:e5:e0:73, OPEN_SYSTEM)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-DELETEKEYS.request(88:cb:87:e5:e0:73)
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+authentication reply: STA=88:cb:87:e5:e0:73 auth_alg=0 auth_transaction=2 resp=0 (IE len=0)
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0fea00
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+mgmt::assoc_req
+association request: STA=88:cb:87:e5:e0:73 capab_info=0x431 listen_interval=15
+  old AID 1
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: association OK (aid 1)
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xef0fe300
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+mgmt::auth cb
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: authenticated
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+mgmt::assoc_resp cb
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.11: associated (aid 1)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-ASSOCIATE.indication(88:cb:87:e5:e0:73)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-DELETEKEYS.request(88:cb:87:e5:e0:73)
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+nl80211ext: wpa_driver_nl80211_sta_remove
+nl80211ext: wpa_driver_nl80211_sta_add
+nl80211ext: wpa_driver_nl80211_sta_set_flags
+wlan0: STA 88:cb:87:e5:e0:73 WPA: event 1 notification
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+IEEE 802.1X: Ignore STA - 802.1X not enabled or forced for WPS
+wlan0: STA 88:cb:87:e5:e0:73 WPA: event 4 notification
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state AUTHENTICATION2
+WPA: Assign ANonce - hexdump(len=32): 4b 10 6c dd 89 52 86 c4 09 9b 4b 99 d9 1d 45 0d 90 a4 d3 34 9d 9b a3 95 4c cf ce 7e 59 a9 ce b4
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state INITPSK
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKSTART
+wlan0: STA 88:cb:87:e5:e0:73 WPA: sending 1/4 msg of 4-Way Handshake
+WPA: Send EAPOL(version=2 secure=0 mic=0 ack=1 install=0 pairwise=8 kde_len=0 keyidx=0 encr=0)
+nl80211ext: wpa_driver_nl80211_hapd_send_eapol
+WPA: Use EAPOL-Key timeout of 100 ms (retry counter 1)
+hostapd_new_assoc_sta: reschedule ap_handle_timer timeout for 88:cb:87:e5:e0:73 (300 seconds - ap_max_inactivity)
+nl80211: Event message available
+nl80211: Delete station 88:cb:87:e5:e0:73
+nl80211: Event message available
+wlan0: Event RX_FROM_UNKNOWN (19) received
+nl80211: Event message available
+nl80211: New station 88:cb:87:e5:e0:73
+wlan0: Event EAPOL_TX_STATUS (48) received
+IEEE 802.1X: 88:cb:87:e5:e0:73 TX status - version=2 type=3 length=95 - ack=1
+WPA: EAPOL-Key TX status for STA 88:cb:87:e5:e0:73 ack=1
+WPA: Increase initial EAPOL-Key 1/4 timeout by 1000 ms because of acknowledged frame
+wlan0: Event EAPOL_RX (27) received
+IEEE 802.1X: 121 bytes from 88:cb:87:e5:e0:73
+   IEEE 802.1X: version=2 type=3 length=117
+WPA: Received EAPOL-Key from 88:cb:87:e5:e0:73 key_info=0x10a type=2 key_data_length=22
+WPA: Received Key Nonce - hexdump(len=32): 49 e6 b0 cd f3 2e 66 8c 68 c8 b9 be 64 10 df 79 f7 93 43 67 e4 c4 4c 46 62 36 dc 9d e4 eb b1 41
+WPA: Received Replay Counter - hexdump(len=8): 00 00 00 00 00 00 00 03
+wlan0: STA 88:cb:87:e5:e0:73 WPA: received EAPOL-Key frame (2/4 Pairwise)
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKCALCNEGOTIATING
+WPA: PTK derivation - A1=c8:3a:35:cc:76:cd A2=88:cb:87:e5:e0:73
+WPA: Nonce1 - hexdump(len=32): 4b 10 6c dd 89 52 86 c4 09 9b 4b 99 d9 1d 45 0d 90 a4 d3 34 9d 9b a3 95 4c cf ce 7e 59 a9 ce b4
+WPA: Nonce2 - hexdump(len=32): 49 e6 b0 cd f3 2e 66 8c 68 c8 b9 be 64 10 df 79 f7 93 43 67 e4 c4 4c 46 62 36 dc 9d e4 eb b1 41
+WPA: PMK - hexdump(len=32): [REMOVED]
+WPA: PTK - hexdump(len=48): [REMOVED]
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKCALCNEGOTIATING2
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKINITNEGOTIATING
+nl80211ext: i802_get_seqnum
+wlan0: STA 88:cb:87:e5:e0:73 WPA: sending 3/4 msg of 4-Way Handshake
+WPA: Send EAPOL(version=2 secure=1 mic=1 ack=1 install=1 pairwise=8 kde_len=86 keyidx=1 encr=1)
+Plaintext EAPOL-Key Key Data - hexdump(len=96): [REMOVED]
+nl80211ext: wpa_driver_nl80211_hapd_send_eapol
+WPA: Use EAPOL-Key timeout of 100 ms (retry counter 1)
+wlan0: Event EAPOL_TX_STATUS (48) received
+IEEE 802.1X: 88:cb:87:e5:e0:73 TX status - version=2 type=3 length=191 - ack=1
+WPA: EAPOL-Key TX status for STA 88:cb:87:e5:e0:73 ack=1
+wlan0: Event EAPOL_RX (27) received
+IEEE 802.1X: 99 bytes from 88:cb:87:e5:e0:73
+   IEEE 802.1X: version=2 type=3 length=95
+WPA: Received EAPOL-Key from 88:cb:87:e5:e0:73 key_info=0x30a type=2 key_data_length=0
+WPA: Received Key Nonce - hexdump(len=32): 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+WPA: Received Replay Counter - hexdump(len=8): 00 00 00 00 00 00 00 04
+wlan0: STA 88:cb:87:e5:e0:73 WPA: received EAPOL-Key frame (4/4 Pairwise)
+WPA: 88:cb:87:e5:e0:73 WPA_PTK entering state PTKINITDONE
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=3 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=16
+   addr=88:cb:87:e5:e0:73
+nl80211ext: wpa_driver_nl80211_sta_set_flags
+wlan0: STA 88:cb:87:e5:e0:73 IEEE 802.1X: authorizing port
+wlan0: STA 88:cb:87:e5:e0:73 RADIUS: starting accounting session 52D5F88E-00000000
+nl80211ext: i802_sta_clear_stats
+wlan0: STA 88:cb:87:e5:e0:73 WPA: pairwise key handshake completed (RSN)
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xf6df0800
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xe5f06500
+nl80211: Event message available
+nl80211: MLME event 60
+nl80211: Frame TX status event
+wlan0: Event TX_STATUS (18) received
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+nl80211: Event message available
+nl80211: MLME event 59
+nl80211: Frame event
+wlan0: Event RX_MGMT (20) received
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=1 offchanok=0
+nl80211: Frame TX command accepted (no ACK); cookie 0x0
+Signal 2 received - terminating
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-DEAUTHENTICATE.indication(88:cb:87:e5:e0:73, 1)
+wlan0: STA 88:cb:87:e5:e0:73 MLME: MLME-DELETEKEYS.request(88:cb:87:e5:e0:73)
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=0x985fb08 key_idx=0 set_tx=1 seq_len=0 key_len=0
+   addr=88:cb:87:e5:e0:73
+Removing station 88:cb:87:e5:e0:73
+wlan0: AP-STA-DISCONNECTED 88:cb:87:e5:e0:73
+nl80211ext: wpa_driver_nl80211_sta_remove
+ap_free_sta: cancel ap_handle_timer for 88:cb:87:e5:e0:73
+wlan0: Flushing old station entries
+nl80211ext: i802_flush
+wlan0: Deauthenticate all stations
+nl80211ext: i802_sta_deauth
+nl80211ext: wpa_driver_nl80211_send_mlme
+nl80211: CMD_FRAME freq=2462 wait=0 no_cck=0 no_ack=0 offchanok=0
+nl80211: Frame TX command accepted; cookie 0xe5f07500
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=0 set_tx=0 seq_len=0 key_len=0
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=1 set_tx=0 seq_len=0 key_len=0
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=2 set_tx=0 seq_len=0 key_len=0
+nl80211ext: wpa_driver_nl80211_set_key
+wpa_driver_nl80211_set_key: ifindex=3 alg=0 addr=(nil) key_idx=3 set_tx=0 seq_len=0 key_len=0
+nl80211ext: i802_deinit
+nl80211ext: wpa_driver_nl80211_deinit
+netlink: Operstate: linkmode=0, operstate=6
+nl80211: Set mode ifindex 3 iftype 2 (STATION)
+nl80211: Unsubscribe mgmt frames handle 0x985d790 (AP teardown)
+nl80211ext: nl80211_global_deinit
