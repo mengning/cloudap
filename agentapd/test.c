@@ -24,6 +24,7 @@
 struct hostapd_data
 {
     struct i802_bss * bss;
+    unsigned char own_addr[ETH_ALEN];
 };
 
 extern struct wpa_driver_ops *wpa_drivers[];
@@ -53,6 +54,7 @@ int main()
         ,0x02,0x00,0x00,0xdd,0x16,0x00,0x50,0xf2,0x01,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02};
 
     struct hostapd_data hapd;
+    memcpy(hapd.own_addr,own_addr,ETH_ALEN);
     struct wpa_init_params params;
     
 	if (eloop_init()) 
@@ -196,6 +198,44 @@ int main()
     return 0;
 }
 
+static void send_auth_reply(struct hostapd_data *hapd,
+			    const u8 *dst, const u8 *bssid,
+			    u16 auth_alg, u16 auth_transaction, u16 resp,
+			    const u8 *ies, size_t ies_len)
+{
+	struct ieee80211_mgmt *reply;
+	u8 *buf;
+	size_t rlen;
+
+	rlen = IEEE80211_HDRLEN + sizeof(reply->u.auth) + ies_len;
+	buf = os_zalloc(rlen);
+	if (buf == NULL)
+		return;
+
+	reply = (struct ieee80211_mgmt *) buf;
+	reply->frame_control = IEEE80211_FC(WLAN_FC_TYPE_MGMT,
+					    WLAN_FC_STYPE_AUTH);
+	os_memcpy(reply->da, dst, ETH_ALEN);
+	os_memcpy(reply->sa, hapd->own_addr, ETH_ALEN);
+	os_memcpy(reply->bssid, bssid, ETH_ALEN);
+
+	reply->u.auth.auth_alg = host_to_le16(auth_alg);
+	reply->u.auth.auth_transaction = host_to_le16(auth_transaction);
+	reply->u.auth.status_code = host_to_le16(resp);
+
+	if (ies && ies_len)
+		os_memcpy(reply->u.auth.variable, ies, ies_len);
+
+	wpa_printf(MSG_DEBUG, "authentication reply: STA=" MACSTR
+		   " auth_alg=%d auth_transaction=%d resp=%d (IE len=%lu)",
+		   MAC2STR(dst), auth_alg, auth_transaction,
+		   resp, (unsigned long) ies_len);
+	if (wpa_drivers[0]->send_mlme(hapd->bss, reply, rlen, 0) < 0)
+		perror("send_auth_reply: send");
+
+	os_free(buf);
+}
+
 void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 		  //   struct hostapd_frame_info *fi)
 {
@@ -232,8 +272,13 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 	switch (stype) {
 	case WLAN_FC_STYPE_AUTH:
 		wpa_printf(MSG_DEBUG, "mgmt::auth");
-		//handle_auth(hapd, mgmt, len);
-		wpa_drivers[i]->send_mlme(hapd->bss,da1,30,0);
+		/* send_auth_reply */
+		/* send_auth_reply(hapd,
+			    const u8 *dst, const u8 *bssid,
+			    u16 auth_alg, u16 auth_transaction, u16 resp,
+			    const u8 *ies, size_t ies_len);
+	    */
+		//wpa_drivers[i]->send_mlme(hapd->bss,buf,sizeof(struct ieee80211_mgmt),0);
 		break;
 	case WLAN_FC_STYPE_ASSOC_REQ:
 		wpa_printf(MSG_DEBUG, "mgmt::assoc_req");
@@ -370,7 +415,7 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 
 		/*hostapd_mgmt_rx(hapd->bss, &data->rx_mgmt);*/
 		break;
-        case EVENT_EAPOL_TX_STATUS:
+    case EVENT_EAPOL_TX_STATUS:
 		printf("\nEVENT_EAPOL_TX_STATUS start\n");
 		/*hostapd_eapol_tx_status(hapd->bss, data->eapol_tx_status.dst,
 					data->eapol_tx_status.data,
