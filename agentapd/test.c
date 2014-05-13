@@ -43,7 +43,7 @@ int main()
     struct hostapd_data hapd;
     unsigned char own_addr[ETH_ALEN] = {0xc8,0x3a,0x35,0xc4,0x01,0xb8};
     char iface[IFNAMSIZ + 1] = "wlan2";
-    char ssid[IFNAMSIZ + 1] = "mengning";
+    char ssid[IFNAMSIZ + 1] = "mengning"; /* if change it,MUST change hd[] data */
     memcpy(hapd.own_addr,own_addr,ETH_ALEN);
     memcpy(hapd.bssid,own_addr,ETH_ALEN);  
     memcpy(hapd.iface,iface,strlen(iface));
@@ -51,7 +51,12 @@ int main()
     memcpy(hapd.ssid,ssid,strlen(ssid));
 	char bridge[IFNAMSIZ + 1] = {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
 	/* what it is? */
-    unsigned char hd[61] = {0x80,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xc8,0x3a,0x35,0xc4,0x01,0xb8,0xc8,0x3a,0x35,0xc4,0x01,0xb8, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x01,0x04,0x00,0x0a,0x6d,0x65,0x6e,0x67,0x64,0x61,0x73,0x68,0x65,0x6e,0x01,0x08, 0x82,0x84,0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b};
+    unsigned char hd[59] = {0x80,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,
+        0xc8,0x3a,0x35,0xc4,0x01,0xb8,/* MAC */
+        0xc8,0x3a,0x35,0xc4,0x01,0xb8,/* MAC */ 
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x01,0x04,
+        0x00,0x08,0x6d,0x65,0x6e,0x67,0x6e,0x69,0x6e,0x67,/* SSID_LEN + SSID(mengning) */
+        0x01,0x08, 0x82,0x84,0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b};
     memcpy(&hd[10],hapd.own_addr,ETH_ALEN);
     memcpy(&hd[16],hapd.own_addr,ETH_ALEN);
     /* what it is? */
@@ -150,12 +155,12 @@ int main()
 
 	my_params = (struct wpa_driver_ap_params *)malloc(sizeof(struct wpa_driver_ap_params));
 
-	my_params->head_len = 61;
+	my_params->head_len = 59;
 	my_params->head = malloc(my_params->head_len);
-	memcpy(my_params->head, hd, 61);
+	memcpy((void*)my_params->head, hd, 59);
 	my_params->tail_len = 9;
 	my_params->tail = malloc(my_params->tail_len);	
-	memcpy(my_params->tail, tl, 9);
+	memcpy((void*)my_params->tail, tl, 9);
 	my_params->dtim_period = 1;
 	my_params->beacon_int = 100;
 	my_params->basic_rates = malloc(48);
@@ -163,7 +168,7 @@ int main()
 	my_params->proberesp = NULL;
 	my_params->ssid_len = strlen(hapd.ssid);
 	my_params->ssid = malloc(my_params->ssid_len);
-	memcpy(my_params->ssid, hapd.ssid, my_params->ssid_len);
+	memcpy((void*)my_params->ssid, hapd.ssid, my_params->ssid_len);
 	my_params->hide_ssid = 0;
 	my_params->pairwise_ciphers = 1;
 	my_params->group_cipher = 1;
@@ -233,7 +238,7 @@ static void send_auth_reply(struct hostapd_data *hapd,
 		   MAC2STR(dst), auth_alg, auth_transaction,
 		   resp, (unsigned long) ies_len);
 
-	if (wpa_drivers[0]->send_mlme(hapd->bss, reply, rlen, 0) < 0)
+	if (wpa_drivers[0]->send_mlme(hapd->bss, (const u8 *)reply, rlen, 0) < 0)
 		perror("send_auth_reply: send");
 
 	os_free(buf);
@@ -372,7 +377,7 @@ void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
 		//params.capability = 1041; 有密码
 		params.capability = 1057;
 		params.supp_rates = malloc(12);
-		memcpy(params.supp_rates, supp, 12);	
+		memcpy((void*)params.supp_rates, supp, 12);	
 		params.ht_capabilities = NULL;
 		//params.supp_rates = supp;
 		params.supp_rates_len = 12;
