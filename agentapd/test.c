@@ -47,11 +47,18 @@ int main()
 #endif
 	char bridge[IFNAMSIZ + 1] = {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
 	/* what it is? */
-	unsigned char hd[59] ={0x80,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x11,0x04,0x00,0x08,0x6d,0x65,0x6e,0x67,0x6e,0x69,0x6e,0x67,0x01,0x08,0x82,0x84, 0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b};
+	/*unsigned char hd[59] ={0x80,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x11,0x04,0x00,0x08,0x6d,0x65,0x6e,0x67,0x6e,0x69,0x6e,0x67,0x01,0x08,0x82,0x84, 0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b}; */
+    unsigned char hd[61] = {0x80,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xc8,0x3a,0x35,0xc4,0x01,0xb8,0xc8,0x3a,0x35,0xc4,0x01,0xb8, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x01,0x04,0x00,0x0a,0x6d,0x65,0x6e,0x67,0x64,0x61,0x73,0x68,0x65,0x6e,0x01,0x08, 0x82,0x84,0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b};
+
+
     /* what it is? */
-    unsigned char tl[55]={
+ /*   unsigned char tl[55]={
         0x2a,0x01,0x04,0x32,0x04,0x30,0x48,0x60,0x6c,0x30,0x14,0x01,0x00,0x00,0x0f,0xac,0x02,0x01,0x00,0x00,0x0f,0xac,0x04,0x01,0x00,0x00,0x0f,0xac
         ,0x02,0x00,0x00,0xdd,0x16,0x00,0x50,0xf2,0x01,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02};
+
+*/
+
+    unsigned char tl[9] = {0x2a,0x01,0x04,0x32,0x04,0x30,0x48,0x60,0x6c};
 
     struct hostapd_data hapd;
     memcpy(hapd.own_addr,own_addr,ETH_ALEN);
@@ -148,12 +155,12 @@ int main()
 
 	my_params = (struct wpa_driver_ap_params *)malloc(sizeof(struct wpa_driver_ap_params));
 
-	my_params->head_len = 59;
+	my_params->head_len = 61;
 	my_params->head = malloc(my_params->head_len);
-	memcpy(my_params->head, hd, 59);
-	my_params->tail_len = 55;
+	memcpy(my_params->head, hd, 61);
+	my_params->tail_len = 9;
 	my_params->tail = malloc(my_params->tail_len);	
-	memcpy(my_params->tail, tl, 55);
+	memcpy(my_params->tail, tl, 9);
 	my_params->dtim_period = 1;
 	my_params->beacon_int = 100;
 	my_params->basic_rates = malloc(48);
@@ -164,12 +171,12 @@ int main()
 	unsigned char *ssid = "mengning";
 	memcpy(my_params->ssid, ssid, my_params->ssid_len);
 	my_params->hide_ssid = 0;
-	my_params->pairwise_ciphers = 16;
-	my_params->group_cipher = 8;
+	my_params->pairwise_ciphers = 1;
+	my_params->group_cipher = 1;
 	my_params->key_mgmt_suites = 2;
 	my_params->auth_algs = 3;
-	my_params->wpa_version = 3;
-	my_params->privacy = 1;
+	my_params->wpa_version = 0;
+	my_params->privacy = 0;
 	my_params->beacon_ies = NULL;
 	my_params->proberesp_ies = NULL;
 	my_params->assocresp_ies = NULL;
@@ -203,9 +210,11 @@ static void send_auth_reply(struct hostapd_data *hapd,
 			    u16 auth_alg, u16 auth_transaction, u16 resp,
 			    const u8 *ies, size_t ies_len)
 {
+	//struct wpa_driver_nl80211_data *drv = hapd->bss->drv;
 	struct ieee80211_mgmt *reply;
 	u8 *buf;
 	size_t rlen;
+	unsigned char own_addr[ETH_ALEN] = {0xc8,0x3a,0x35,0xc4,0x01,0xb8};/*20:4e:7f:da:23:6c*/
 
 	rlen = IEEE80211_HDRLEN + sizeof(reply->u.auth) + ies_len;
 	buf = os_zalloc(rlen);
@@ -216,7 +225,7 @@ static void send_auth_reply(struct hostapd_data *hapd,
 	reply->frame_control = IEEE80211_FC(WLAN_FC_TYPE_MGMT,
 					    WLAN_FC_STYPE_AUTH);
 	os_memcpy(reply->da, dst, ETH_ALEN);
-	os_memcpy(reply->sa, hapd->own_addr, ETH_ALEN);
+	os_memcpy(reply->sa, own_addr, ETH_ALEN);
 	os_memcpy(reply->bssid, bssid, ETH_ALEN);
 
 	reply->u.auth.auth_alg = host_to_le16(auth_alg);
@@ -225,11 +234,12 @@ static void send_auth_reply(struct hostapd_data *hapd,
 
 	if (ies && ies_len)
 		os_memcpy(reply->u.auth.variable, ies, ies_len);
-
+//authentication reply: STA=54:ea:a8:16:18:90 auth_alg=0 auth_transaction=2 resp=0 (IE len=0)
 	wpa_printf(MSG_DEBUG, "authentication reply: STA=" MACSTR
 		   " auth_alg=%d auth_transaction=%d resp=%d (IE len=%lu)",
 		   MAC2STR(dst), auth_alg, auth_transaction,
 		   resp, (unsigned long) ies_len);
+
 	if (wpa_drivers[0]->send_mlme(hapd->bss, reply, rlen, 0) < 0)
 		perror("send_auth_reply: send");
 
@@ -242,19 +252,26 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 	struct ieee80211_mgmt *mgmt;
 	u16 fc, stype;
 
-    unsigned char da1[30]={0xb0,0x00,0x00,0x00,0x54,0xea,0xa8,0x16,0x18,0x90,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x00,
+    unsigned char da1[30]={0xb0,0x00,0x00,0x00,0x54,0xea,0xa8,0x16,0x18,0x90,0xc8,0x3a,0x35,0xc4,0x01,0xb8,0xc8,0x3a,0x35,0xc4,0x01,0xb8,0x00,
         0x00,0x00,0x00,0x02,0x00,0x00,0x00};
 
-    unsigned char da2[46]={0x10,0x00,0x00,0x00,0x54,0xea,0xa8,0x16,0x18,0x90,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x00,
+    unsigned char da2[46]={0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xc8,0x3a,0x35,0xc4,0x01,0xb8,0xc8,0x3a,0x35,0xc4,0x01,0xb8,0x00,
         0x00,0x11,0x04,0x00,0x00,0x01,0xc0,0x01,0x08,0x82,0x84,0x8b,0x96,0x0c,0x12,0x18,0x24,0x32,0x04,0x30,0x48,0x60,0x6c};
-
-
+	unsigned char addr[ETH_ALEN] = {0};// {0x54,0xea,0xa8,0x16,0x18,0x90};/*54 ea a8 16 18 90*/
+	unsigned char bssid[ETH_ALEN] = {0xc8,0x3a,0x35,0xc4,0x01,0xb8};/*20:4e:7f:da:23:6c*/
 	if (len < 24)
 		return;
 
 	mgmt = (struct ieee80211_mgmt *) buf;
 	fc = le_to_host16(mgmt->frame_control);
 	stype = WLAN_FC_GET_STYPE(fc);
+	if(memcmp(bssid,mgmt->da,6)!=0)
+	{	
+		return;
+	}
+	memcpy(addr,mgmt->sa,6);
+	wpa_hexdump(MSG_DEBUG, "------------mgmt->sa",addr, ETH_ALEN);
+	wpa_hexdump(MSG_DEBUG, "------------mgmt->da",mgmt->da, ETH_ALEN);
 
 	if (stype == WLAN_FC_STYPE_BEACON) {
         	printf("-----WLAN_FC_STYPE_BEACON\n");
@@ -273,20 +290,21 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 	case WLAN_FC_STYPE_AUTH:
 		wpa_printf(MSG_DEBUG, "mgmt::auth");
 		/* send_auth_reply */
-		/* send_auth_reply(hapd,
-			    const u8 *dst, const u8 *bssid,
-			    u16 auth_alg, u16 auth_transaction, u16 resp,
-			    const u8 *ies, size_t ies_len);
-	    */
-		//wpa_drivers[i]->send_mlme(hapd->bss,buf,sizeof(struct ieee80211_mgmt),0);
+		send_auth_reply(hapd,addr, bssid,0, 2, 0,NULL, 0);
+	  
+	//	wpa_drivers[i]->send_mlme(hapd->bss,buf,sizeof(struct ieee80211_mgmt),0);
 		break;
 	case WLAN_FC_STYPE_ASSOC_REQ:
 		wpa_printf(MSG_DEBUG, "mgmt::assoc_req");
+		//sta = ap_get_sta(hapd, mgmt->sa);
+		//send_assoc_resp(hapd, sta, resp, reassoc, pos, left);
+		memcpy(da2+4,mgmt->sa,6);
+		wpa_hexdump(MSG_DEBUG, "------------da2",da2,46);
 		wpa_drivers[i]->send_mlme(hapd->bss,da2,46,0);
 		//handle_assoc(hapd, mgmt, len, 0);
 		break;
 	/*case WLAN_FC_STYPE_REASSOC_REQ:
-		wpa_printf(MSG_DEBUG, "mgmt::reassoc_req");
+		wpa_printf(MShapd.bsG_DEBUG, "mgmt::reassoc_req");
 		//handle_assoc(hapd, mgmt, len, 1);
 		break;
 	case WLAN_FC_STYPE_DISASSOC:
@@ -312,13 +330,34 @@ void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
 {
 	const struct ieee80211_mgmt *mgmt;
 	mgmt = (const struct ieee80211_mgmt *) buf;
-	char iface[IFNAMSIZ + 1]  = "wlan1";
-	unsigned char addr[ETH_ALEN] = {0x54,0xea,0xa8,0x16,0x18,0x90};/*54 ea a8 16 18 90*/
+	char iface[IFNAMSIZ + 1]  = "wlan2";
+	unsigned char addr[ETH_ALEN] = {0};//{0x54,0xea,0xa8,0x16,0x18,0x90};/*54 ea a8 16 18 90*/
 	unsigned char seq[32] = {0xa5,0xad,0x37,0x88,0xb8,0x5b,0x96,0x3f,0x8c,0x71,0x2a,0x46,0x4e,0x6e,0xad,0xcc,0xca,
             0x12,0x14,0xf3,0xa3,0x2d,0xba,0x7c,0xc4,0x12,0x33,0x6e,0x91,0xcb,0x62,0x6b};
-	unsigned char own_addr[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
+	unsigned char own_addr[ETH_ALEN] = {0xc8,0x3a,0x35,0xc4,0x01,0xb8};/*20:4e:7f:da:23:6c*/
 	unsigned char data[99] = {0x02, 0x03, 0x00, 0x5f, 0x02, 0x00, 0x8a, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xae, 0x05, 0x1f, 0xa4, 0xdf, 0x43, 0x4e, 0xb7, 0x80, 0x34, 0xdb, 0x0e, 0x3d, 0x4e, 0xfd, 0xc2, 0xfa, 0xb4, 0xcd, 0xe1, 0x5f, 0x2d, 0x25, 0x30, 0x7d, 0x57, 0xdd, 0x2a, 0x88, 0xb0, 0x49, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	int i = 0;
+	//unsigned char supp[12] = {0x02, 0x04, 0x0b, 0x16, 0x0c, 0x12, 0x18, 0x24, 0x30, 0x48, 0x60, 0x6c}; 有密码
+	unsigned char supp[12] = {0x82,0x84,0x8b,0x96,0x24,0x30,0x48,0x6c,0x0c,0x12,0x18,0x60};
+	struct hostapd_sta_add_params params;
+	/*params.ht_capabilities->ht_capabilities_info = ;
+	params.ht_capabilities->a_mpdu_params = ;
+	params.ht_capabilities->supported_mcs_set[16] = ;
+	params.ht_capabilities->ht_extended_capabilities = ;
+	params.ht_capabilities->tx_bf_capability_info = ;
+	params.ht_capabilities->asel_capabilities = ;*/
+
+	wpa_hexdump(MSG_DEBUG, "ieee802_11ext_mgmt_cb------------mgmt->da",mgmt->da, ETH_ALEN);
+
+	if(memcmp(own_addr,mgmt->sa,6)!=0)
+	{	
+		printf("memcmp(own_addr,mgmt->da,6)!=0\n");
+		return;
+	}
+	memcpy(addr,mgmt->da,6);
+	wpa_hexdump(MSG_DEBUG, "ieee802_11ext_mgmt_cb------------mgmt->sa",addr, ETH_ALEN);
+	wpa_hexdump(MSG_DEBUG, "ieee802_11ext_mgmt_cb------------mgmt->da",mgmt->da, ETH_ALEN);
+
 
 	switch (stype) {
 	case WLAN_FC_STYPE_AUTH:
@@ -329,15 +368,34 @@ void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
 		wpa_printf(MSG_DEBUG, "mgmt::assoc_resp cb");
 		//handle_assoc_cb(hapd, mgmt, len, 0, ok);
 	
-		wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+		//wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
 		wpa_drivers[i]->sta_remove(hapd->bss,addr);
-		//wpa_drivers[i]->sta_add();
-		wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,4,-11);
-		wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
-		wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
-		wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,0,-2);
-		wpa_drivers[i]->set_key(iface,hapd->bss,2,addr,1,1,NULL,0,seq,32);
-		wpa_drivers[i]->hapd_send_eapol(hapd->bss, addr, data,99,0,own_addr,4);
+		printf("++++++++1\n");
+		params.addr = addr;
+		params.aid = 1;
+		//params.capability = 1041; 有密码
+		params.capability = 1057;
+		params.supp_rates = malloc(12);
+		memcpy(params.supp_rates, supp, 12);	
+		params.ht_capabilities = NULL;
+		//params.supp_rates = supp;
+		params.supp_rates_len = 12;
+		params.listen_interval = 20;
+		params.flags = 5;
+		params.set = 0;
+		params.qosinfo = 0;
+		wpa_drivers[i]->sta_add(hapd->bss, &params);
+		printf("++++++++2\n");
+		wpa_drivers[i]->sta_set_flags(hapd->bss,addr,5,5,-11);
+		printf("++++++++3\n");
+		
+		//wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,4,-11);
+		//wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+		//wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+		//wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,0,-2);
+		//wpa_drivers[i]->set_key(iface,hapd->bss,2,addr,1,1,NULL,0,seq,32);
+		//wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+		//wpa_drivers[i]->hapd_send_eapol(hapd->bss, addr, data,99,0,own_addr,4);
 
 		break;
 	/*case WLAN_FC_STYPE_REASSOC_RESP:
@@ -386,7 +444,6 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 	wpa_dbg(hapd->msg_ctx, level, "Event %s (%d) received",
 		event_to_string(event), event);
 #endif /* CONFIG_NO_STDOUT_DEBUG */
-    printf("\n___________________\n");
 
 	switch (event) {
 	case EVENT_TX_STATUS:
@@ -394,7 +451,7 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 		switch (data->tx_status.type) {
 		case WLAN_FC_TYPE_MGMT:
 			printf("WLAN_FC_TYPE_MGMT:\n");
-			ieee802_11ext_mgmt_cb(hapd->bss, data->tx_status.data,
+			ieee802_11ext_mgmt_cb(hapd, data->tx_status.data,
 					   data->tx_status.data_len,
 					   data->tx_status.stype,
 					   data->tx_status.ack);
@@ -410,7 +467,7 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 		break;
 	case EVENT_RX_MGMT:
 		printf("EVENT_RX_MGMT\n");
-		ieee802_11ext_mgmt(hapd->bss, data->rx_mgmt.frame,
+		ieee802_11ext_mgmt(hapd, data->rx_mgmt.frame,
 					data->rx_mgmt.frame_len);		
 
 		/*hostapd_mgmt_rx(hapd->bss, &data->rx_mgmt);*/
