@@ -15,6 +15,9 @@
 #ifdef TRUE
 #undef TRUE
 #endif
+#ifndef BIT
+#define BIT(x) (1 << (x))
+#endif
 typedef enum { FALSE = 0, TRUE = 1 } Boolean;
 
 

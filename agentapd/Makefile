@@ -15,8 +15,8 @@ copy:
 	$(CP) ../src/drivers/wiflow_protocol.c ./
 
 $(TARGETS):$(OBJS) main.o test.o
-	$(CC) $(CC_OUTPUT_FLAGS) $(TARGETS) main.o $(OBJS) $(CC_NETLINK_FLAGS)
-	$(CC) $(CC_OUTPUT_FLAGS) test test.o $(OBJS) $(CC_NETLINK_FLAGS)
+	$(CC) $(CC_OUTPUT_FLAGS) $(TARGETS) main.o $(OBJS) $(CC_NETLINK_FLAGS) 
+	$(CC) $(CC_OUTPUT_FLAGS) test test.o $(OBJS) $(CC_NETLINK_FLAGS) $(CC_OPENSSL_FLAGS)
 
 .c.o:
 	$(CC) $(CC_FLAGS)  $(COMMON_INCLUDE_DIRS)  $<
