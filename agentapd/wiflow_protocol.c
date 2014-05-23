@@ -4001,6 +4001,7 @@ int wpa_if_remove_format(char * pdu, int *p_size,enum wpa_driver_if_type type,
     element->len = IFNAMSIZ + 1;
     memcpy(&element->data,&ifname,element->len);
     counter += len;
+	*p_size = counter;
 	return 0;
 	
 err:
@@ -4072,7 +4073,7 @@ err:
  {
 	 struct wiflow_pdu *wpdu;
 	 int pdu_size = *p_size;
- 
+ 	 int counter = 0;
 	 if(pdu == NULL || pdu_size < sizeof(struct wiflow_pdu) )
 	 {
 		 fprintf(stderr,"i802_flush_format args Error,%s:%d\n",__FILE__,__LINE__); 
@@ -4080,7 +4081,8 @@ err:
 	 }
 	 wpdu = (struct wiflow_pdu*)pdu;
 	 wpdu->type = WIFLOW_NL80211_i802_FLUSH_REQUEST;
-	 
+	 counter += sizeof(struct wiflow_pdu);
+	 *p_size = counter;
 	 return 0;
  err:
 	 return -1;
