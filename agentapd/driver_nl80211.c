@@ -5407,8 +5407,6 @@ static int wpa_driver_nl80211_send_mlme_freq(struct i802_bss *bss,
 		 * but it works due to the single-threaded nature
 		 * of wpa_supplicant.
 		 */
-		printf("------send_mlme_freq last_mgmt_freq:%d\n"
-			,drv->last_mgmt_freq);
 		if (freq == 0)
 			freq = drv->last_mgmt_freq;
 		return nl80211_send_frame_cmd(bss, freq, 0,
@@ -5417,7 +5415,6 @@ static int wpa_driver_nl80211_send_mlme_freq(struct i802_bss *bss,
 	}
 
 	if (drv->device_ap_sme && is_ap_interface(drv->nlmode)) {
-		printf("------send_mlme_freq bss->freq:%d\n"
 			,bss->freq);
 		if (freq == 0)
 			freq = bss->freq;
