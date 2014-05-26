@@ -588,7 +588,7 @@ static void nl80211_recv_beacons(int sock, void *eloop_ctx, void *handle)
 {
 	struct nl80211_wiphy_data *w = eloop_ctx;
 
-	wpa_printf(MSG_EXCESSIVE, "nl80211: Beacon event message available");
+	//wpa_printf(MSG_EXCESSIVE, "nl80211: Beacon event message available");
 
 	nl_recvmsgs(handle, w->nl_cb);
 }
@@ -1468,9 +1468,9 @@ static void mlme_event(struct wpa_driver_nl80211_data *drv,
 		return;
 	}
 
-	wpa_printf(MSG_DEBUG, "nl80211: MLME event %d", cmd);
-	wpa_hexdump(MSG_MSGDUMP, "nl80211: MLME event frame",
-		    nla_data(frame), nla_len(frame));
+	//wpa_printf(MSG_DEBUG, "nl80211: MLME event %d", cmd);
+	//wpa_hexdump(MSG_MSGDUMP, "nl80211: MLME event frame",
+	//	    nla_data(frame), nla_len(frame));
 
 	switch (cmd) {
 	case NL80211_CMD_AUTHENTICATE:
@@ -2371,7 +2371,7 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
 {
 	struct nl_cb *cb = eloop_ctx;
 
-	wpa_printf(MSG_DEBUG, "nl80211: Event message available");
+	//wpa_printf(MSG_DEBUG, "nl80211: Event message available");
 
 	nl_recvmsgs(handle, cb);
 }
@@ -3142,8 +3142,8 @@ static int nl80211_register_frame(struct i802_bss *bss,
 
 	wpa_printf(MSG_DEBUG, "nl80211: Register frame type=0x%x nl_handle=%p",
 		   type, nl_handle);
-	wpa_hexdump(MSG_DEBUG, "nl80211: Register frame match",
-		    match, match_len);
+	//wpa_hexdump(MSG_DEBUG, "nl80211: Register frame match",
+	//	    match, match_len);
 
 	nl80211_cmd(drv, msg, 0, NL80211_CMD_REGISTER_ACTION);
 
@@ -5367,6 +5367,7 @@ static int wpa_driver_nl80211_send_frame(struct i802_bss *bss,
 					 unsigned int freq, int no_cck,
 					 int offchanok, unsigned int wait_time)
 {
+	//printf("------freq: %d\n",freq);
 	struct wpa_driver_nl80211_data *drv = bss->drv;
 	u64 cookie;
 
@@ -5389,6 +5390,7 @@ static int wpa_driver_nl80211_send_mlme_freq(struct i802_bss *bss,
 					     int offchanok,
 					     unsigned int wait_time)
 {
+	//printf("*******mlme_freq :%d\n",freq);
 	struct wpa_driver_nl80211_data *drv = bss->drv;
 	struct ieee80211_mgmt *mgmt;
 	int encrypt = 1;
@@ -5405,6 +5407,8 @@ static int wpa_driver_nl80211_send_mlme_freq(struct i802_bss *bss,
 		 * but it works due to the single-threaded nature
 		 * of wpa_supplicant.
 		 */
+		printf("------send_mlme_freq last_mgmt_freq:%d\n"
+			,drv->last_mgmt_freq);
 		if (freq == 0)
 			freq = drv->last_mgmt_freq;
 		return nl80211_send_frame_cmd(bss, freq, 0,
@@ -5413,6 +5417,8 @@ static int wpa_driver_nl80211_send_mlme_freq(struct i802_bss *bss,
 	}
 
 	if (drv->device_ap_sme && is_ap_interface(drv->nlmode)) {
+		printf("------send_mlme_freq bss->freq:%d\n"
+			,bss->freq);
 		if (freq == 0)
 			freq = bss->freq;
 		return nl80211_send_frame_cmd(bss, freq,
@@ -5760,7 +5766,6 @@ static int wpa_driver_nl80211_sta_add(void *priv,
 			sizeof(*params->ht_capabilities),
 			params->ht_capabilities);
 	}
-
 	os_memset(&upd, 0, sizeof(upd));
 	upd.mask = sta_flags_nl80211(params->flags);
 	upd.set = upd.mask;
@@ -5779,7 +5784,6 @@ static int wpa_driver_nl80211_sta_add(void *priv,
 		if (nla_put_nested(msg, NL80211_ATTR_STA_WME, wme) < 0)
 			goto nla_put_failure;
 	}
-
 	ret = send_and_recv_msgs(drv, msg, NULL, NULL);
 	msg = NULL;
 	if (ret)
@@ -6427,6 +6431,7 @@ static int nl80211_send_eapol_data(struct i802_bss *bss,
 				   const u8 *addr, const u8 *data,
 				   size_t data_len)
 {
+	printf("-----------nl80211_send_eapol_data\n");
 	struct sockaddr_ll ll;
 	int ret;
 
@@ -6457,6 +6462,7 @@ static int wpa_driver_nl80211_hapd_send_eapol(
 	void *priv, const u8 *addr, const u8 *data,
 	size_t data_len, int encrypt, const u8 *own_addr, u32 flags)
 {
+	printf("----------wpa_driver_nl80211_hapd_send_eapol\n");
 	struct i802_bss *bss = priv;
 	struct wpa_driver_nl80211_data *drv = bss->drv;
 	struct ieee80211_hdr *hdr;
@@ -6522,6 +6528,8 @@ static int wpa_driver_nl80211_sta_set_flags(void *priv, const u8 *addr,
 					    int total_flags,
 					    int flags_or, int flags_and)
 {
+	//printf("wpa_driver_nl80211_sta_set_flags total_flags %d,flags_or %d,flags_and %d\n", total_flags,
+	//				     flags_or,  flags_and);
 	struct i802_bss *bss = priv;
 	struct wpa_driver_nl80211_data *drv = bss->drv;
 	struct nl_msg *msg, *flags = NULL;

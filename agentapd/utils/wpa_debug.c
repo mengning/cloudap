@@ -49,6 +49,7 @@ int wpa_debug_timestamp = 0;
  */
 void wpa_printf(int level, const char *fmt, ...)
 {
+	return;
 	va_list ap;
 
 	va_start(ap, fmt);

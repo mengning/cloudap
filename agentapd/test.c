@@ -70,6 +70,12 @@ struct ieee802_1x_hdr {
 	/* followed by length octets of data */
 };
 
+struct black_nodes {
+	unsigned char black_addr[ETH_ALEN];
+        struct black_nodes *next;
+	/*MAC Black list*/
+};
+
 struct hostapd_data
 {
     struct i802_bss * bss;
@@ -77,6 +83,7 @@ struct hostapd_data
     unsigned char bssid[ETH_ALEN];
     char iface[IFNAMSIZ + 1];
     char ssid[IFNAMSIZ + 1];
+    struct black_nodes * black_list;
 };
 
 extern struct wpa_driver_ops *wpa_drivers[];
@@ -97,16 +104,24 @@ int main()
     void * global_priv;
     struct hostapd_data hapd;
     struct wpa_init_params params;
-
+    struct black_nodes * bl;
     unsigned char bssid[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
     unsigned char own_addr[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
+    unsigned char black_addr[ETH_ALEN] = {0x54,0xea,0xa8,0x16,0x18,0x90};/*Black MAC*/
     char ssid[IFNAMSIZ + 1] = "mengning";
 
     memcpy(hapd.own_addr,own_addr,ETH_ALEN);
-    memcpy(hapd.bssid,own_addr,ETH_ALEN);  
+    memcpy(hapd.bssid,own_addr,ETH_ALEN); 
     memcpy(hapd.iface,iface,strlen(iface));
     hapd.iface[strlen(iface)] = '\0';
     memcpy(hapd.ssid,ssid,strlen(ssid));
+
+    hapd.black_list = NULL;
+    bl = (struct black_nodes *)malloc(sizeof(struct black_nodes));
+    bl->next = NULL;
+    memcpy(bl->black_addr,black_addr,ETH_ALEN); 
+
+    hapd.black_list = bl;
 
     char bridge[IFNAMSIZ + 1] = {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
 	/* what it is? */
@@ -158,13 +173,13 @@ int main()
     		return -1;
 
         params.own_addr = own_addr;
-        wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params.bssid, ETH_ALEN);
+        //wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params.bssid, ETH_ALEN);
         wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params.ifname);
         wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params.ssid);
         wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params.ssid_len);
         wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params.num_bridge);
-        wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params.bridge[0],IFNAMSIZ + 1);
-        wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params.own_addr, ETH_ALEN);
+        //wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params.bridge[0],IFNAMSIZ + 1);
+       // wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params.own_addr, ETH_ALEN);
 
         assert((wpa_drivers[i]->hapd_init != NULL));
 		if (wpa_drivers[i]->hapd_init) 
@@ -256,7 +271,8 @@ int main()
 	wpa_drivers[i]->set_tx_queue_params(hapd.bss,1,1,7,15,30);
 	wpa_drivers[i]->set_tx_queue_params(hapd.bss,2,3,15,63,0);
 	wpa_drivers[i]->set_tx_queue_params(hapd.bss,3,7,15,1023,0);
-
+	
+	printf("Start working!\n");
 	eloop_run();
 
     	return 0;
@@ -305,11 +321,16 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 {
 	struct ieee80211_mgmt *mgmt;
 	u16 fc, stype;
-
+	struct black_nodes * bl = NULL;
     unsigned char da2[46]={0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x00,
-        0x00,0x11,0x04,0x00,0x00,0x01,0xc0,0x01,0x08,0x82,0x84,0x8b,0x96,
+	0x20,0x4e,0x7f,0xda,0x23,0x6c,/*MAC*/
+	0x20,0x4e,0x7f,0xda,0x23,0x6c,/*MAC*/
+	0x00,0x00,0x11,0x04,0x00,0x00,0x01,0xc0,0x01,0x08,0x82,0x84,0x8b,0x96,
 	0x0c,0x12,0x18,0x24,0x32,0x04,0x30,0x48,0x60,0x6c};
+
+	memcpy((void *)&da2[10],hapd->own_addr,ETH_ALEN);
+   	memcpy((void *)&da2[16],hapd->own_addr,ETH_ALEN);
+	
 	unsigned char addr[ETH_ALEN] = {0};
 	if (len < 24)
 		return;
@@ -322,9 +343,24 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 		return;
 	}
 	memcpy(addr,mgmt->sa,6);
+	
+	if(hapd->black_list != NULL)
+	{
+		bl = hapd->black_list;
+		do{
+			if(memcmp(bl->black_addr,mgmt->sa,6)==0)
+			{	
+				//printf("Deny Black list\n");
+				wpa_hexdump(MSG_DEBUG, "Deny Black list MAC : ",mgmt->sa,6);
+				return;
+	    		}
+			bl = bl->next;
+		}while(bl != NULL);
+		bl = NULL;
+	}
 
 	if (stype == WLAN_FC_STYPE_BEACON) {
-        	printf("-----WLAN_FC_STYPE_BEACON\n");
+        	//printf("-----WLAN_FC_STYPE_BEACON\n");
 		return;
 	}
 
@@ -337,15 +373,15 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 	int i = 0;
 	switch (stype) {
 	case WLAN_FC_STYPE_AUTH:
-		wpa_printf(MSG_DEBUG, "mgmt::auth");
+		printf("mgmt::auth\n");
 		/* send_auth_reply */
 		send_auth_reply(hapd,addr, hapd->own_addr,0, 2, 0,NULL, 0);
 	  
 		break;
 	case WLAN_FC_STYPE_ASSOC_REQ:
-		wpa_printf(MSG_DEBUG, "mgmt::assoc_req");
+		printf("mgmt::assoc_req\n");
 		memcpy(da2+4,mgmt->sa,6);
-		wpa_hexdump(MSG_DEBUG, "------------da2",da2,46);
+		//wpa_hexdump(MSG_DEBUG, "------------da2",da2,46);
 		wpa_drivers[i]->send_mlme(hapd->bss,da2,46,0);
 		break;
 	default:
@@ -377,10 +413,10 @@ void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
 
 	switch (stype) {
 	case WLAN_FC_STYPE_AUTH:
-		wpa_printf(MSG_DEBUG, "mgmt::auth cb");
+		printf("mgmt::auth cb\n");
 		break;
 	case WLAN_FC_STYPE_ASSOC_RESP:
-		wpa_printf(MSG_DEBUG, "mgmt::assoc_resp cb");
+		printf("mgmt::assoc_resp cb\n");
 
 		params.addr = addr;
 		params.aid = 1;
@@ -407,7 +443,7 @@ void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
 		break;
 
 	default:
-		printf("unknown mgmt cb frame subtype %d\n", stype);
+		//printf("unknown mgmt cb frame subtype %d\n", stype);
 		break;
 	}
 }
@@ -565,7 +601,10 @@ static int wpa_verify_key_mic(struct wpa_ptk *PTK, u8 *data, size_t data_len)
 		ret = -1;
 
 	os_memcpy(key->key_mic, mic, 16);
-	printf("ret: %d\n",ret);
+	if(ret != -1)
+	{
+		printf("\n\nPwd is right .\n\n");
+	}
 	return ret;
 }
 
@@ -589,7 +628,6 @@ void sm_machine_PTKCALCNEGOTIATING_entry(struct wpa_state_machine *sm)
 	// 搜索 need to print 
 	for (;;) {
 		if (wpa_key_mgmt_wpa_psk(sm->wpa_key_mgmt)) {
-			printf("if (wpa_key_mgmt_wpa_psk(sm->wpa_key_mgmt))\n");
 			pmk = my_pmk;
 			if (pmk == NULL)
 				break;
@@ -659,7 +697,7 @@ static inline int hostapd_drv_hapd_send_eapol(struct hostapd_data *hapd,
 					      size_t data_len, int encrypt,
 					      u32 flags)
 {
-	wpa_hexdump(MSG_DEBUG, " data: ", data, data_len);
+	//wpa_hexdump(MSG_DEBUG, " data: ", data, data_len);
 	return wpa_drivers[0]->hapd_send_eapol(hapd->bss, addr, data,
 					     data_len, encrypt,
 					     hapd->own_addr, flags);
@@ -913,7 +951,6 @@ static void wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *
 	
 	if (sm == NULL)
 		return;
-	printf("return2\n");
 	__wpa_send_eapol(hapd, wpa_auth, sm, key_info, key_rsc, nonce, kde, kde_len,
 			 keyidx, encr, 0);
 
@@ -995,7 +1032,6 @@ int random_get_bytes(void *buf, size_t len)
 	/* Mix in additional entropy extracted from the internal pool */
 	left = len;
 	while (left) {
-		printf("random_get_bytes\n");
 		size_t siz, i;
 		u8 tmp[16];
 		random_extract(tmp);
@@ -1127,6 +1163,7 @@ void wpa_receive(struct hostapd_data *hapd, struct wpa_state_machine *sm, u8 *da
 		memcpy(sta_addr, global_sm->addr, 6);
 		wpa_drivers[0]->set_key(iface,hapd->bss,3,sta_addr,0,1,NULL,0, key,16);
 		wpa_drivers[0]->sta_set_flags(hapd->bss,sta_addr,5,1,-1);
+		printf("Station Added\n");
 		free(key);
 		free(sta_addr);
 	} 
@@ -1238,13 +1275,13 @@ void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
 		}
 		break;
 	case EVENT_RX_MGMT:
-		printf("EVENT_RX_MGMT\n");
+		//printf("EVENT_RX_MGMT\n");
 		ieee802_11ext_mgmt(hapd, data->rx_mgmt.frame,
 					data->rx_mgmt.frame_len);		
 		break;
     case EVENT_EAPOL_TX_STATUS:
-		printf("\nEVENT_EAPOL_TX_STATUS start\n");
-		printf("\nEVENT_EAPOL_TX_STATUS end\n");
+		//printf("\nEVENT_EAPOL_TX_STATUS start\n");
+		//printf("\nEVENT_EAPOL_TX_STATUS end\n");
 		break;
 	case EVENT_EAPOL_RX:
 		printf("\nEVENT_EAPOL_RX start\n");
