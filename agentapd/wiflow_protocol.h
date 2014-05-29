@@ -31,55 +31,55 @@
 /* this is ABI! */
 enum wiflow_commands
 {
-    WIFLOW_INIT_PARAMS_REQUEST, /* agent request AP params */
-    WIFLOW_INIT_PARAMS_RESPONSE, /* remote response AP params to agent */
-    WIFLOW_NL80211_SET_OPERSTATE_REQUEST, /*remote request call set_operstate func*/
-    WIFLOW_NL80211_HAPD_DEINIT_REQUEST, /*remote request call hapd_deinit func*/
-    WIFLOW_NL80211_SEND_FRAME_REQUEST, /*remote request call send_fram func*/
-    WIFLOW_NL80211_I802_SET_WDS_STA_REQUEST, /*remote request call i802_set_wds_sta func*/
-    WIFLOW_NL80211_STA_ADD_REQUEST, /*remote request call sta_add func*/
-    WIFLOW_NL80211_IF_ADD_REQUEST1, /*remote request call if_add func*/
-    WIFLOW_NL80211_IF_ADD_REQUEST2,  /*remote request call if_add func*/
-    WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
-    WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
-    WIFLOW_NL80211_SET_RTS_REQUEST,/*remote request call set_rts func*/
-    WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
-    WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST, /*remote request call set_tx_queue_params func*/
-    WIFLOW_NL80211_SCAN2_REQUEST, /*remote request call scan2 func*/
-    WIFLOW_NL80211_STA_DEAUTH_REQUEST, /*remote request call sta_deauth func*/
-    WIFLOW_NL80211_STA_DISASSOC_REQUEST, /*remote request call sta_disassoc func*/
-    WIFLOW_NL80211_SET_KEY_REQUEST, /*remote request call set_key func*/
-    WIFLOW_NL80211_SEND_MLME_REQUEST, /*remote request call send_mlme func*/
-    WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST, /*remote request call get_scan_results2 func*/
+	WIFLOW_INIT_PARAMS_REQUEST, /* agent request AP params */
+	WIFLOW_INIT_PARAMS_RESPONSE, /* remote response AP params to agent */
+	WIFLOW_NL80211_SET_OPERSTATE_REQUEST, /*remote request call set_operstate func*/
+	WIFLOW_NL80211_HAPD_DEINIT_REQUEST, /*remote request call hapd_deinit func*/
+	WIFLOW_NL80211_SEND_FRAME_REQUEST, /*remote request call send_fram func*/
+	WIFLOW_NL80211_I802_SET_WDS_STA_REQUEST, /*remote request call i802_set_wds_sta func*/
+	WIFLOW_NL80211_STA_ADD_REQUEST, /*remote request call sta_add func*/
+	WIFLOW_NL80211_IF_ADD_REQUEST1, /*remote request call if_add func*/
+	WIFLOW_NL80211_IF_ADD_REQUEST2,  /*remote request call if_add func*/
+	WIFLOW_NL80211_SET_FREQ_REQUEST, /*remote request call set_freq func*/
+	WIFLOW_NL80211_STA_SET_FLAGS_REQUEST, /*remote request call sta_set_flags func*/
+	WIFLOW_NL80211_SET_RTS_REQUEST,/*remote request call set_rts func*/
+	WIFLOW_NL80211_SEND_ACTION_REQUEST, /*remote request call send action func*/
+	WIFLOW_NL80211_SET_TX_QUEUE_PARAMS_REQUEST, /*remote request call set_tx_queue_params func*/
+	WIFLOW_NL80211_SCAN2_REQUEST, /*remote request call scan2 func*/
+	WIFLOW_NL80211_STA_DEAUTH_REQUEST, /*remote request call sta_deauth func*/
+	WIFLOW_NL80211_STA_DISASSOC_REQUEST, /*remote request call sta_disassoc func*/
+	WIFLOW_NL80211_SET_KEY_REQUEST, /*remote request call set_key func*/
+	WIFLOW_NL80211_SEND_MLME_REQUEST, /*remote request call send_mlme func*/
+	WIFLOW_NL80211_GET_SCAN_RESULTS2_REQUEST, /*remote request call get_scan_results2 func*/
 	WIFLOW_NL80211_GET_SEQNUM_REQUEST, /*remote request call get_seqnum func*/
-    WIFLOW_NL80211_SET_STA_VLAN_REQUEST, /*remote request call set_sta_vlan func*/
-    WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST, /*remote request call hapd_send_eapol func*/
-    WIFLOW_NL80211_READ_STA_DATA_REQUEST, /*remote request call read_sta_data func */
-    WIFLOW_NL80211_POLL_CLIENT_REQUEST, /*remote request call poll_client func*/
-    WIFLOW_NL80211_GET_INACT_SEC_REQUEST, /*remote request call get_inact_sec func*/
-    WIFLOW_NL80211_STA_REMOVE_REQUEST, /*remote request call sta_remove func*/
-    WIFLOW_NL80211_SET_AP_REQUEST,  /*remote request call set_ap func*/
+	WIFLOW_NL80211_SET_STA_VLAN_REQUEST, /*remote request call set_sta_vlan func*/
+	WIFLOW_NL80211_HAPD_SEND_EAPOL_REQUEST, /*remote request call hapd_send_eapol func*/
+	WIFLOW_NL80211_READ_STA_DATA_REQUEST, /*remote request call read_sta_data func */
+	WIFLOW_NL80211_POLL_CLIENT_REQUEST, /*remote request call poll_client func*/
+	WIFLOW_NL80211_GET_INACT_SEC_REQUEST, /*remote request call get_inact_sec func*/
+	WIFLOW_NL80211_STA_REMOVE_REQUEST, /*remote request call sta_remove func*/
+	WIFLOW_NL80211_SET_AP_REQUEST,  /*remote request call set_ap func*/
 	WIFLOW_NL80211_SET_FRAG,			/* remote  call set_farg */
-    WIFLOW_NL80211_IF_REMOVE,			/* remote call if_remove */
-    WIFLOW_NL80211_i802_FLUSH_REQUEST,   /*remote call flush func*/
-    WIFLOW_INIT_CAPA_RESPONSE,             /*get capa from*/
-    WIFLOW_INIT_CAPA_REQUEST,
-    WIFLOW_SET_COUNTRY,
-    WPA_GET_HW_MODE_REQUEST,
-    REMOTE_HW_MODE,
-    WPA_SUP_EVENT
+	WIFLOW_NL80211_IF_REMOVE,			/* remote call if_remove */
+	WIFLOW_NL80211_i802_FLUSH_REQUEST,   /*remote call flush func*/
+	WIFLOW_INIT_CAPA_RESPONSE,             /*get capa from*/
+	WIFLOW_INIT_CAPA_REQUEST,
+	WIFLOW_SET_COUNTRY,
+	WPA_GET_HW_MODE_REQUEST,
+	REMOTE_HW_MODE,
+	WPA_SUP_EVENT
 }; 
 
 struct wiflow_pdu_element
 {
-    int len;
-    char data;
+	int len;
+	char data;
 };
 
 struct wiflow_pdu 
 {
-    int type;
-    /* elements - struct wiflow_pdu_element */
+	int type;
+	/* elements - struct wiflow_pdu_element */
 };
 
 int wiflow_pdu_format(char * pdu, int *pdu_size,enum wiflow_commands type);
@@ -179,7 +179,7 @@ int wpa_sta_add_parser(char * pdu, int p_size, struct hostapd_sta_add_params * p
  *
  */
 int wpa_if_add_format(char *pdu, int *p_size, enum wpa_driver_if_type type, const char *ifname, const u8 *addr, 
-							void *bss_ctx, void **drv_priv, char *force_ifname, u8 *if_addr);
+		void *bss_ctx, void **drv_priv, char *force_ifname, u8 *if_addr);
 
 /*
  * Parse the PDU to if_add() argc
@@ -216,7 +216,7 @@ int wpa_set_freq_parser(char * pdu, int p_size, struct hostapd_freq_params * fre
  *
  */
 int wpa_sta_set_flags_format(char *pdu, int *p_size, const u8 *addr, int total_flags,
-					    int flags_or, int flags_and);
+		int flags_or, int flags_and);
 
 /*
  * Parse the PDU to sta_set_flags() argc
@@ -226,7 +226,7 @@ int wpa_sta_set_flags_format(char *pdu, int *p_size, const u8 *addr, int total_f
  *
  */
 int wpa_sta_set_flags_parser(char *pdu, int p_size, u8 **addr, int* total_flags,
-					    int* flags_or, int* flags_and);
+		int* flags_or, int* flags_and);
 
 /*
  * Format the struct i802_bss *bss to the PDU
@@ -238,12 +238,12 @@ int wpa_sta_set_flags_parser(char *pdu, int p_size, u8 **addr, int* total_flags,
 int wpa_set_rts_format(char * pdu, int *p_size, int rts);
 
 /*
-  * Parse the PDU to sta_set_rts() argc
-  * input	: char * pdu , Memory allocate outside
-  * output	: sta_set_rts() agrc , Memory allocate outside
-  * return	: SUCCESS(0)/FAILURE(-1)
-  *
-  */
+ * Parse the PDU to sta_set_rts() argc
+ * input	: char * pdu , Memory allocate outside
+ * output	: sta_set_rts() agrc , Memory allocate outside
+ * return	: SUCCESS(0)/FAILURE(-1)
+ *
+ */
 int wpa_set_rts_parser(char * pdu, int p_size, int * rts);
 
 /*
@@ -254,8 +254,8 @@ int wpa_set_rts_parser(char * pdu, int p_size, int * rts);
  *
  */
 int wpa_send_action_format(char *pdu, int *p_size, unsigned int freq, unsigned int wait_time,
-					  const u8 *dst,
-					  const u8 *data, size_t data_len);
+		const u8 *dst,
+		const u8 *data, size_t data_len);
 
 /*
  * Parse the PDU to send_action() argc
@@ -265,7 +265,7 @@ int wpa_send_action_format(char *pdu, int *p_size, unsigned int freq, unsigned i
  *
  */
 int wpa_send_action_parser(char * pdu,int p_size, unsigned int *freq, unsigned int *wait_time, 
-							u8 ** dst, u8 ** data,size_t *data_len);
+		u8 ** dst, u8 ** data,size_t *data_len);
 
 
 /*
@@ -287,12 +287,12 @@ int wpa_set_tx_queue_params_format(char * pdu, int * p_size, int queue, int aifs
 int wpa_set_tx_queue_params_parser(char * pdu, int p_size, struct wpa_set_tx_queue_params *tx_params);
 
 /*
-* Format the struct wpa_driver_scan_params *params to the PDU
-* output   : char * pdu , Memory allocate outside
-* input    : struct wpa_driver_scan_params *params, Memory allocate outside
-* return   : SUCCESS(0)/FAILURE(-1)
-*
-*/
+ * Format the struct wpa_driver_scan_params *params to the PDU
+ * output   : char * pdu , Memory allocate outside
+ * input    : struct wpa_driver_scan_params *params, Memory allocate outside
+ * return   : SUCCESS(0)/FAILURE(-1)
+ *
+ */
 int wpa_scan2_format(char * pdu, int * p_size, struct wpa_driver_scan_params *params, int data_len);
 
 /*
@@ -348,8 +348,8 @@ int wpa_sta_disassoc_parser(char * pdu,int p_size, u8 ** addr,int *reason);
  *
  */
 int wpa_set_key_format(char * pdu, int * p_size, enum wpa_alg alg, const u8 *addr,
-				      int key_idx, int set_tx, const u8 *seq, size_t seq_len,
-				      const u8 *key, size_t key_len);
+		int key_idx, int set_tx, const u8 *seq, size_t seq_len,
+		const u8 *key, size_t key_len);
 
 /*
  * Parse the PDU to set_key() argc
@@ -376,7 +376,7 @@ int wpa_send_mlme_format(char *pdu, int *p_size, const u8 *data, size_t data_len
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_send_mlme_parser(char *pdu, int p_size, u8 **data, size_t *data_len, int *noack);
+char* wpa_send_mlme_parser(char *pdu, int p_size, size_t *data_len, int *noack);
 
 
 /*
@@ -386,7 +386,7 @@ int wpa_send_mlme_parser(char *pdu, int p_size, u8 **data, size_t *data_len, int
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_get_seqnum_format(char *pdu, int *p_size, const u8 *addr, int idx, u8 *seq);
+int wpa_get_seqnum_format(char *pdu, int *p_size, int idx);
 
 /*
  * Parse the PDU to get_seqnum() argc
@@ -395,7 +395,7 @@ int wpa_get_seqnum_format(char *pdu, int *p_size, const u8 *addr, int idx, u8 *s
  * return	: SUCCESS(0)/FAILURE(-1)
  *
  */
-int wpa_get_seqnum_parser(char *pdu, int p_size, u8 **addr, int *idx, u8 *seq);
+int wpa_get_seqnum_parser(char *pdu, int p_size, int *idx);
 
 /*
  * Format the func argc to the PDU
@@ -423,7 +423,7 @@ int wpa_set_sta_vlan_parser(char *pdu, int p_size, u8 **addr, int *vlan_id);
  *
  */
 int wpa_hapd_send_eapol_format(char *pdu, int *p_size, const u8 *addr, const u8 *data,
-							size_t data_len, int encrypt, u32 flags);
+		size_t data_len, int encrypt, u32 flags);
 
 /*
  * Parse the PDU to hapd_send_eapol() argc
@@ -433,7 +433,7 @@ int wpa_hapd_send_eapol_format(char *pdu, int *p_size, const u8 *addr, const u8 
  *
  */
 int wpa_hapd_send_eapol_parser(char *pdu, int p_size, u8 **addr, u8 **data,
-							size_t *data_len, int *encrypt, u32 *flags);
+		size_t *data_len, int *encrypt, u32 *flags);
 
 /*
  * Format thestruct hostap_sta_driver_data *data to the PDU
@@ -541,9 +541,9 @@ int wpa_set_frag_format(char * pdu, int *p_size,int frag);
  * return	: frag/FAILURE(-1)
  *
  */	
-int wpa_set_frag_parser(char * pdu, int pdu_size);
+int wpa_set_frag_parser(char * pdu, int pdu_size, int* frag);
 
- /*
+/*
  * Format the func argc to the PDU
  * output	: char * pdu , Memory allocate outside
  * input	: func argc, Memory allocate outside
@@ -551,7 +551,7 @@ int wpa_set_frag_parser(char * pdu, int pdu_size);
  *
  */
 int wpa_if_remove_format(char * pdu, int *p_size,enum wpa_driver_if_type type,
-					const char *ifname);
+		const char *ifname);
 /*
  * Parse the PDU to wpa_if_remove_parser argc
  * input	: char * pdu , Memory allocate outside

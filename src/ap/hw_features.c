@@ -56,10 +56,6 @@ int hostapd_get_hw_features(struct hostapd_iface *iface)
 	modes = hostapd_get_hw_feature_data(hapd, &num_modes, &flags);
 
 	if (modes == NULL) {
-		hostapd_logger(hapd, NULL, HOSTAPD_MODULE_IEEE80211,
-			       HOSTAPD_LEVEL_DEBUG,
-			       "Fetching hardware channel/rate support not "
-			       "supported.");
 		return -1;
 	}
 
@@ -80,7 +76,7 @@ int hostapd_get_hw_features(struct hostapd_iface *iface)
 			 * since that (in addition to full DFS) is not yet
 			 * supported.
 			 */
-			if (feature->channels[j].flag &
+			/*if (feature->channels[j].flag &
 			    (HOSTAPD_CHAN_NO_IBSS |
 			     HOSTAPD_CHAN_PASSIVE_SCAN |
 			     HOSTAPD_CHAN_RADAR))
@@ -88,12 +84,13 @@ int hostapd_get_hw_features(struct hostapd_iface *iface)
 					HOSTAPD_CHAN_DISABLED;
 			if (feature->channels[j].flag & HOSTAPD_CHAN_DISABLED)
 				continue;
-			wpa_printf(MSG_MSGDUMP, "Allowed channel: mode=%d "
+			*/
+			/*wpa_printf(MSG_MSGDUMP, "Allowed channel: mode=%d "
 				   "chan=%d freq=%d MHz max_tx_power=%d dBm",
 				   feature->mode,
 				   feature->channels[j].chan,
 				   feature->channels[j].freq,
-				   feature->channels[j].max_tx_power);
+				   feature->channels[j].max_tx_power);*/
 		}
 	}
 	return ret;

@@ -72,11 +72,11 @@ struct ieee802_1x_hdr {
 
 struct hostapd_data
 {
-    struct i802_bss * bss;
-    unsigned char own_addr[ETH_ALEN];
-    unsigned char bssid[ETH_ALEN];
-    char iface[IFNAMSIZ + 1];
-    char ssid[IFNAMSIZ + 1];
+	struct i802_bss * bss;
+	unsigned char own_addr[ETH_ALEN];
+	unsigned char bssid[ETH_ALEN];
+	char iface[IFNAMSIZ + 1];
+	char ssid[IFNAMSIZ + 1];
 };
 
 extern struct wpa_driver_ops *wpa_drivers[];
@@ -93,47 +93,47 @@ static u32 pool[POOL_WORDS];
 
 int main() 
 {
-    int i = 0;
-    void * global_priv;
-    struct hostapd_data hapd;
-    struct wpa_init_params params;
+	int i = 0;
+	void * global_priv;
+	struct hostapd_data hapd;
+	struct wpa_init_params params;
 
-    unsigned char bssid[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
-    unsigned char own_addr[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
-    char ssid[IFNAMSIZ + 1] = "mengning";
+	unsigned char bssid[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
+	unsigned char own_addr[ETH_ALEN] = {0x20,0x4e,0x7f,0xda,0x23,0x6c};/*20:4e:7f:da:23:6c*/
+	char ssid[IFNAMSIZ + 1] = "mengning";
 
-    memcpy(hapd.own_addr,own_addr,ETH_ALEN);
-    memcpy(hapd.bssid,own_addr,ETH_ALEN);  
-    memcpy(hapd.iface,iface,strlen(iface));
-    hapd.iface[strlen(iface)] = '\0';
-    memcpy(hapd.ssid,ssid,strlen(ssid));
+	memcpy(hapd.own_addr,own_addr,ETH_ALEN);
+	memcpy(hapd.bssid,own_addr,ETH_ALEN);  
+	memcpy(hapd.iface,iface,strlen(iface));
+	hapd.iface[strlen(iface)] = '\0';
+	memcpy(hapd.ssid,ssid,strlen(ssid));
 
-    char bridge[IFNAMSIZ + 1] = {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+	char bridge[IFNAMSIZ + 1] = {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
 	/* what it is? */
 	const unsigned char hd[59] ={0x80,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,
-	0x20,0x4e,0x7f,0xda,0x23,0x6c,/* MAC */
-	0x20,0x4e,0x7f,0xda,0x23,0x6c,/* MAC */ 
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x11,0x04,
-	0x00,0x08,0x6d,0x65,0x6e,0x67,0x6e,0x69,0x6e,0x67,/* SSID_LEN + SSID(mengning) */
-	0x01,0x08,0x82,0x84, 0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b}; 
-    memcpy((void *)&hd[10],hapd.own_addr,ETH_ALEN);
-    memcpy((void *)&hd[16],hapd.own_addr,ETH_ALEN);
+		0x20,0x4e,0x7f,0xda,0x23,0x6c,/* MAC */
+		0x20,0x4e,0x7f,0xda,0x23,0x6c,/* MAC */ 
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x64,0x00,0x11,0x04,
+		0x00,0x08,0x6d,0x65,0x6e,0x67,0x6e,0x69,0x6e,0x67,/* SSID_LEN + SSID(mengning) */
+		0x01,0x08,0x82,0x84, 0x8b,0x96,0x0c,0x12,0x18,0x24,0x03,0x01,0x0b}; 
+	memcpy((void *)&hd[10],hapd.own_addr,ETH_ALEN);
+	memcpy((void *)&hd[16],hapd.own_addr,ETH_ALEN);
 
-    /* what it is? */
-   const unsigned char tl[55]={0x2a,0x01,0x04,0x32,0x04,0x30,0x48,0x60,0x6c,
-	0x30,0x14,0x01,0x00,0x00,0x0f,0xac,0x02,0x01,0x00,0x00,0x0f,0xac,0x04,0x01,
-	0x00,0x00,0x0f,0xac,0x02,0x00,0x00,0xdd,0x16,0x00,0x50,0xf2,0x01,0x01,0x00,
-	0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02};
+	/* what it is? */
+	const unsigned char tl[55]={0x2a,0x01,0x04,0x32,0x04,0x30,0x48,0x60,0x6c,
+		0x30,0x14,0x01,0x00,0x00,0x0f,0xac,0x02,0x01,0x00,0x00,0x0f,0xac,0x04,0x01,
+		0x00,0x00,0x0f,0xac,0x02,0x00,0x00,0xdd,0x16,0x00,0x50,0xf2,0x01,0x01,0x00,
+		0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02};
 
-   unsigned char KEY[32] ={0x69,0x8e,0x84,0xf8,0xf5,0xb2,0x1c,0x87,0x17,0x5b,0x90,0x0b,0xb1,0xab,0x7a,
-	0xd4,0x5b,0x61,0x01,0xb9,0x60,0x30,0x47,0xc0,0x71,0x30,0xa0,0x2c,0x83,0x0c,0xa4,0x54};
-    
+	unsigned char KEY[32] ={0x69,0x8e,0x84,0xf8,0xf5,0xb2,0x1c,0x87,0x17,0x5b,0x90,0x0b,0xb1,0xab,0x7a,
+		0xd4,0x5b,0x61,0x01,0xb9,0x60,0x30,0x47,0xc0,0x71,0x30,0xa0,0x2c,0x83,0x0c,0xa4,0x54};
+
 	if (eloop_init()) 
 	{
 		wpa_printf(MSG_ERROR, "Failed to initialize event loop");
 		return -1;
 	}
-    /* init nl80211 */ 
+	/* init nl80211 */ 
 	for (i = 0; wpa_drivers[i]; i++) 
 	{
 		if (wpa_drivers[i]->global_init) 
@@ -150,27 +150,27 @@ int main()
 		params.ifname = iface;
 		params.ssid = "mengning";
 		params.ssid_len = 8;       
-        params.test_socket = NULL;
-        params.use_pae_group_addr = 0;
-        params.num_bridge = 1;
-        params.bridge = os_calloc(params.num_bridge, sizeof(char *));
-    	if (params.bridge == NULL)
-    		return -1;
+		params.test_socket = NULL;
+		params.use_pae_group_addr = 0;
+		params.num_bridge = 1;
+		params.bridge = os_calloc(params.num_bridge, sizeof(char *));
+		if (params.bridge == NULL)
+			return -1;
 
-        params.own_addr = own_addr;
-        wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params.bssid, ETH_ALEN);
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params.ifname);
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params.ssid);
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params.ssid_len);
-        wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params.num_bridge);
-        wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params.bridge[0],IFNAMSIZ + 1);
-        wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params.own_addr, ETH_ALEN);
+		params.own_addr = own_addr;
+		wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bssid",params.bssid, ETH_ALEN);
+		wpa_printf(MSG_DEBUG, "nl80211ext: params->ifname:%s",params.ifname);
+		wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid:%s",params.ssid);
+		wpa_printf(MSG_DEBUG, "nl80211ext: params->ssid_len:%d",params.ssid_len);
+		wpa_printf(MSG_DEBUG, "nl80211ext: params->num_bridge:%d",params.num_bridge);
+		wpa_hexdump(MSG_DEBUG, "nl80211ext: params->bridge[0]:%s",params.bridge[0],IFNAMSIZ + 1);
+		wpa_hexdump(MSG_DEBUG, "nl80211ext: params->own_addr",params.own_addr, ETH_ALEN);
 
-        assert((wpa_drivers[i]->hapd_init != NULL));
+		assert((wpa_drivers[i]->hapd_init != NULL));
 		if (wpa_drivers[i]->hapd_init) 
 		{
-		    wpa_printf(MSG_DEBUG, "i = %d\n",i);
-		    wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_init(&hapd,&params)");
+			wpa_printf(MSG_DEBUG, "i = %d\n",i);
+			wpa_printf(MSG_DEBUG, "nl80211ext: wpa_drivers[i]->hapd_init(&hapd,&params)");
 			hapd.bss = wpa_drivers[i]->hapd_init(&hapd,&params);
 			if (hapd.bss == NULL) 
 			{
@@ -178,34 +178,34 @@ int main()
 				return -1;
 			}		    
 		}
-        wpa_printf(MSG_DEBUG, "nl80211ext: hapd.bss->ifname:%s",hapd.bss->ifname);
-    
+		wpa_printf(MSG_DEBUG, "nl80211ext: hapd.bss->ifname:%s",hapd.bss->ifname);
+
 	}
 	printf("NL80211 initialized\n");
-    
-    /* get driver capability information(key/enc/auth...) */
+
+	/* get driver capability information(key/enc/auth...) */
 	struct wpa_driver_capa capa;
 	int ret;
 	i = 0; 
 	ret = wpa_drivers[i]->get_capa(hapd.bss,&capa);
-    /*get supported hardware mode information(11a/b/g/ad ...) */
+	/*get supported hardware mode information(11a/b/g/ad ...) */
 	u16 flags, num_modes;
 	struct hostapd_hw_modes *modes;
 	modes = wpa_drivers[i]->get_hw_feature_data(hapd.bss, &num_modes,&flags);
-    /* Set kernel driver on given frequency (MHz) */
+	/* Set kernel driver on given frequency (MHz) */
 	struct hostapd_freq_params freq;
 	freq.freq=2462; /* why? */
 	freq.ht_enabled=0; /* why? */
 	freq.sec_channel_offset=0; /* why? */
 	wpa_drivers[i]->set_freq(hapd.bss,&freq);
-    /* rts = request to send */
+	/* rts = request to send */
 	int rts = 2347; /* why? */
 	wpa_drivers[i]->set_rts(hapd.bss,rts);
 	/* What is frag/WIPHY_FRAG_THRESHOLD ? */
 	int frag = 2346; /* why? */
 	wpa_drivers[i]->set_frag(hapd.bss, frag);
 	const u8 *addr1 = broad_addr;	
-    /* DEL_STATION and flush all VLANs too */
+	/* DEL_STATION and flush all VLANs too */
 	wpa_drivers[i]->flush(hapd.bss);
 	wpa_drivers[i]->sta_deauth(hapd.bss,params.own_addr, addr1,2);
 	wpa_drivers[i]->set_key(iface, hapd.bss,0, NULL,0,0,NULL, 0,NULL,0);
@@ -248,7 +248,7 @@ int main()
 	my_params->access_network_type = 0;
 	my_params->ap_max_inactivity = 300;
 	my_params->disable_dgaf = 0;
-    /* enable beacon here ? */
+	/* enable beacon here ? */
 	wpa_drivers[i]->set_ap(hapd.bss, my_params);
 	wpa_drivers[i]->set_key(iface, hapd.bss,2, broad_addr,1,1,NULL, 0,KEY,32);
 	wpa_drivers[i]->set_operstate(hapd.bss, 1);
@@ -259,13 +259,13 @@ int main()
 
 	eloop_run();
 
-    	return 0;
+	return 0;
 }
 
 static void send_auth_reply(struct hostapd_data *hapd,
-			    const u8 *dst, const u8 *bssid,
-			    u16 auth_alg, u16 auth_transaction, u16 resp,
-			    const u8 *ies, size_t ies_len)
+		const u8 *dst, const u8 *bssid,
+		u16 auth_alg, u16 auth_transaction, u16 resp,
+		const u8 *ies, size_t ies_len)
 {
 	struct ieee80211_mgmt *reply;
 	u8 *buf;
@@ -278,7 +278,7 @@ static void send_auth_reply(struct hostapd_data *hapd,
 
 	reply = (struct ieee80211_mgmt *) buf;
 	reply->frame_control = IEEE80211_FC(WLAN_FC_TYPE_MGMT,
-					    WLAN_FC_STYPE_AUTH);
+			WLAN_FC_STYPE_AUTH);
 	os_memcpy(reply->da, dst, ETH_ALEN);
 	os_memcpy(reply->sa, hapd->own_addr, ETH_ALEN);
 	os_memcpy(reply->bssid, bssid, ETH_ALEN);
@@ -291,9 +291,9 @@ static void send_auth_reply(struct hostapd_data *hapd,
 		os_memcpy(reply->u.auth.variable, ies, ies_len);
 
 	wpa_printf(MSG_DEBUG, "authentication reply: STA=" MACSTR
-		   " auth_alg=%d auth_transaction=%d resp=%d (IE len=%lu)",
-		   MAC2STR(dst), auth_alg, auth_transaction,
-		   resp, (unsigned long) ies_len);
+			" auth_alg=%d auth_transaction=%d resp=%d (IE len=%lu)",
+			MAC2STR(dst), auth_alg, auth_transaction,
+			resp, (unsigned long) ies_len);
 
 	if (wpa_drivers[0]->send_mlme(hapd->bss, (const u8 *)reply, rlen, 0) < 0)
 		perror("send_auth_reply: send");
@@ -306,10 +306,10 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 	struct ieee80211_mgmt *mgmt;
 	u16 fc, stype;
 
-    unsigned char da2[46]={0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x00,
-        0x00,0x11,0x04,0x00,0x00,0x01,0xc0,0x01,0x08,0x82,0x84,0x8b,0x96,
-	0x0c,0x12,0x18,0x24,0x32,0x04,0x30,0x48,0x60,0x6c};
+	unsigned char da2[46]={0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x20,0x4e,0x7f,0xda,0x23,0x6c,0x20,0x4e,0x7f,0xda,0x23,0x6c,0x00,
+		0x00,0x11,0x04,0x00,0x00,0x01,0xc0,0x01,0x08,0x82,0x84,0x8b,0x96,
+		0x0c,0x12,0x18,0x24,0x32,0x04,0x30,0x48,0x60,0x6c};
 	unsigned char addr[ETH_ALEN] = {0};
 	if (len < 24)
 		return;
@@ -324,7 +324,7 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 	memcpy(addr,mgmt->sa,6);
 
 	if (stype == WLAN_FC_STYPE_BEACON) {
-        	printf("-----WLAN_FC_STYPE_BEACON\n");
+		printf("-----WLAN_FC_STYPE_BEACON\n");
 		return;
 	}
 
@@ -336,33 +336,33 @@ void ieee802_11ext_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len)
 
 	int i = 0;
 	switch (stype) {
-	case WLAN_FC_STYPE_AUTH:
-		wpa_printf(MSG_DEBUG, "mgmt::auth");
-		/* send_auth_reply */
-		send_auth_reply(hapd,addr, hapd->own_addr,0, 2, 0,NULL, 0);
-	  
-		break;
-	case WLAN_FC_STYPE_ASSOC_REQ:
-		wpa_printf(MSG_DEBUG, "mgmt::assoc_req");
-		memcpy(da2+4,mgmt->sa,6);
-		wpa_hexdump(MSG_DEBUG, "------------da2",da2,46);
-		wpa_drivers[i]->send_mlme(hapd->bss,da2,46,0);
-		break;
-	default:
-		wpa_printf(MSG_DEBUG, "-----default");
-		break;
+		case WLAN_FC_STYPE_AUTH:
+			wpa_printf(MSG_DEBUG, "mgmt::auth");
+			/* send_auth_reply */
+			send_auth_reply(hapd,addr, hapd->own_addr,0, 2, 0,NULL, 0);
+
+			break;
+		case WLAN_FC_STYPE_ASSOC_REQ:
+			wpa_printf(MSG_DEBUG, "mgmt::assoc_req");
+			memcpy(da2+4,mgmt->sa,6);
+			wpa_hexdump(MSG_DEBUG, "------------da2",da2,46);
+			wpa_drivers[i]->send_mlme(hapd->bss,da2,46,0);
+			break;
+		default:
+			wpa_printf(MSG_DEBUG, "-----default");
+			break;
 	}
 }
 
 void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
-			u16 stype, int ok)
+		u16 stype, int ok)
 {
 	const struct ieee80211_mgmt *mgmt;
 	mgmt = (const struct ieee80211_mgmt *) buf;
 	unsigned char addr[ETH_ALEN] = {0};
 	unsigned char key[32] = {0xbe, 0x44, 0x92, 0xfb, 0x30, 0xf5, 0x5a, 0x1e, 0xb2, 
-	0x93, 0xb4, 0x7a, 0xc7, 0xc9, 0x84, 0x4a, 0x79, 0xa8, 0x17, 0x93, 0xc5, 0xb5, 
-	0x49, 0x3e, 0xc0, 0x0e, 0xb9, 0x6a, 0xad, 0x69, 0xd2, 0xa8};
+		0x93, 0xb4, 0x7a, 0xc7, 0xc9, 0x84, 0x4a, 0x79, 0xa8, 0x17, 0x93, 0xc5, 0xb5, 
+		0x49, 0x3e, 0xc0, 0x0e, 0xb9, 0x6a, 0xad, 0x69, 0xd2, 0xa8};
 	unsigned char data[99] = {0x02, 0x03, 0x00, 0x5f, 0x02, 0x00, 0x8a, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xae, 0x05, 0x1f, 0xa4, 0xdf, 0x43, 0x4e, 0xb7, 0x80, 0x34, 0xdb, 0x0e, 0x3d, 0x4e, 0xfd, 0xc2, 0xfa, 0xb4, 0xcd, 0xe1, 0x5f, 0x2d, 0x25, 0x30, 0x7d, 0x57, 0xdd, 0x2a, 0x88, 0xb0, 0x49, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	int i = 0;
 	unsigned char supp[12] = {0x82,0x84,0x8b,0x96,0x24,0x30,0x48,0x6c,0x0c,0x12,0x18,0x60};
@@ -376,44 +376,44 @@ void ieee802_11ext_mgmt_cb(struct hostapd_data *hapd, const u8 *buf, size_t len,
 	memcpy(addr,mgmt->da,6);
 
 	switch (stype) {
-	case WLAN_FC_STYPE_AUTH:
-		wpa_printf(MSG_DEBUG, "mgmt::auth cb");
-		break;
-	case WLAN_FC_STYPE_ASSOC_RESP:
-		wpa_printf(MSG_DEBUG, "mgmt::assoc_resp cb");
+		case WLAN_FC_STYPE_AUTH:
+			wpa_printf(MSG_DEBUG, "mgmt::auth cb");
+			break;
+		case WLAN_FC_STYPE_ASSOC_RESP:
+			wpa_printf(MSG_DEBUG, "mgmt::assoc_resp cb");
 
-		params.addr = addr;
-		params.aid = 1;
-		params.capability = 1041;
-		params.supp_rates = malloc(12);
-		memcpy((void *)params.supp_rates, supp, 12);	
-		params.ht_capabilities = NULL;
-		params.supp_rates_len = 12;
-		params.listen_interval = 2;
-		params.flags = 0;
-		params.set = 0;
-		params.qosinfo = 0;
-		wpa_drivers[i]->sta_add(hapd->bss, &params);
+			params.addr = addr;
+			params.aid = 1;
+			params.capability = 1041;
+			params.supp_rates = malloc(12);
+			memcpy((void *)params.supp_rates, supp, 12);	
+			params.ht_capabilities = NULL;
+			params.supp_rates_len = 12;
+			params.listen_interval = 2;
+			params.flags = 0;
+			params.set = 0;
+			params.qosinfo = 0;
+			wpa_drivers[i]->sta_add(hapd->bss, &params);
 
-		wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,4,-11);
-		wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
-		wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
-		wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,0,-2);
-		wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
-		wpa_drivers[i]->set_key(iface,hapd->bss,2,broad_addr,1,1,NULL,0,key,32);
-		wpa_drivers[i]->hapd_send_eapol(hapd->bss, addr, data,99,0,hapd->own_addr,4);
+			wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,4,-11);
+			wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+			wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+			wpa_drivers[i]->sta_set_flags(hapd->bss,addr,4,0,-2);
+			wpa_drivers[i]->set_key(iface,hapd->bss,0,addr,0,1,NULL,0,NULL,0);
+			wpa_drivers[i]->set_key(iface,hapd->bss,2,broad_addr,1,1,NULL,0,key,32);
+			wpa_drivers[i]->hapd_send_eapol(hapd->bss, addr, data,99,0,hapd->own_addr,4);
 
-		free((void*)params.supp_rates);
-		break;
+			free((void*)params.supp_rates);
+			break;
 
-	default:
-		printf("unknown mgmt cb frame subtype %d\n", stype);
-		break;
+		default:
+			printf("unknown mgmt cb frame subtype %d\n", stype);
+			break;
 	}
 }
 
 int sha1_prf(const u8 *key, size_t key_len, const char *label,
-	     const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
+		const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
 {
 	u8 counter = 0;
 	size_t pos, plen;
@@ -428,18 +428,18 @@ int sha1_prf(const u8 *key, size_t key_len, const char *label,
 	len[1] = data_len;
 	addr[2] = &counter;
 	len[2] = 1;
-	
+
 	pos = 0;
 	while (pos < buf_len) {
 		plen = buf_len - pos;
 		if (plen >= SHA1_MAC_LEN) {
 			if (hmac_sha1_vector(key, key_len, 3, addr, len,
-					     &buf[pos]))
+						&buf[pos]))
 				return -1;
 			pos += SHA1_MAC_LEN;
 		} else {
 			if (hmac_sha1_vector(key, key_len, 3, addr, len,
-					     hash))
+						hash))
 				return -1;
 			os_memcpy(&buf[pos], hash, plen);
 			break;
@@ -451,11 +451,11 @@ int sha1_prf(const u8 *key, size_t key_len, const char *label,
 
 
 void wpa_pmk_to_ptk(const u8 *pmk, size_t pmk_len, const char *label,
-		    const u8 *addr1, const u8 *addr2,
-		    const u8 *nonce1, const u8 *nonce2,
-		    u8 *ptk, size_t ptk_len, int use_sha256)
+		const u8 *addr1, const u8 *addr2,
+		const u8 *nonce1, const u8 *nonce2,
+		u8 *ptk, size_t ptk_len, int use_sha256)
 {
-	
+
 	u8 data[2 * ETH_ALEN + 2 * WPA_NONCE_LEN];
 	if (os_memcmp(addr1, addr2, ETH_ALEN) < 0) {
 		os_memcpy(data, addr1, ETH_ALEN);
@@ -468,16 +468,16 @@ void wpa_pmk_to_ptk(const u8 *pmk, size_t pmk_len, const char *label,
 	if (os_memcmp(nonce1, nonce2, WPA_NONCE_LEN) < 0) {
 		os_memcpy(data + 2 * ETH_ALEN, nonce1, WPA_NONCE_LEN);
 		os_memcpy(data + 2 * ETH_ALEN + WPA_NONCE_LEN, nonce2,
-			  WPA_NONCE_LEN);
+				WPA_NONCE_LEN);
 	} else {
 		os_memcpy(data + 2 * ETH_ALEN, nonce2, WPA_NONCE_LEN);
 		os_memcpy(data + 2 * ETH_ALEN + WPA_NONCE_LEN, nonce1,
-			  WPA_NONCE_LEN);
+				WPA_NONCE_LEN);
 	}
-	
+
 	sha1_prf(pmk, pmk_len, label, data, sizeof(data), ptk, ptk_len);
 	wpa_printf(MSG_DEBUG, "WPA: PTK derivation - A1=" MACSTR " A2=" MACSTR,
-		   MAC2STR(addr1), MAC2STR(addr2));
+			MAC2STR(addr1), MAC2STR(addr2));
 	wpa_hexdump(MSG_DEBUG, "WPA: Nonce1", nonce1, WPA_NONCE_LEN);
 	wpa_hexdump(MSG_DEBUG, "WPA: Nonce2", nonce2, WPA_NONCE_LEN);
 	wpa_hexdump(MSG_DEBUG, "WPA: PMK", pmk, pmk_len);
@@ -485,19 +485,19 @@ void wpa_pmk_to_ptk(const u8 *pmk, size_t pmk_len, const char *label,
 }
 
 static int wpa_derive_ptk(struct wpa_state_machine *sm, const u8 *pmk,
-			  struct wpa_ptk *ptk)
+		struct wpa_ptk *ptk)
 {
 	size_t ptk_len = 48;
 	wpa_pmk_to_ptk(pmk, PMK_LEN, "Pairwise key expansion",
-		       sm->wpa_auth->addr, sm->addr, sm->ANonce, sm->SNonce,
-		       (u8 *) ptk, ptk_len,
-		       wpa_key_mgmt_sha256(2));
+			sm->wpa_auth->addr, sm->addr, sm->ANonce, sm->SNonce,
+			(u8 *) ptk, ptk_len,
+			wpa_key_mgmt_sha256(2));
 
 	return 0;
 }
 
 int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
-		     const u8 *addr[], const size_t *len, u8 *mac)
+		const u8 *addr[], const size_t *len, u8 *mac)
 {
 	HMAC_CTX ctx;
 	size_t i;
@@ -526,14 +526,14 @@ int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
 }
 
 int hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
-	       u8 *mac)
+		u8 *mac)
 {
 	return hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
 }
 
 
 int wpa_eapol_key_mic(const u8 *key, int ver, const u8 *buf, size_t len,
-		      u8 *mic)
+		u8 *mic)
 {
 	u8 hash[SHA1_MAC_LEN];
 	if (hmac_sha1(key, 16, buf, len, hash))
@@ -560,8 +560,8 @@ static int wpa_verify_key_mic(struct wpa_ptk *PTK, u8 *data, size_t data_len)
 	os_memcpy(mic, key->key_mic, 16);
 	os_memset(key->key_mic, 0, 16);
 	if (wpa_eapol_key_mic(PTK->kck, key_info & WPA_KEY_INFO_TYPE_MASK,
-			      data, data_len, key->key_mic) ||
-	    os_memcmp(mic, key->key_mic, 16) != 0)
+				data, data_len, key->key_mic) ||
+			os_memcmp(mic, key->key_mic, 16) != 0)
 		ret = -1;
 
 	os_memcpy(key->key_mic, mic, 16);
@@ -572,17 +572,17 @@ static int wpa_verify_key_mic(struct wpa_ptk *PTK, u8 *data, size_t data_len)
 
 void sm_machine_PTKCALCNEGOTIATING_entry(struct wpa_state_machine *sm)
 {
-	
+
 	struct wpa_ptk PTK;
 	int ok = 0;
 	const u8 *pmk = NULL;
 	unsigned char my_pmk[32] = {0x93,0xf0, 0xe8, 0xe5, 0x9d, 0x34, 0x87, 0xdf, 0x4b,
-	0xb7, 0x06, 0x0d, 0xed, 0x68, 0xaf, 0xe4, 0x7a, 0x7d, 0xc9, 0xf8, 0x57, 0x9e, 
-	0xcc, 0x7c, 0xc1, 0x7f, 0x91, 0x8b, 0xf8, 0x90, 0x22, 0x66};
+		0xb7, 0x06, 0x0d, 0xed, 0x68, 0xaf, 0xe4, 0x7a, 0x7d, 0xc9, 0xf8, 0x57, 0x9e, 
+		0xcc, 0x7c, 0xc1, 0x7f, 0x91, 0x8b, 0xf8, 0x90, 0x22, 0x66};
 
 	sm->EAPOLKeyReceived = FALSE;
 	sm->update_snonce = FALSE;
-	
+
 	/* WPA with IEEE 802.1X: use the derived PMK from EAP
 	 * WPA-PSK: iterate through possible PSKs and select the one matching
 	 * the packet */
@@ -597,8 +597,8 @@ void sm_machine_PTKCALCNEGOTIATING_entry(struct wpa_state_machine *sm)
 
 		wpa_derive_ptk(sm, pmk, &PTK);
 		wpa_verify_key_mic(&PTK, sm->last_rx_eapol_key,
-				       sm->last_rx_eapol_key_len);
-	
+				sm->last_rx_eapol_key_len);
+
 		break;
 	}
 
@@ -622,7 +622,7 @@ void sm_machine_PTKCALCNEGOTIATING2_entry(struct wpa_state_machine *sm)
 }
 
 u8 * wpa_add_kde(u8 *pos, u32 kde, const u8 *data, size_t data_len,
-		 const u8 *data2, size_t data2_len)
+		const u8 *data2, size_t data2_len)
 {
 	*pos++ = WLAN_EID_VENDOR_SPECIFIC;
 	*pos++ = RSN_SELECTOR_LEN + data_len + data2_len;
@@ -640,60 +640,60 @@ u8 * wpa_add_kde(u8 *pos, u32 kde, const u8 *data, size_t data_len,
 int wpa_cipher_key_len(int cipher)
 {
 	switch (cipher) {
-	case WPA_CIPHER_CCMP:
-	case WPA_CIPHER_GCMP:
-		return 16;
-	case WPA_CIPHER_TKIP:
-		return 32;
-	case WPA_CIPHER_WEP104:
-		return 13;
-	case WPA_CIPHER_WEP40:
-		return 5;
+		case WPA_CIPHER_CCMP:
+		case WPA_CIPHER_GCMP:
+			return 16;
+		case WPA_CIPHER_TKIP:
+			return 32;
+		case WPA_CIPHER_WEP104:
+			return 13;
+		case WPA_CIPHER_WEP40:
+			return 5;
 	}
 
 	return 0;
 }
 
 static inline int hostapd_drv_hapd_send_eapol(struct hostapd_data *hapd,
-					      const u8 *addr, const u8 *data,
-					      size_t data_len, int encrypt,
-					      u32 flags)
+		const u8 *addr, const u8 *data,
+		size_t data_len, int encrypt,
+		u32 flags)
 {
 	wpa_hexdump(MSG_DEBUG, " data: ", data, data_len);
 	return wpa_drivers[0]->hapd_send_eapol(hapd->bss, addr, data,
-					     data_len, encrypt,
-					     hapd->own_addr, flags);
+			data_len, encrypt,
+			hapd->own_addr, flags);
 }
 
 
 static int hostapd_wpa_auth_send_eapol(void *ctx, const u8 *addr,
-				       const u8 *data, size_t data_len,
-				       int encrypt)
+		const u8 *data, size_t data_len,
+		int encrypt)
 {
 	struct hostapd_data *hapd = ctx;
 	u32 flags = 4;
 	return hostapd_drv_hapd_send_eapol(hapd, addr, data, data_len,
-					   encrypt, flags);
+			encrypt, flags);
 }
 
 
-static int
+	static int
 wpa_auth_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_auth, const u8 *addr,
-		    const u8 *data, size_t data_len, int encrypt)
+		const u8 *data, size_t data_len, int encrypt)
 {
 	return hostapd_wpa_auth_send_eapol(hapd, addr, data, data_len,
-				       encrypt);
+			encrypt);
 }
 
 static const EVP_CIPHER * aes_get_evp_cipher(size_t keylen)
 {
 	switch (keylen) {
-	case 16:
-		return EVP_aes_128_ecb();
-	case 24:
-		return EVP_aes_192_ecb();
-	case 32:
-		return EVP_aes_256_ecb();
+		case 16:
+			return EVP_aes_128_ecb();
+		case 24:
+			return EVP_aes_192_ecb();
+		case 32:
+			return EVP_aes_256_ecb();
 	}
 
 	return NULL;
@@ -728,11 +728,11 @@ void aes_encrypt_deinit(void *ctx)
 	int len = sizeof(buf);
 	if (EVP_EncryptFinal_ex(c, buf, &len) != 1) {
 		wpa_printf(MSG_ERROR, "OpenSSL: EVP_EncryptFinal_ex failed: "
-			   "%s", (char*)ERR_error_string(ERR_get_error(), NULL));
+				"%s", (char*)ERR_error_string(ERR_get_error(), NULL));
 	}
 	if (len != 0) {
 		wpa_printf(MSG_ERROR, "OpenSSL: Unexpected padding length %d "
-			   "in AES encrypt", len);
+				"in AES encrypt", len);
 	}
 	EVP_CIPHER_CTX_cleanup(c);
 	os_free(c);
@@ -744,7 +744,7 @@ void aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
 	int clen = 16;
 	if (EVP_EncryptUpdate(c, crypt, &clen, plain, 16) != 1) {
 		wpa_printf(MSG_ERROR, "OpenSSL: EVP_EncryptUpdate failed: %s",
-			   (char *)ERR_error_string(ERR_get_error(), NULL));
+				(char *)ERR_error_string(ERR_get_error(), NULL));
 	}
 }
 
@@ -792,10 +792,10 @@ int aes_wrap(const u8 *kek, int n, const u8 *plain, u8 *cipher)
 
 
 void __wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_auth,
-		      struct wpa_state_machine *sm, int key_info,
-		      const u8 *key_rsc, const u8 *nonce,
-		      const u8 *kde, size_t kde_len,
-		      int keyidx, int encr, int force_version)
+		struct wpa_state_machine *sm, int key_info,
+		const u8 *key_rsc, const u8 *nonce,
+		const u8 *kde, size_t kde_len,
+		int keyidx, int encr, int force_version)
 {
 	struct ieee802_1x_hdr *hdr;
 	struct wpa_eapol_key *key;
@@ -813,7 +813,7 @@ void __wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_a
 	key_data_len = kde_len;
 
 	if ((version == WPA_KEY_INFO_TYPE_HMAC_SHA1_AES ||
-	     version == WPA_KEY_INFO_TYPE_AES_128_CMAC) && encr) {
+				version == WPA_KEY_INFO_TYPE_AES_128_CMAC) && encr) {
 		pad_len = key_data_len % 8;
 		if (pad_len)
 			pad_len = 8 - pad_len;
@@ -821,7 +821,7 @@ void __wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_a
 	}
 	len += key_data_len;
 	hdr = os_zalloc(len);
-	
+
 	if (hdr == NULL)
 		return;
 	hdr->version = 2;
@@ -846,12 +846,12 @@ void __wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_a
 	for (i = RSNA_MAX_EAPOL_RETRIES - 1; i > 0; i--) {
 		sm->key_replay[i].valid = sm->key_replay[i - 1].valid;
 		os_memcpy(sm->key_replay[i].counter,
-			  sm->key_replay[i - 1].counter,
-			  WPA_REPLAY_COUNTER_LEN);
+				sm->key_replay[i - 1].counter,
+				WPA_REPLAY_COUNTER_LEN);
 	}
 	inc_byte_array(sm->key_replay[0].counter, WPA_REPLAY_COUNTER_LEN);
 	os_memcpy(key->replay_counter, counter,
-		  WPA_REPLAY_COUNTER_LEN);
+			WPA_REPLAY_COUNTER_LEN);
 	sm->key_replay[0].valid = TRUE;
 	if (nonce)
 		os_memcpy(key->key_nonce, nonce, WPA_NONCE_LEN);
@@ -878,9 +878,9 @@ void __wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_a
 		wpa_hexdump_key(MSG_DEBUG, "Plaintext EAPOL-Key Key Data",
 				buf, key_data_len);
 		if (version == WPA_KEY_INFO_TYPE_HMAC_SHA1_AES ||
-		    version == WPA_KEY_INFO_TYPE_AES_128_CMAC) {
+				version == WPA_KEY_INFO_TYPE_AES_128_CMAC) {
 			aes_wrap(sm->PTK.kek, (key_data_len - 8) / 8, buf,
-				     (u8 *) (key + 1));
+					(u8 *) (key + 1));
 			WPA_PUT_BE16(key->key_data_length, key_data_len);
 		}
 		os_free(buf);
@@ -891,37 +891,37 @@ void __wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_a
 			return;
 		}
 		wpa_eapol_key_mic(sm->PTK.kck, version, (u8 *) hdr, len,
-				  key->key_mic);
+				key->key_mic);
 	}
 
 	wpa_auth_send_eapol(hapd, wpa_auth, sm->addr, (u8 *) hdr, len,
-			    sm->pairwise_set);
+			sm->pairwise_set);
 	os_free(hdr);
 }
 
 
 
 static void wpa_send_eapol(struct hostapd_data *hapd, struct wpa_authenticator *wpa_auth,
-			   struct wpa_state_machine *sm, int key_info,
-			   const u8 *key_rsc, const u8 *nonce,
-			   const u8 *kde, size_t kde_len,
-			   int keyidx, int encr)
+		struct wpa_state_machine *sm, int key_info,
+		const u8 *key_rsc, const u8 *nonce,
+		const u8 *kde, size_t kde_len,
+		int keyidx, int encr)
 {
 	int timeout_ms;
 	int pairwise = key_info & WPA_KEY_INFO_KEY_TYPE;
 	int ctr;
-	
+
 	if (sm == NULL)
 		return;
 	printf("return2\n");
 	__wpa_send_eapol(hapd, wpa_auth, sm, key_info, key_rsc, nonce, kde, kde_len,
-			 keyidx, encr, 0);
+			keyidx, encr, 0);
 
 	ctr = pairwise ? sm->TimeoutCtr : sm->GTimeoutCtr;
 	if (pairwise && ctr == 1 && !(key_info & WPA_KEY_INFO_MIC))
 		sm->pending_1_of_4_timeout = 1;
 	wpa_printf(MSG_DEBUG, "WPA: Use EAPOL-Key timeout of %u ms (retry "
-		   "counter %d)", timeout_ms, ctr);
+			"counter %d)", timeout_ms, ctr);
 }
 
 static u32 __ROL32(u32 x, u32 y)
@@ -964,17 +964,17 @@ static void random_extract(u8 *out)
 	u32 *hash_ptr;
 	u32 buf[POOL_WORDS / 2];
 	u8 dummy_key[20] = {0xcf,0x0a,0xce,0x2e,0xa8,0x39,0xcf,0xfe,0x5c,0xf2,0xeb,0x55,0x7b,0x9a,0x60,0x32,0xe9,0xb2,0x87,0xad};
-	
+
 
 	/* First, add hash back to pool to make backtracking more difficult. */
 	hmac_sha1(dummy_key, sizeof(dummy_key), (const u8 *) pool,
-		  sizeof(pool), hash);
+			sizeof(pool), hash);
 	random_mix_pool(hash, sizeof(hash));
 	/* Hash half the pool to extra data */
 	for (i = 0; i < POOL_WORDS / 2; i++)
 		buf[i] = pool[(pool_pos - i) & POOL_WORDS_MASK];
 	hmac_sha1(dummy_key, sizeof(dummy_key), (const u8 *) buf,
-		  sizeof(buf), hash);
+			sizeof(buf), hash);
 
 	hash_ptr = (u32 *) hash;
 	hash_ptr[0] ^= hash_ptr[4];
@@ -1005,10 +1005,10 @@ int random_get_bytes(void *buf, size_t len)
 		left -= siz;
 	}
 
-//	if (entropy < len)
-//		entropy = 0;
-//	else
-//		entropy -= len;
+	//	if (entropy < len)
+	//		entropy = 0;
+	//	else
+	//		entropy -= len;
 
 	return ret;
 }
@@ -1022,8 +1022,8 @@ void sm_machine_PTKINITNEGOTIATING_entry(struct hostapd_data *hapd, struct wpa_s
 	//u8 *wpa_ie;
 	int wpa_ie_len, secure, keyidx, encr = 0;
 	unsigned char wpa_ie[46] = {0x30,0x14,0x01,0x00,0x00,0x0f,0xac,0x02,0x01,0x00,0x00,0x0f,0xac,0x04,0x01,
-	0x00,0x00,0x0f,0xac,0x02,0x00,0x00,0xdd,0x16,0x00,0x50,0xf2,0x01,0x01,0x00,0x00,0x50,
-	0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02};
+		0x00,0x00,0x0f,0xac,0x02,0x00,0x00,0xdd,0x16,0x00,0x50,0xf2,0x01,0x01,0x00,0x00,0x50,
+		0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02,0x01,0x00,0x00,0x50,0xf2,0x02};
 	sm->TimeoutEvt = FALSE;
 
 	sm->TimeoutCtr++;
@@ -1077,14 +1077,14 @@ void sm_machine_PTKINITNEGOTIATING_entry(struct hostapd_data *hapd, struct wpa_s
 		hdr[0] = keyidx & 0x03;
 		hdr[1] = 0;
 		pos = wpa_add_kde(pos, RSN_KEY_DATA_GROUPKEY, hdr, 2,
-				  gtk, gtk_len);
+				gtk, gtk_len);
 	}
 	pos = 0;
 	wpa_send_eapol(hapd, sm->wpa_auth, sm,
-		       (secure ? WPA_KEY_INFO_SECURE : 0) | WPA_KEY_INFO_MIC |
-		       WPA_KEY_INFO_ACK | WPA_KEY_INFO_INSTALL |
-		       WPA_KEY_INFO_KEY_TYPE,
-		       _rsc, sm->ANonce, kde, kde_len, keyidx, encr);
+			(secure ? WPA_KEY_INFO_SECURE : 0) | WPA_KEY_INFO_MIC |
+			WPA_KEY_INFO_ACK | WPA_KEY_INFO_INSTALL |
+			WPA_KEY_INFO_KEY_TYPE,
+			_rsc, sm->ANonce, kde, kde_len, keyidx, encr);
 	os_free(kde);
 }
 
@@ -1095,7 +1095,7 @@ void wpa_receive(struct hostapd_data *hapd, struct wpa_state_machine *sm, u8 *da
 	struct wpa_eapol_key *key;
 	u16 key_info, key_data_length;
 	enum { PAIRWISE_2, PAIRWISE_4, GROUP_2, REQUEST,
-	       SMK_M1, SMK_M3, SMK_ERROR } msg;
+		SMK_M1, SMK_M3, SMK_ERROR } msg;
 	int ft;
 	const u8 *eapol_key_ie;
 	size_t eapol_key_ie_len;
@@ -1110,16 +1110,16 @@ void wpa_receive(struct hostapd_data *hapd, struct wpa_state_machine *sm, u8 *da
 	key_data_length = WPA_GET_BE16(key->key_data_length);
 
 	printf("key_data_length: %d\n",key_data_length);
-	
+
 	wpa_hexdump(MSG_DEBUG, "WPA: Received Key Nonce", key->key_nonce,
-		    WPA_NONCE_LEN);
+			WPA_NONCE_LEN);
 	wpa_hexdump(MSG_DEBUG, "WPA: Received Replay Counter",
-		    key->replay_counter, WPA_REPLAY_COUNTER_LEN);
+			key->replay_counter, WPA_REPLAY_COUNTER_LEN);
 
 
 	sm->update_snonce = 1;
 	sm->MICVerified = FALSE;
-	
+
 	if (key_data_length == 0) {
 		u8 * key = (u8 *)malloc(16);
 		memcpy(key, global_sm->PTK.tk1, 16);
@@ -1151,7 +1151,7 @@ void wpa_receive(struct hostapd_data *hapd, struct wpa_state_machine *sm, u8 *da
 		os_memcpy(sm->SNonce, key->key_nonce, WPA_NONCE_LEN);
 		os_memcpy(sm->ANonce, ANonce, WPA_NONCE_LEN);
 		os_memcpy(sm->wpa_auth->addr, hapd->own_addr, ETH_ALEN);
- 		sm_machine_PTKCALCNEGOTIATING_entry(sm);
+		sm_machine_PTKCALCNEGOTIATING_entry(sm);
 		sm_machine_PTKCALCNEGOTIATING2_entry(sm);
 		sm_machine_PTKINITNEGOTIATING_entry(hapd, sm);
 		free(sm->last_rx_eapol_key);
@@ -1163,7 +1163,7 @@ void wpa_receive(struct hostapd_data *hapd, struct wpa_state_machine *sm, u8 *da
 
 
 void ieee802_1xext_receive(struct hostapd_data *hapd, const u8 *sa, const u8 *buf,
-			size_t len)
+		size_t len)
 {
 	struct sta_info *sta;
 	struct ieee802_1x_hdr *hdr;
@@ -1185,8 +1185,8 @@ void ieee802_1xext_receive(struct hostapd_data *hapd, const u8 *sa, const u8 *bu
 
 	if (len - sizeof(*hdr) > datalen) {
 		wpa_printf(MSG_DEBUG, "   ignoring %lu extra octets after "
-			   "IEEE 802.1X packet",
-			   (unsigned long) len - sizeof(*hdr) - datalen);
+				"IEEE 802.1X packet",
+				(unsigned long) len - sizeof(*hdr) - datalen);
 	}
 
 	wpa_receive(hapd, wpa_sm, (u8 *) hdr,sizeof(*hdr) + datalen);
@@ -1198,69 +1198,69 @@ void ieee802_1xext_receive(struct hostapd_data *hapd, const u8 *sa, const u8 *bu
 
 
 void wpa_supplicant_event(void *ctx, enum wpa_event_type event,
-			  union wpa_event_data *data)
+		union wpa_event_data *data)
 { 
 	struct hostapd_data *hapd = ctx;
 	static int count = 1;
 #ifndef CONFIG_NO_STDOUT_DEBUG
 	int level = MSG_DEBUG;
-	
-	
+
+
 	if (event == EVENT_RX_MGMT && data->rx_mgmt.frame &&
-	    data->rx_mgmt.frame_len >= 24) {
+			data->rx_mgmt.frame_len >= 24) {
 		const struct ieee80211_hdr *hdr;
 		u16 fc;
 		hdr = (const struct ieee80211_hdr *) data->rx_mgmt.frame;
 		fc = le_to_host16(hdr->frame_control);
 		if (WLAN_FC_GET_TYPE(fc) == WLAN_FC_TYPE_MGMT &&
-		    WLAN_FC_GET_STYPE(fc) == WLAN_FC_STYPE_BEACON)
+				WLAN_FC_GET_STYPE(fc) == WLAN_FC_STYPE_BEACON)
 			level = MSG_EXCESSIVE;
 	}
 
 	wpa_dbg(hapd->msg_ctx, level, "Event %s (%d) received",
-		event_to_string(event), event);
+			event_to_string(event), event);
 #endif /* CONFIG_NO_STDOUT_DEBUG */
 
 	switch (event) {
-	case EVENT_TX_STATUS:
-		printf("EVENT_TX_STATUS\n");
-		switch (data->tx_status.type) {
-		case WLAN_FC_TYPE_MGMT:
-			printf("WLAN_FC_TYPE_MGMT:\n");
-			ieee802_11ext_mgmt_cb(hapd, data->tx_status.data,
-					   data->tx_status.data_len,
-					   data->tx_status.stype,
-					   data->tx_status.ack);
+		case EVENT_TX_STATUS:
+			printf("EVENT_TX_STATUS\n");
+			switch (data->tx_status.type) {
+				case WLAN_FC_TYPE_MGMT:
+					printf("WLAN_FC_TYPE_MGMT:\n");
+					ieee802_11ext_mgmt_cb(hapd, data->tx_status.data,
+							data->tx_status.data_len,
+							data->tx_status.stype,
+							data->tx_status.ack);
+					break;
+				case WLAN_FC_TYPE_DATA:
+					printf("WLAN_FC_TYPE_DATA:\n");
+					break;
+			}
 			break;
-		case WLAN_FC_TYPE_DATA:
-			printf("WLAN_FC_TYPE_DATA:\n");
-			break;
-		}
-		break;
-	case EVENT_RX_MGMT:
-		printf("EVENT_RX_MGMT\n");
-		ieee802_11ext_mgmt(hapd, data->rx_mgmt.frame,
+		case EVENT_RX_MGMT:
+			printf("EVENT_RX_MGMT\n");
+			ieee802_11ext_mgmt(hapd, data->rx_mgmt.frame,
 					data->rx_mgmt.frame_len);		
-		break;
-    case EVENT_EAPOL_TX_STATUS:
-		printf("\nEVENT_EAPOL_TX_STATUS start\n");
-		printf("\nEVENT_EAPOL_TX_STATUS end\n");
-		break;
-	case EVENT_EAPOL_RX:
-		printf("\nEVENT_EAPOL_RX start\n");
-		ieee802_1xext_receive(hapd, data->eapol_rx.src,data->eapol_rx.data,data->eapol_rx.data_len);
-		printf("\nEVENT_EAPOL_RX end\n");
-		break;
+			break;
+		case EVENT_EAPOL_TX_STATUS:
+			printf("\nEVENT_EAPOL_TX_STATUS start\n");
+			printf("\nEVENT_EAPOL_TX_STATUS end\n");
+			break;
+		case EVENT_EAPOL_RX:
+			printf("\nEVENT_EAPOL_RX start\n");
+			ieee802_1xext_receive(hapd, data->eapol_rx.src,data->eapol_rx.data,data->eapol_rx.data_len);
+			printf("\nEVENT_EAPOL_RX end\n");
+			break;
 
-	default:
-		wpa_printf(MSG_DEBUG, "Unknown event %d", event);
-		break;
+		default:
+			wpa_printf(MSG_DEBUG, "Unknown event %d", event);
+			break;
 	}
 }
 
 void wpa_scan_results_free(struct wpa_scan_results *res)
 {
-    return;   
+	return;   
 }
 
 
