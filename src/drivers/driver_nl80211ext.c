@@ -411,12 +411,6 @@ static int wpa_driver_nl80211_send_mlme(void *priv, const u8 *data,
 		fprintf(stderr,"Send Error,%s:%d\n",__FILE__,__LINE__);
 		return -1;
 	}
-	ret = recv(agentfd,buf,MAX_BUF_LEN,0);
-	if(ret < 0)
-	{
-		fprintf(stderr,"Recv Error,%s:%d\n",__FILE__,__LINE__);
-		return -1;
-	}
 	return 0;
 }
 
@@ -1338,7 +1332,7 @@ static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx,
 			wpa_supplicant_event((void*)(ghapd), event, &data);
 			break;
 		default:
-			printf("Unknown WiFlow PDU type\n");
+			fprintf(stderr,"Unknown WiFlow PDU type,%s:%d\n",__FILE__,__LINE__);
 			break;
 	}  
 	return;
@@ -1352,7 +1346,7 @@ static void handle_remote_accept(int sock, void *eloop_ctx, void *sock_ctx)
 	if(agentfd == -1)
 	{
 		fprintf(stderr,"Accept Error,%s:%d\n",__FILE__,__LINE__);
-		return ;
+		return;
 	}
 	if (eloop_register_read_sock(agentfd, wpa_driver_nl80211_event_receive, NULL, NULL)) 
 	{
